@@ -71,7 +71,7 @@ export default function AuthScreen() {
           <View className="bg-white rounded-3xl p-8 shadow-2xl">
             <View className="items-center mb-8">
               <View className="w-20 h-20 bg-saffron-500 rounded-full items-center justify-center mb-4">
-                <Text className="text-4xl">🇮🇳</Text>
+                <Text className="text-4xl">FUCK</Text>
               </View>
               <Text className="text-3xl font-bold text-gray-800">
                 {isLogin ? 'Welcome Back' : 'Create Account'}
