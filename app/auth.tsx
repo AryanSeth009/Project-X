@@ -56,103 +56,181 @@ export default function AuthScreen() {
   };
 
   return (
-    <LinearGradient
-      colors={['#FF9933', '#FFFFFF', '#138808']}
-      className="flex-1"
-    >
+    <View className="flex-1 bg-gray-50">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className="flex-1"
       >
         <ScrollView
-          contentContainerClassName="flex-grow justify-center px-6"
+          contentContainerClassName="flex-grow"
           keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
-          <View className="bg-white rounded-3xl p-8 shadow-2xl">
-            <View className="items-center mb-8">
-              <View className="w-20 h-20 bg-saffron-500 rounded-full items-center justify-center mb-4">
-                <Text className="text-4xl">FUCK</Text>
+          {/* Modern Header with gradient */}
+          <LinearGradient
+            colors={['#FF6B35', '#FF8C42']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            className="pt-16 pb-8 px-6"
+          >
+            <View className="items-center">
+              <View className="w-16 h-16 bg-white rounded-2xl items-center justify-center mb-4 shadow-lg">
+                <Text className="text-3xl">✈️</Text>
               </View>
-              <Text className="text-3xl font-bold text-gray-800">
-                {isLogin ? 'Welcome Back' : 'Create Account'}
+              <Text className="text-3xl font-black text-white mb-2">
+                {isLogin ? 'Welcome back!' : 'Get started'}
               </Text>
-              <Text className="text-gray-500 mt-2">
+              <Text className="text-white/80 text-center text-base">
                 {isLogin
-                  ? 'Sign in to continue your journey'
-                  : 'Start planning your perfect trip'}
+                  ? 'Sign in to continue exploring'
+                  : 'Create your account in seconds'}
               </Text>
             </View>
+          </LinearGradient>
 
+          {/* Main Content Card */}
+          <View className="flex-1 bg-gray-50 -mt-4 rounded-t-3xl px-6 pt-8">
             {error ? (
-              <View className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
-                <Text className="text-red-600 text-center">{error}</Text>
+              <View className="bg-red-50 border-l-4 border-red-500 rounded-xl p-4 mb-6 flex-row items-center">
+                <Text className="text-2xl mr-3">⚠️</Text>
+                <Text className="text-red-700 flex-1 font-medium">{error}</Text>
               </View>
             ) : null}
 
-            <View className="gap-4">
+            {/* Sign-up bonus banner */}
+            {!isLogin && (
+              <View className="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-2xl p-4 mb-6 flex-row items-center">
+                <View className="w-10 h-10 bg-orange-500 rounded-full items-center justify-center mr-3">
+                  <Text className="text-xl">🎁</Text>
+                </View>
+                <View className="flex-1">
+                  <Text className="text-gray-800 font-bold text-sm">Welcome Gift!</Text>
+                  <Text className="text-gray-600 text-xs mt-0.5">
+                    Get 3 free AI credits on signup
+                  </Text>
+                </View>
+              </View>
+            )}
+
+            <View className="gap-5">
+              {/* Email Input */}
               <View>
-                <Text className="text-gray-700 font-medium mb-2">Email</Text>
-                <TextInput
-                  className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
-                  placeholder="your@email.com"
-                  value={email}
-                  onChangeText={setEmail}
-                  autoCapitalize="none"
-                  keyboardType="email-address"
-                />
+                <Text className="text-gray-700 font-semibold mb-2 text-sm">
+                  Email address
+                </Text>
+                <View className="bg-white border border-gray-200 rounded-2xl px-4 py-4 flex-row items-center shadow-sm">
+                  <Text className="text-gray-400 mr-3 text-lg">📧</Text>
+                  <TextInput
+                    className="flex-1 text-gray-800 text-base"
+                    placeholder="name@example.com"
+                    placeholderTextColor="#9CA3AF"
+                    value={email}
+                    onChangeText={setEmail}
+                    autoCapitalize="none"
+                    keyboardType="email-address"
+                  />
+                </View>
               </View>
 
+              {/* Password Input */}
               <View>
-                <Text className="text-gray-700 font-medium mb-2">Password</Text>
-                <TextInput
-                  className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
-                  placeholder="••••••••"
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry
-                />
+                <Text className="text-gray-700 font-semibold mb-2 text-sm">
+                  Password
+                </Text>
+                <View className="bg-white border border-gray-200 rounded-2xl px-4 py-4 flex-row items-center shadow-sm">
+                  <Text className="text-gray-400 mr-3 text-lg">🔒</Text>
+                  <TextInput
+                    className="flex-1 text-gray-800 text-base"
+                    placeholder="Enter your password"
+                    placeholderTextColor="#9CA3AF"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry
+                  />
+                </View>
               </View>
 
+              {/* Forgot Password (only on login) */}
+              {isLogin && (
+                <TouchableOpacity className="self-end -mt-2">
+                  <Text className="text-orange-500 font-semibold text-sm">
+                    Forgot password?
+                  </Text>
+                </TouchableOpacity>
+              )}
+
+              {/* CTA Button */}
               <TouchableOpacity
-                className={`rounded-xl py-4 mt-4 ${
-                  loading ? 'bg-gray-400' : 'bg-saffron-500'
+                className={`rounded-2xl py-4 mt-2 shadow-lg ${
+                  loading ? 'bg-gray-300' : 'bg-gradient-to-r from-orange-500 to-orange-600'
                 }`}
                 onPress={handleAuth}
                 disabled={loading}
+                activeOpacity={0.8}
               >
-                <Text className="text-white text-center font-bold text-lg">
-                  {loading ? 'Please wait...' : isLogin ? 'Sign In' : 'Sign Up'}
-                </Text>
+                <LinearGradient
+                  colors={loading ? ['#D1D5DB', '#D1D5DB'] : ['#FF6B35', '#FF8C42']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  className="rounded-2xl py-4"
+                >
+                  <Text className="text-white text-center font-bold text-lg">
+                    {loading ? (
+                      <View className="flex-row items-center justify-center gap-2">
+                        <Text>⏳</Text>
+                        <Text className="text-white font-bold">Please wait...</Text>
+                      </View>
+                    ) : (
+                      isLogin ? 'Sign in' : 'Create account'
+                    )}
+                  </Text>
+                </LinearGradient>
               </TouchableOpacity>
 
+              {/* Divider */}
+              <View className="flex-row items-center my-2">
+                <View className="flex-1 h-px bg-gray-200" />
+                <Text className="px-4 text-gray-400 text-xs font-medium">OR</Text>
+                <View className="flex-1 h-px bg-gray-200" />
+              </View>
+
+              {/* Social Login Options */}
+              <View className="flex-row gap-3">
+                <TouchableOpacity className="flex-1 bg-white border border-gray-200 rounded-2xl py-3 items-center shadow-sm">
+                  <Text className="text-2xl">🔍</Text>
+                </TouchableOpacity>
+                <TouchableOpacity className="flex-1 bg-white border border-gray-200 rounded-2xl py-3 items-center shadow-sm">
+                  <Text className="text-2xl">📱</Text>
+                </TouchableOpacity>
+                <TouchableOpacity className="flex-1 bg-white border border-gray-200 rounded-2xl py-3 items-center shadow-sm">
+                  <Text className="text-2xl">🍎</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Toggle Auth Mode */}
               <TouchableOpacity
                 onPress={() => {
                   setIsLogin(!isLogin);
                   setError('');
                 }}
-                className="py-2"
+                className="py-4"
               >
-                <Text className="text-center text-gray-600">
+                <Text className="text-center text-gray-600 text-base">
                   {isLogin
                     ? "Don't have an account? "
                     : 'Already have an account? '}
-                  <Text className="text-saffron-500 font-bold">
-                    {isLogin ? 'Sign Up' : 'Sign In'}
+                  <Text className="text-orange-500 font-bold">
+                    {isLogin ? 'Sign up' : 'Sign in'}
                   </Text>
                 </Text>
               </TouchableOpacity>
             </View>
-          </View>
 
-          {!isLogin && (
-            <View className="mt-6 bg-white/80 rounded-2xl p-4">
-              <Text className="text-center text-gray-600">
-                🎉 Get <Text className="font-bold text-saffron-500">3 free credits</Text> when you sign up!
-              </Text>
-            </View>
-          )}
+            {/* Bottom spacing */}
+            <View className="h-8" />
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </LinearGradient>
+    </View>
   );
 }

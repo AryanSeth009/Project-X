@@ -160,193 +160,328 @@ export default function ProfileScreen() {
   }
 
   return (
-    <ScrollView className="flex-1 bg-gray-50">
+    <ScrollView className="flex-1 bg-gray-50" showsVerticalScrollIndicator={false}>
+      {/* Premium Header */}
       <LinearGradient
-        colors={profile.is_pro ? ['#FFD700', '#FFA500'] : ['#FF9933', '#FFA500']}
-        className="pt-12 pb-8 px-6"
+        colors={profile.is_pro ? ['#FFD700', '#FF8C42'] : ['#FF6B35', '#FF8C42']}
+        className="pt-16 pb-12 px-6"
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
       >
-        <View className="items-center">
+        {/* Decorative elements */}
+        <View className="absolute top-10 right-8 w-32 h-32 bg-white/10 rounded-full" />
+        <View className="absolute bottom-8 left-6 w-20 h-20 bg-white/10 rounded-full" />
+        
+        <View className="items-center relative z-10">
           <View
             className={`w-24 h-24 ${
-              profile.is_pro ? 'bg-yellow-400' : 'bg-white'
-            } rounded-full items-center justify-center mb-4 shadow-lg`}
+              profile.is_pro ? 'bg-white' : 'bg-white'
+            } rounded-3xl items-center justify-center mb-4 shadow-2xl`}
           >
             {profile.is_pro ? (
-              <Crown size={48} color="#FF9933" />
+              <Crown size={44} color="#FF6B35" strokeWidth={2.5} />
             ) : (
               <Text className="text-5xl">👤</Text>
             )}
           </View>
-          <Text className="text-white text-2xl font-bold mb-1">
+          
+          <Text className="text-white text-xl font-bold mb-2 text-center px-4" numberOfLines={1}>
             {user.email}
           </Text>
+          
           {profile.is_pro ? (
-            <View className="bg-white/20 rounded-full px-4 py-1 flex-row items-center gap-2">
-              <Crown size={16} color="#FFFFFF" />
-              <Text className="text-white font-bold">Pro Member</Text>
+            <View className="bg-white/25 backdrop-blur rounded-full px-5 py-2 flex-row items-center gap-2">
+              <Crown size={14} color="#FFFFFF" strokeWidth={2.5} />
+              <Text className="text-white font-bold text-sm tracking-wide">PRO MEMBER</Text>
             </View>
           ) : (
-            <Text className="text-white/80">Free Plan</Text>
+            <View className="bg-white/20 rounded-full px-4 py-1.5">
+              <Text className="text-white/90 font-medium text-sm">Free Plan</Text>
+            </View>
           )}
         </View>
       </LinearGradient>
 
-      <View className="px-6 py-6">
-        <View className="bg-white rounded-2xl p-6 shadow-lg mb-6">
-          <View className="flex-row items-center justify-between mb-6">
-            <View>
-              <Text className="text-gray-500 mb-1">Available Credits</Text>
+      {/* Stats Cards */}
+      <View className="px-6 -mt-6 mb-6">
+        <View className="bg-white rounded-3xl p-6 shadow-xl">
+          <View className="flex-row items-center justify-between">
+            {/* Credits */}
+            <View className="flex-1">
+              <Text className="text-gray-500 text-xs font-semibold mb-2 uppercase tracking-wide">
+                Credits
+              </Text>
               <View className="flex-row items-center gap-2">
-                <Sparkles size={24} color="#FF9933" />
-                <Text className="text-4xl font-bold text-gray-800">
+                <View className="w-10 h-10 bg-orange-100 rounded-2xl items-center justify-center">
+                  <Sparkles size={20} color="#FF6B35" strokeWidth={2.5} />
+                </View>
+                <Text className="text-3xl font-black text-gray-800">
                   {profile.is_pro ? '∞' : profile.credits}
                 </Text>
               </View>
             </View>
-            <View>
-              <Text className="text-gray-500 mb-1">Itineraries</Text>
-              <Text className="text-4xl font-bold text-saffron-500">
-                {itineraries.length}
+
+            {/* Divider */}
+            <View className="w-px h-16 bg-gray-200 mx-4" />
+
+            {/* Itineraries */}
+            <View className="flex-1">
+              <Text className="text-gray-500 text-xs font-semibold mb-2 uppercase tracking-wide">
+                Trips
               </Text>
+              <View className="flex-row items-center gap-2">
+                <View className="w-10 h-10 bg-blue-100 rounded-2xl items-center justify-center">
+                  <Text className="text-xl">✈️</Text>
+                </View>
+                <Text className="text-3xl font-black text-gray-800">
+                  {itineraries.length}
+                </Text>
+              </View>
             </View>
           </View>
 
+          {/* Buy Credits Section */}
           {!profile.is_pro && (
-            <View className="border-t border-gray-100 pt-4">
-              <Text className="text-sm text-gray-600 mb-3">
-                1 credit = 1 itinerary generation
+            <View className="mt-6 pt-6 border-t border-gray-100">
+              <Text className="text-gray-600 text-sm font-medium mb-4">
+                💳 Purchase more credits
               </Text>
-              <View className="flex-row gap-3">
+              <View className="flex-row gap-2">
                 <TouchableOpacity
-                  className="flex-1 bg-blue-500 rounded-xl py-3"
+                  className="flex-1 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-4 shadow-md"
                   onPress={() => handleBuyCredits(5, 99)}
+                  activeOpacity={0.8}
                 >
-                  <Text className="text-white text-center font-bold">
-                    5 Credits
-                  </Text>
-                  <Text className="text-white/80 text-center text-xs">₹99</Text>
+                  <LinearGradient
+                    colors={['#3B82F6', '#2563EB']}
+                    className="rounded-2xl p-4"
+                  >
+                    <Text className="text-white font-black text-lg mb-1">5</Text>
+                    <Text className="text-white/90 text-xs font-medium mb-2">credits</Text>
+                    <Text className="text-white font-bold text-base">₹99</Text>
+                  </LinearGradient>
                 </TouchableOpacity>
+
                 <TouchableOpacity
-                  className="flex-1 bg-blue-600 rounded-xl py-3"
+                  className="flex-1 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl p-4 shadow-md border-2 border-indigo-400"
                   onPress={() => handleBuyCredits(10, 149)}
+                  activeOpacity={0.8}
                 >
-                  <Text className="text-white text-center font-bold">
-                    10 Credits
-                  </Text>
-                  <Text className="text-white/80 text-center text-xs">₹149</Text>
+                  <LinearGradient
+                    colors={['#6366F1', '#4F46E5']}
+                    className="rounded-2xl p-4"
+                  >
+                    <View className="absolute -top-2 -right-2 bg-yellow-400 rounded-full px-2 py-0.5">
+                      <Text className="text-xs font-black text-gray-800">SAVE</Text>
+                    </View>
+                    <Text className="text-white font-black text-lg mb-1">10</Text>
+                    <Text className="text-white/90 text-xs font-medium mb-2">credits</Text>
+                    <Text className="text-white font-bold text-base">₹149</Text>
+                  </LinearGradient>
                 </TouchableOpacity>
+
                 <TouchableOpacity
-                  className="flex-1 bg-blue-700 rounded-xl py-3"
+                  className="flex-1 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-4 shadow-md"
                   onPress={() => handleBuyCredits(25, 299)}
+                  activeOpacity={0.8}
                 >
-                  <Text className="text-white text-center font-bold">
-                    25 Credits
-                  </Text>
-                  <Text className="text-white/80 text-center text-xs">₹299</Text>
+                  <LinearGradient
+                    colors={['#9333EA', '#7C3AED']}
+                    className="rounded-2xl p-4"
+                  >
+                    <View className="absolute -top-2 -right-2 bg-green-400 rounded-full px-2 py-0.5">
+                      <Text className="text-xs font-black text-gray-800">BEST</Text>
+                    </View>
+                    <Text className="text-white font-black text-lg mb-1">25</Text>
+                    <Text className="text-white/90 text-xs font-medium mb-2">credits</Text>
+                    <Text className="text-white font-bold text-base">₹299</Text>
+                  </LinearGradient>
                 </TouchableOpacity>
               </View>
             </View>
           )}
         </View>
+      </View>
 
-        {!profile.is_pro && (
-          <View className="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl p-6 mb-6 shadow-xl">
-            <View className="flex-row items-center gap-2 mb-3">
-              <Crown size={28} color="#FFFFFF" />
-              <Text className="text-white text-2xl font-bold">Upgrade to Pro</Text>
+      {/* Pro Upgrade Card */}
+      {!profile.is_pro && (
+        <View className="px-6 mb-6">
+          <LinearGradient
+            colors={['#FFD700', '#FF8C42']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            className="rounded-3xl p-6 shadow-2xl"
+          >
+            {/* Decorative crown pattern */}
+            <View className="absolute top-4 right-4 opacity-20">
+              <Crown size={80} color="#FFFFFF" />
             </View>
-            <Text className="text-white/90 mb-4 text-lg">
-              Unlock unlimited potential for just ₹199/month
-            </Text>
-            <View className="gap-2 mb-6">
-              {[
-                'Unlimited itinerary generation',
-                'Priority AI processing',
-                'Advanced editing features',
-                'Premium destinations database',
-                '24/7 Priority support',
-                'Export to PDF & more formats',
-              ].map((feature, index) => (
-                <View key={index} className="flex-row items-center gap-2">
-                  <View className="w-5 h-5 bg-white/20 rounded-full items-center justify-center">
-                    <Check size={14} color="#FFFFFF" />
-                  </View>
-                  <Text className="text-white flex-1">{feature}</Text>
+            
+            <View className="relative z-10">
+              <View className="flex-row items-center gap-2 mb-2">
+                <View className="w-10 h-10 bg-white/30 rounded-2xl items-center justify-center">
+                  <Crown size={20} color="#FFFFFF" strokeWidth={2.5} />
                 </View>
-              ))}
+                <Text className="text-white text-2xl font-black">Go Pro</Text>
+              </View>
+              
+              <Text className="text-white/95 mb-5 text-base font-medium">
+                Unlimited planning for ₹199/month
+              </Text>
+
+              <View className="gap-3 mb-6">
+                {[
+                  { icon: '♾️', text: 'Unlimited itineraries' },
+                  { icon: '⚡', text: 'Priority AI processing' },
+                  { icon: '✨', text: 'Advanced features' },
+                  { icon: '🎯', text: 'Premium destinations' },
+                  { icon: '🛟', text: '24/7 Priority support' },
+                  { icon: '📄', text: 'Export to PDF' },
+                ].map((feature, index) => (
+                  <View key={index} className="flex-row items-center gap-3">
+                    <View className="w-7 h-7 bg-white/25 rounded-xl items-center justify-center">
+                      <Text className="text-sm">{feature.icon}</Text>
+                    </View>
+                    <Text className="text-white font-medium">{feature.text}</Text>
+                  </View>
+                ))}
+              </View>
+
+              <TouchableOpacity
+                className="bg-white rounded-2xl py-4 shadow-xl"
+                onPress={handleUpgradePro}
+                activeOpacity={0.9}
+              >
+                <View className="flex-row items-center justify-center gap-2">
+                  <Zap size={22} color="#FF6B35" fill="#FF6B35" />
+                  <Text className="text-orange-600 font-black text-lg">
+                    Upgrade Now
+                  </Text>
+                </View>
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity
-              className="bg-white rounded-xl py-4 shadow-lg"
-              onPress={handleUpgradePro}
-            >
-              <View className="flex-row items-center justify-center gap-2">
-                <Zap size={20} color="#FF9933" />
-                <Text className="text-saffron-500 font-bold text-lg">
-                  Upgrade Now - ₹199/mo
+          </LinearGradient>
+        </View>
+      )}
+
+      {/* Pro Active Status */}
+      {profile.is_pro && (
+        <View className="px-6 mb-6">
+          <View className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-3xl p-6">
+            <View className="flex-row items-center gap-3 mb-3">
+              <View className="w-12 h-12 bg-green-500 rounded-2xl items-center justify-center shadow-md">
+                <Crown size={24} color="#FFFFFF" strokeWidth={2.5} />
+              </View>
+              <View className="flex-1">
+                <Text className="text-green-800 text-lg font-black">
+                  Pro Active
+                </Text>
+                <Text className="text-green-600 text-sm font-medium">
+                  All premium features unlocked
                 </Text>
               </View>
-            </TouchableOpacity>
-          </View>
-        )}
-
-        {profile.is_pro && (
-          <View className="bg-green-50 border-2 border-green-200 rounded-2xl p-6 mb-6">
-            <View className="flex-row items-center gap-2 mb-2">
-              <Crown size={24} color="#10B981" />
-              <Text className="text-green-800 text-xl font-bold">
-                Pro Member Benefits
-              </Text>
             </View>
-            <Text className="text-green-700">
-              Your Pro subscription is active. Enjoy unlimited itineraries and premium features!
-            </Text>
             {profile.pro_expires_at && (
-              <Text className="text-green-600 text-sm mt-2">
-                Renews on:{' '}
-                {new Date(profile.pro_expires_at).toLocaleDateString('en-IN')}
-              </Text>
+              <View className="bg-white/60 rounded-xl p-3 mt-2">
+                <Text className="text-green-700 text-sm font-medium">
+                  ⏱️ Renews on{' '}
+                  {new Date(profile.pro_expires_at).toLocaleDateString('en-IN', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                  })}
+                </Text>
+              </View>
             )}
           </View>
-        )}
+        </View>
+      )}
 
-        <View className="gap-3 mb-6">
-          <TouchableOpacity className="bg-white rounded-xl p-4 flex-row items-center justify-between shadow-sm">
-            <View className="flex-row items-center gap-3">
-              <View className="w-10 h-10 bg-blue-100 rounded-full items-center justify-center">
-                <History size={20} color="#3B82F6" />
+      {/* Quick Actions */}
+      <View className="px-6 mb-6">
+        <Text className="text-gray-700 font-bold text-base mb-4 uppercase tracking-wide">
+          Quick Actions
+        </Text>
+        <View className="gap-3">
+          <TouchableOpacity 
+            className="bg-white rounded-2xl p-4 flex-row items-center justify-between shadow-sm active:scale-98"
+            activeOpacity={0.7}
+          >
+            <View className="flex-row items-center gap-4">
+              <View className="w-12 h-12 bg-blue-100 rounded-2xl items-center justify-center">
+                <History size={22} color="#3B82F6" strokeWidth={2.5} />
               </View>
-              <Text className="text-gray-800 font-semibold">
-                Itinerary History
-              </Text>
+              <View>
+                <Text className="text-gray-800 font-bold text-base">
+                  Trip History
+                </Text>
+                <Text className="text-gray-500 text-xs">
+                  View all your itineraries
+                </Text>
+              </View>
             </View>
-            <Text className="text-gray-400">→</Text>
+            <Text className="text-gray-300 text-2xl">→</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity className="bg-white rounded-xl p-4 flex-row items-center justify-between shadow-sm">
-            <View className="flex-row items-center gap-3">
-              <View className="w-10 h-10 bg-purple-100 rounded-full items-center justify-center">
-                <CreditCard size={20} color="#9333EA" />
+          <TouchableOpacity 
+            className="bg-white rounded-2xl p-4 flex-row items-center justify-between shadow-sm active:scale-98"
+            activeOpacity={0.7}
+          >
+            <View className="flex-row items-center gap-4">
+              <View className="w-12 h-12 bg-purple-100 rounded-2xl items-center justify-center">
+                <CreditCard size={22} color="#9333EA" strokeWidth={2.5} />
               </View>
-              <Text className="text-gray-800 font-semibold">
-                Payment History
-              </Text>
+              <View>
+                <Text className="text-gray-800 font-bold text-base">
+                  Billing
+                </Text>
+                <Text className="text-gray-500 text-xs">
+                  Manage payments & invoices
+                </Text>
+              </View>
             </View>
-            <Text className="text-gray-400">→</Text>
+            <Text className="text-gray-300 text-2xl">→</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            className="bg-white rounded-2xl p-4 flex-row items-center justify-between shadow-sm active:scale-98"
+            activeOpacity={0.7}
+          >
+            <View className="flex-row items-center gap-4">
+              <View className="w-12 h-12 bg-gray-100 rounded-2xl items-center justify-center">
+                <Text className="text-xl">⚙️</Text>
+              </View>
+              <View>
+                <Text className="text-gray-800 font-bold text-base">
+                  Settings
+                </Text>
+                <Text className="text-gray-500 text-xs">
+                  Preferences & notifications
+                </Text>
+              </View>
+            </View>
+            <Text className="text-gray-300 text-2xl">→</Text>
           </TouchableOpacity>
         </View>
+      </View>
 
+      {/* Sign Out */}
+      <View className="px-6 mb-8">
         <TouchableOpacity
-          className="bg-red-50 border-2 border-red-200 rounded-xl p-4 flex-row items-center justify-center gap-2"
+          className="bg-red-50 border-2 border-red-200 rounded-2xl p-4 flex-row items-center justify-center gap-3 active:bg-red-100"
           onPress={handleSignOut}
+          activeOpacity={0.8}
         >
-          <LogOut size={20} color="#EF4444" />
-          <Text className="text-red-600 font-bold">Sign Out</Text>
+          <LogOut size={20} color="#EF4444" strokeWidth={2.5} />
+          <Text className="text-red-600 font-bold text-base">Sign Out</Text>
         </TouchableOpacity>
+      </View>
 
-        <View className="mt-8 items-center">
-          <Text className="text-gray-400 text-sm">YatraAI v1.0.0</Text>
-          <Text className="text-gray-400 text-xs">Made with 🇮🇳 in India</Text>
-        </View>
+      {/* Footer */}
+      <View className="px-6 pb-12 items-center">
+        <View className="w-12 h-1 bg-gray-200 rounded-full mb-4" />
+        <Text className="text-gray-400 text-sm font-medium">YatraAI v1.0.0</Text>
+        <Text className="text-gray-400 text-xs mt-1">Made with ❤️ in India 🇮🇳</Text>
       </View>
     </ScrollView>
   );
