@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Sparkles, MapPin, Calendar, Users, Wallet, Heart, Info } from 'lucide-react-native';
+import { Sparkles, MapPin, Calendar, Users, Wallet, Heart, Info, MessageCircle } from 'lucide-react-native';
 import { useStore } from '@/store/useStore';
 
 export default function HomeScreen() {
@@ -20,6 +20,9 @@ export default function HomeScreen() {
   const [endDate, setEndDate] = useState('');
   const [travelers, setTravelers] = useState('1');
   const [interests, setInterests] = useState<string[]>([]);
+  const [budget, setBudget] = useState('');
+  const [personalPrompt, setPersonalPrompt] = useState('');
+  const { profile } = useStore();
 
   const popularDestinations = [
     'Goa', 'Kerala', 'Rajasthan', 'Himachal Pradesh', 'Uttarakhand', 'Andaman', 'Ladakh', 'Sikkim'
@@ -52,7 +55,7 @@ export default function HomeScreen() {
     setStep(2);
   };
 
-  const handleNext = () => {
+  const handleGenerate = () => {
     if (!destination || !startDate || !endDate) {
       Alert.alert('Missing Information', 'Please fill in all required fields');
       return;
@@ -147,13 +150,11 @@ export default function HomeScreen() {
 
           <View className="gap-5">
             {step === 1 ? (
-              <>
+              <View>
                 <View>
                   <View className="flex-row items-center gap-2 mb-2">
                     <MapPin size={18} color="#FF9933" />
-                    <Text className="text-gray-700 font-semibold">
-                      Where do you wanna go?
-                    </Text>
+                    <Text className="text-gray-700 font-semibold">Destination</Text>
                   </View>
                   <TextInput
                     className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
@@ -161,35 +162,23 @@ export default function HomeScreen() {
                     value={destination}
                     onChangeText={setDestination}
                   />
+                  {destination === '' && (
+                    <View className="mt-2">
+                      <Text className="text-xs text-gray-500 mb-2">Popular destinations:</Text>
+                      <View className="flex-row flex-wrap gap-2">
+                        {popularDestinations.slice(0, 4).map((dest) => (
+                          <TouchableOpacity
+                            key={dest}
+                            onPress={() => setDestination(dest)}
+                            className="bg-orange-50 px-3 py-1 rounded-full"
+                          >
+                            <Text className="text-orange-600 text-xs font-medium">{dest}</Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    </View>
+                  )}
                 </View>
-            <View>
-              <View className="flex-row items-center gap-2 mb-2">
-                <MapPin size={18} color="#FF9933" />
-                <Text className="text-gray-700 font-semibold">Destination</Text>
-              </View>
-              <TextInput
-                className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
-                placeholder="e.g., Goa, Kerala, Rajasthan"
-                value={destination}
-                onChangeText={setDestination}
-              />
-              {destination === '' && (
-                <View className="mt-2">
-                  <Text className="text-xs text-gray-500 mb-2">Popular destinations:</Text>
-                  <View className="flex-row flex-wrap gap-2">
-                    {popularDestinations.slice(0, 4).map((dest) => (
-                      <TouchableOpacity
-                        key={dest}
-                        onPress={() => setDestination(dest)}
-                        className="bg-orange-50 px-3 py-1 rounded-full"
-                      >
-                        <Text className="text-orange-600 text-xs font-medium">{dest}</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                </View>
-              )}
-            </View>
 
                 <View className="flex-row gap-3">
                   <View className="flex-1">
@@ -244,9 +233,9 @@ export default function HomeScreen() {
                     </Text>
                   </View>
                 </TouchableOpacity>
-              </>
+              </View>
             ) : (
-              <>
+              <View>
                 <View>
                   <View className="flex-row items-center gap-2 mb-3">
                     <Heart size={18} color="#FF9933" />
@@ -257,22 +246,22 @@ export default function HomeScreen() {
                   <View className="flex-row flex-wrap gap-2">
                     {interestOptions.map((interest) => (
                       <TouchableOpacity
-                        key={interest}
-                        onPress={() => toggleInterest(interest)}
+                        key={interest.id}
+                        onPress={() => toggleInterest(interest.id)}
                         className={`px-4 py-2 rounded-full border-2 ${
-                          interests.includes(interest)
+                          interests.includes(interest.id)
                             ? 'bg-saffron-500 border-saffron-500'
                             : 'bg-white border-gray-300'
                         }`}
                       >
                         <Text
                           className={`font-semibold ${
-                            interests.includes(interest)
+                            interests.includes(interest.id)
                               ? 'text-white'
                               : 'text-gray-600'
                           }`}
                         >
-                          {interest}
+                          {interest.id}
                         </Text>
                       </TouchableOpacity>
                     ))}
@@ -294,76 +283,76 @@ export default function HomeScreen() {
                     multiline
                   />
                 </View>
-            <View className="flex-row gap-3">
-              <View className="flex-1">
-                <View className="flex-row items-center gap-2 mb-2">
-                  <Users size={18} color="#FF9933" />
-                  <Text className="text-gray-700 font-semibold">Travelers</Text>
-                </View>
-                <TextInput
-                  className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
-                  placeholder="1"
-                  value={travelers}
-                  onChangeText={setTravelers}
-                  keyboardType="number-pad"
-                />
-              </View>
-              <View className="flex-1">
-                <View className="flex-row items-center gap-2 mb-2">
-                  <Wallet size={18} color="#FF9933" />
-                  <Text className="text-gray-700 font-semibold">Budget (₹)</Text>
-                </View>
-                <TextInput
-                  className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
-                  placeholder="50000"
-                  value={budget}
-                  onChangeText={setBudget}
-                  keyboardType="number-pad"
-                />
-                {budget && (
-                  <View className="mt-2 flex-row items-center gap-2">
-                    <Info size={12} color="#6B7280" />
-                    <Text className="text-xs text-gray-500">
-                      Daily budget: ₹{Math.round(parseInt(budget || '0') / Math.max(1, Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1))}
-                    </Text>
-                  </View>
-                )}
-              </View>
-            </View>
 
-            <View>
-              <View className="flex-row items-center gap-2 mb-3">
-                <Heart size={18} color="#FF9933" />
-                <Text className="text-gray-700 font-semibold">Your Interests</Text>
-              </View>
-              <View className="flex-row flex-wrap gap-2">
-                {interestOptions.map((interest) => (
-                  <TouchableOpacity
-                    key={interest.id}
-                    onPress={() => toggleInterest(interest.id)}
-                    className={`px-3 py-2 rounded-full border-2 ${
-                      interests.includes(interest.id)
-                        ? 'bg-orange-500 border-orange-500'
-                        : 'bg-white border-gray-300'
-                    }`}
-                  >
-                    <View className="flex-row items-center gap-1">
-                      <Text className="text-sm">{interest.icon}</Text>
-                      <Text
-                        className={`font-semibold text-sm ${
+                <View className="flex-row gap-3">
+                  <View className="flex-1">
+                    <View className="flex-row items-center gap-2 mb-2">
+                      <Users size={18} color="#FF9933" />
+                      <Text className="text-gray-700 font-semibold">Travelers</Text>
+                    </View>
+                    <TextInput
+                      className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
+                      placeholder="1"
+                      value={travelers}
+                      onChangeText={setTravelers}
+                      keyboardType="number-pad"
+                    />
+                  </View>
+                  <View className="flex-1">
+                    <View className="flex-row items-center gap-2 mb-2">
+                      <Wallet size={18} color="#FF9933" />
+                      <Text className="text-gray-700 font-semibold">Budget (₹)</Text>
+                    </View>
+                    <TextInput
+                      className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
+                      placeholder="50000"
+                      value={budget}
+                      onChangeText={setBudget}
+                      keyboardType="number-pad"
+                    />
+                    {budget && (
+                      <View className="mt-2 flex-row items-center gap-2">
+                        <Info size={12} color="#6B7280" />
+                        <Text className="text-xs text-gray-500">
+                          Daily budget: ₹{Math.round(parseInt(budget || '0') / Math.max(1, Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1))}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                </View>
+
+                <View>
+                  <View className="flex-row items-center gap-2 mb-3">
+                    <Heart size={18} color="#FF9933" />
+                    <Text className="text-gray-700 font-semibold">Your Interests</Text>
+                  </View>
+                  <View className="flex-row flex-wrap gap-2">
+                    {interestOptions.map((interest) => (
+                      <TouchableOpacity
+                        key={interest.id}
+                        onPress={() => toggleInterest(interest.id)}
+                        className={`px-3 py-2 rounded-full border-2 ${
                           interests.includes(interest.id)
-                            ? 'text-white'
-                            : 'text-gray-600'
+                            ? 'bg-orange-500 border-orange-500'
+                            : 'bg-white border-gray-300'
                         }`}
                       >
-                        {interest.id}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-          </View>
+                        <View className="flex-row items-center gap-1">
+                          <Text className="text-sm">{interest.icon}</Text>
+                          <Text
+                            className={`font-semibold text-sm ${
+                              interests.includes(interest.id)
+                                ? 'text-white'
+                                : 'text-gray-600'
+                            }`}
+                          >
+                            {interest.id}
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
 
                 <View className="flex-row gap-3 mt-2">
                   <TouchableOpacity
@@ -386,7 +375,7 @@ export default function HomeScreen() {
                     </View>
                   </TouchableOpacity>
                 </View>
-              </>
+              </View>
             )}
           </View>
         </View>
