@@ -1,17 +1,20 @@
 import { useEffect, useState } from 'react';
-import { View, Text, Animated } from 'react-native';
+import { View, Text, Animated, Alert } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '@/lib/supabase';
 import { useStore } from '@/store/useStore';
+import { itineraryGenerator, type ItineraryFormData } from '@/lib/itinerary-generator';
 
 const loadingMessages = [
-  'Analyzing your preferences...',
-  'Finding the best destinations...',
-  'Crafting your perfect itinerary...',
-  'Adding amazing experiences...',
-  'Calculating optimal routes...',
-  'Almost ready!',
+  '🔍 Analyzing your travel preferences...',
+  '🗺️ Finding the best destinations in your area...',
+  '🤖 AI is crafting your perfect itinerary...',
+  '⭐ Adding amazing experiences and hidden gems...',
+  '📍 Calculating optimal routes and timing...',
+  '💰 Optimizing for your budget...',
+  '🎯 Personalizing activities based on your interests...',
+  '✨ Almost ready! Your adventure awaits...',
 ];
 
 export default function LoadingScreen() {
@@ -50,159 +53,94 @@ export default function LoadingScreen() {
     try {
       if (!profile || !user) return;
 
-      const formData = JSON.parse(params.data as string);
+      const formData: ItineraryFormData = JSON.parse(params.data as string);
+      
+      console.log('🚀 Starting AI-powered itinerary generation for:', formData.destination);
 
-      const mockItinerary = {
-        user_id: user.id,
-        title: `${formData.destination} Adventure`,
-        destination: formData.destination,
-        start_date: formData.startDate,
-        end_date: formData.endDate,
-        budget: parseInt(formData.budget) || 50000,
-        travelers: parseInt(formData.travelers) || 1,
-        preferences: formData.interests || {},
-        status: 'active' as const,
-      };
+      // Generate AI-powered itinerary
+      const generatedItinerary = await itineraryGenerator.generateItinerary(formData);
+      
+      console.log('📋 AI generation complete, saving to database...');
 
+      // Save to database
       const { data: itinerary, error: itineraryError } = await supabase
         .from('itineraries')
-        .insert([mockItinerary])
+        .insert([{
+          user_id: user.id,
+          title: generatedItinerary.title,
+          destination: generatedItinerary.destination,
+          start_date: generatedItinerary.start_date,
+          end_date: generatedItinerary.end_date,
+          budget: generatedItinerary.budget,
+          travelers: generatedItinerary.travelers,
+          preferences: generatedItinerary.preferences,
+          status: 'active' as const,
+        }])
         .select()
         .single();
 
       if (itineraryError) throw itineraryError;
 
-      const days = calculateDays(formData.startDate, formData.endDate);
+      // Save days and activities
       const dayRecords = [];
-
-      for (let i = 0; i < days; i++) {
-        const date = new Date(formData.startDate);
-        date.setDate(date.getDate() + i);
-
-        const dayData = {
-          itinerary_id: itinerary.id,
-          day_number: i + 1,
-          date: date.toISOString().split('T')[0],
-          title: `Day ${i + 1}: ${getDayTitle(i, formData.destination)}`,
-          notes: null,
-        };
-
-        const { data: day, error: dayError } = await supabase
+      for (const day of generatedItinerary.days) {
+        const { data: dayData, error: dayError } = await supabase
           .from('itinerary_days')
-          .insert([dayData])
+          .insert([{
+            itinerary_id: itinerary.id,
+            day_number: day.day_number,
+            date: day.date,
+            title: day.title,
+            notes: day.notes,
+          }])
           .select()
           .single();
 
         if (dayError) throw dayError;
 
-        const activities = getMockActivities(i, day.id, formData.destination);
+        // Save activities for this day
+        const activitiesWithDayId = day.activities.map(activity => ({
+          ...activity,
+          day_id: dayData.id,
+        }));
 
         const { error: activitiesError } = await supabase
           .from('activities')
-          .insert(activities);
+          .insert(activitiesWithDayId);
 
         if (activitiesError) throw activitiesError;
 
-        dayRecords.push({ ...day, activities });
+        dayRecords.push({ ...dayData, activities: day.activities });
       }
 
-      updateProfile({ credits: (profile.credits || 0) - 1 });
+      // Update user credits
+      const newCredits = (profile.credits || 0) - 1;
+      updateProfile({ credits: newCredits });
 
       await supabase
         .from('profiles')
-        .update({ credits: (profile.credits || 0) - 1 })
+        .update({ credits: newCredits })
         .eq('id', user.id);
 
+      // Update store
       const fullItinerary = { ...itinerary, days: dayRecords };
       addItinerary(fullItinerary);
       setCurrentItinerary(fullItinerary);
 
+      console.log('✅ Itinerary generation complete!');
+
+      // Navigate to itinerary screen
       setTimeout(() => {
         router.replace({
           pathname: '/(tabs)/itinerary',
           params: { id: itinerary.id },
         });
-      }, 1000);
+      }, 1500);
     } catch (error) {
-      console.error('Error generating itinerary:', error);
+      console.error('❌ Error generating itinerary:', error);
+      Alert.alert('Error', 'Failed to generate itinerary. Please try again.');
       router.back();
     }
-  };
-
-  const calculateDays = (start: string, end: string) => {
-    const startDate = new Date(start);
-    const endDate = new Date(end);
-    const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays + 1;
-  };
-
-  const getDayTitle = (dayIndex: number, destination: string) => {
-    const titles = [
-      `Arrival & ${destination} Exploration`,
-      'Cultural Immersion',
-      'Adventure & Activities',
-      'Local Experiences',
-      'Hidden Gems Discovery',
-      'Relaxation & Leisure',
-      'Farewell & Departure',
-    ];
-    return titles[dayIndex % titles.length];
-  };
-
-  const getMockActivities = (dayIndex: number, dayId: string, destination: string) => {
-    const activities = [
-      {
-        day_id: dayId,
-        title: 'Morning Temple Visit',
-        description: `Explore the beautiful ancient temples of ${destination}`,
-        time_start: '09:00',
-        time_end: '11:00',
-        location: `${destination} Old Town`,
-        cost: 500,
-        category: 'attraction' as const,
-        order_index: 0,
-        image_url: 'https://images.pexels.com/photos/2166553/pexels-photo-2166553.jpeg',
-      },
-      {
-        day_id: dayId,
-        title: 'Local Cuisine Lunch',
-        description: 'Taste authentic regional dishes at a popular restaurant',
-        time_start: '12:30',
-        time_end: '14:00',
-        location: 'City Center',
-        cost: 800,
-        category: 'food' as const,
-        order_index: 1,
-        image_url: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
-      },
-      {
-        day_id: dayId,
-        title: 'Heritage Walk',
-        description: 'Guided walking tour through historic neighborhoods',
-        time_start: '15:00',
-        time_end: '17:30',
-        location: 'Heritage District',
-        cost: 600,
-        category: 'activity' as const,
-        order_index: 2,
-        image_url: 'https://images.pexels.com/photos/1659438/pexels-photo-1659438.jpeg',
-      },
-      {
-        day_id: dayId,
-        title: 'Sunset Viewpoint',
-        description: 'Watch the stunning sunset from the best vantage point',
-        time_start: '18:00',
-        time_end: '19:30',
-        location: `${destination} Viewpoint`,
-        cost: 200,
-        category: 'attraction' as const,
-        order_index: 3,
-        image_url: 'https://images.pexels.com/photos/1659437/pexels-photo-1659437.jpeg',
-      },
-    ];
-
-    return activities;
   };
 
   return (
@@ -226,12 +164,12 @@ export default function LoadingScreen() {
         </Animated.View>
 
         <View className="mt-12 flex-row gap-2">
-          {[0, 1, 2].map((i) => (
+          {[0, 1, 2, 3].map((i) => (
             <View
               key={i}
               className="w-3 h-3 bg-white rounded-full"
               style={{
-                opacity: messageIndex % 3 === i ? 1 : 0.3,
+                opacity: messageIndex % 4 === i ? 1 : 0.3,
               }}
             />
           ))}
