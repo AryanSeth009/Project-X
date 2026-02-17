@@ -1,28 +1,41 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { View, Text, Animated, Alert } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+
 import { supabase } from '@/lib/supabase';
 import { useStore } from '@/store/useStore';
-import { itineraryGenerator, type ItineraryFormData } from '@/lib/itinerary-generator';
+import {
+  itineraryGenerator,
+  type ItineraryFormData,
+} from '@/lib/itinerary-generator';
 
 const loadingMessages = [
   '🔍 Analyzing your travel preferences...',
-  '🗺️ Finding the best destinations in your area...',
-  '🤖 AI is crafting your perfect itinerary...',
-  '⭐ Adding amazing experiences and hidden gems...',
-  '📍 Calculating optimal routes and timing...',
-  '💰 Optimizing for your budget...',
-  '🎯 Personalizing activities based on your interests...',
-  '✨ Almost ready! Your adventure awaits...',
+  '🗺️ Finding the best destinations...',
+  '🤖 AI is crafting your itinerary...',
+  '⭐ Adding hidden gems...',
+  '📍 Optimizing routes...',
+  '💰 Optimizing for budget...',
+  '🎯 Personalizing experiences...',
+  '✨ Almost ready...',
 ];
 
 export default function LoadingScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { user, addItinerary, setCurrentItinerary } = useStore();
+
+  const {
+    user,
+    profile,
+    updateProfile,
+    addItinerary,
+    setCurrentItinerary,
+  } = useStore();
+
   const [messageIndex, setMessageIndex] = useState(0);
-  const [fadeAnim] = useState(new Animated.Value(1));
+
+  const fadeAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -51,78 +64,96 @@ export default function LoadingScreen() {
 
   const generateItinerary = async () => {
     try {
-      if (!user) return;
+      if (!user) {
+        Alert.alert('Error', 'User not found');
+        return;
+      }
 
-      const formData = JSON.parse(params.data as string);
+      if (!params.data) {
+        Alert.alert('Error', 'Missing itinerary data');
+        router.back();
+        return;
+      }
 
-      const mockItinerary = {
-        user_id: user.id,
-        title: `${formData.destination} Adventure`,
-        destination: formData.destination,
-        start_date: formData.startDate,
-        end_date: formData.endDate,
-        budget: parseInt(formData.budget) || 50000,
-        travelers: parseInt(formData.travelers) || 1,
-        preferences: {
-          interests: formData.interests || [],
-          personalPrompt: formData.personalPrompt || '',
-        },
-        status: 'active' as const,
-      };
+      const formData: ItineraryFormData = JSON.parse(
+        params.data as string
+      );
 
-      const { data: itinerary, error: itineraryError } = await supabase
-        .from('itineraries')
-        .insert([{
-          user_id: user.id,
-          title: generatedItinerary.title,
-          destination: generatedItinerary.destination,
-          start_date: generatedItinerary.start_date,
-          end_date: generatedItinerary.end_date,
-          budget: generatedItinerary.budget,
-          travelers: generatedItinerary.travelers,
-          preferences: generatedItinerary.preferences,
-          status: 'active' as const,
-        }])
-        .select()
-        .single();
+      // Generate itinerary using AI
+      const generatedItinerary = await itineraryGenerator(formData);
 
-      if (itineraryError) throw itineraryError;
+      if (!generatedItinerary) {
+        throw new Error('Failed to generate itinerary');
+      }
 
-      // Save days and activities
-      const dayRecords = [];
-      for (const day of generatedItinerary.days) {
-        const { data: dayData, error: dayError } = await supabase
-          .from('itinerary_days')
-          .insert([{
-            itinerary_id: itinerary.id,
-            day_number: day.day_number,
-            date: day.date,
-            title: day.title,
-            notes: day.notes,
-          }])
+      // Save itinerary
+      const { data: itinerary, error: itineraryError } =
+        await supabase
+          .from('itineraries')
+          .insert([
+            {
+              user_id: user.id,
+              title: generatedItinerary.title,
+              destination: generatedItinerary.destination,
+              start_date: generatedItinerary.start_date,
+              end_date: generatedItinerary.end_date,
+              budget: generatedItinerary.budget,
+              travelers: generatedItinerary.travelers,
+              preferences: generatedItinerary.preferences,
+              status: 'active',
+            },
+          ])
           .select()
           .single();
 
+      if (itineraryError) throw itineraryError;
+
+      const dayRecords = [];
+
+      // Save days and activities
+      for (const day of generatedItinerary.days) {
+        const { data: dayData, error: dayError } =
+          await supabase
+            .from('itinerary_days')
+            .insert([
+              {
+                itinerary_id: itinerary.id,
+                day_number: day.day_number,
+                date: day.date,
+                title: day.title,
+                notes: day.notes,
+              },
+            ])
+            .select()
+            .single();
+
         if (dayError) throw dayError;
 
-        // Save activities for this day
-        const activitiesWithDayId = day.activities.map(activity => ({
+        const activities = day.activities.map((activity) => ({
           ...activity,
           day_id: dayData.id,
         }));
 
-        const { error: activitiesError } = await supabase
-          .from('activities')
-          .insert(activitiesWithDayId);
+        const { error: activityError } =
+          await supabase
+            .from('activities')
+            .insert(activities);
 
-        if (activitiesError) throw activitiesError;
+        if (activityError) throw activityError;
 
-        dayRecords.push({ ...dayData, activities: day.activities });
+        dayRecords.push({
+          ...dayData,
+          activities: day.activities,
+        });
       }
 
-      // Update user credits
-      const newCredits = (profile.credits || 0) - 1;
-      updateProfile({ credits: newCredits });
+      // Deduct credits
+      const newCredits = (profile?.credits || 0) - 1;
+
+      updateProfile({
+        ...profile,
+        credits: newCredits,
+      });
 
       await supabase
         .from('profiles')
@@ -130,22 +161,31 @@ export default function LoadingScreen() {
         .eq('id', user.id);
 
       // Update store
-      const fullItinerary = { ...itinerary, days: dayRecords };
+      const fullItinerary = {
+        ...itinerary,
+        days: dayRecords,
+      };
+
       addItinerary(fullItinerary);
       setCurrentItinerary(fullItinerary);
 
-      console.log('✅ Itinerary generation complete!');
+      console.log('✅ Itinerary created');
 
-      // Navigate to itinerary screen
       setTimeout(() => {
         router.replace({
           pathname: '/(tabs)/itinerary',
           params: { id: itinerary.id },
         });
-      }, 1500);
+      }, 1200);
+
     } catch (error) {
-      console.error('❌ Error generating itinerary:', error);
-      Alert.alert('Error', 'Failed to generate itinerary. Please try again.');
+      console.error(error);
+
+      Alert.alert(
+        'Error',
+        'Failed to generate itinerary'
+      );
+
       router.back();
     }
   };
@@ -156,31 +196,34 @@ export default function LoadingScreen() {
       className="flex-1 items-center justify-center px-6"
     >
       <View className="items-center">
-        <View className="w-40 h-40 bg-white rounded-full items-center justify-center mb-8 shadow-2xl">
-          <Text className="text-7xl animate-spin">✨</Text>
+
+        <View className="w-40 h-40 bg-white rounded-full items-center justify-center mb-8">
+          <Text className="text-6xl">✨</Text>
         </View>
 
-        <Text className="text-3xl font-bold text-white mb-4 text-center">
+        <Text className="text-3xl font-bold text-white mb-4">
           Creating Your Journey
         </Text>
 
         <Animated.View style={{ opacity: fadeAnim }}>
-          <Text className="text-xl text-white/90 text-center px-8">
+          <Text className="text-xl text-white text-center">
             {loadingMessages[messageIndex]}
           </Text>
         </Animated.View>
 
-        <View className="mt-12 flex-row gap-2">
+        <View className="flex-row mt-10 gap-2">
           {[0, 1, 2, 3].map((i) => (
             <View
               key={i}
               className="w-3 h-3 bg-white rounded-full"
               style={{
-                opacity: messageIndex % 4 === i ? 1 : 0.3,
+                opacity:
+                  messageIndex % 4 === i ? 1 : 0.3,
               }}
             />
           ))}
         </View>
+
       </View>
     </LinearGradient>
   );
