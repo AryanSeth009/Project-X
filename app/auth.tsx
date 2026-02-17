@@ -106,7 +106,7 @@ export default function AuthScreen() {
                 <View className="flex-1">
                   <Text className="text-gray-800 font-bold text-sm">Welcome Gift!</Text>
                   <Text className="text-gray-600 text-xs mt-0.5">
-                    Get 3 free AI credits on signup
+                    Get started with your first trips instantly
                   </Text>
                 </View>
               </View>
