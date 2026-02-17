@@ -4,14 +4,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { History, LogOut, User as UserIcon } from 'lucide-react-native';
 import { useStore } from '@/store/useStore';
 import { supabase } from '@/lib/supabase';
-import { signOutCompletely } from '@/lib/auth';
-import * as WebBrowser from 'expo-web-browser';
-import { useState } from 'react';
 
 export default function ProfileScreen() {
   const router = useRouter();
   const { user, reset, itineraries } = useStore();
-  const [loading , setLoading] = useState(false);
 
   const handleSignOut = async () => {
     Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
@@ -20,35 +16,9 @@ export default function ProfileScreen() {
         text: 'Sign Out',
         style: 'destructive',
         onPress: async () => {
-          try {
-            setLoading(true);
-            console.log('Starting sign out process...');
-            
-            // Clear local state first
-            reset();
-            
-            // Use comprehensive sign out function
-            const result = await signOutCompletely();
-            
-            if (!result.success) {
-              console.error('Sign out had issues:', result.error);
-              Alert.alert('Warning', 'Signed out with some issues. You may need to restart the app.');
-            } else {
-              console.log('Sign out successful');
-            }
-            
-            // Always navigate to auth screen
-            router.replace('/auth');
-            
-          } catch (error) {
-            console.error('Unexpected sign out error:', error);
-            // Reset state and navigate anyway on unexpected errors
-            reset();
-            router.replace('/auth');
-            Alert.alert('Signed Out', 'You have been signed out.');
-          } finally {
-            setLoading(false);
-          }
+          await supabase.auth.signOut();
+          reset();
+          router.replace('/auth');
         },
       },
     ]);
