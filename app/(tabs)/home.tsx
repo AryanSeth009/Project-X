@@ -9,7 +9,8 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Sparkles, MapPin, Calendar, Users, Heart, MessageCircle } from 'lucide-react-native';
+import { Sparkles, MapPin, Calendar, Users, Wallet, Heart, Info } from 'lucide-react-native';
+import { useStore } from '@/store/useStore';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -19,24 +20,27 @@ export default function HomeScreen() {
   const [endDate, setEndDate] = useState('');
   const [travelers, setTravelers] = useState('1');
   const [interests, setInterests] = useState<string[]>([]);
-  const [personalPrompt, setPersonalPrompt] = useState('');
 
-  const interestOptions = [
-    'Culture',
-    'Adventure',
-    'Food',
-    'Nature',
-    'Shopping',
-    'Nightlife',
-    'History',
-    'Relaxation',
+  const popularDestinations = [
+    'Goa', 'Kerala', 'Rajasthan', 'Himachal Pradesh', 'Uttarakhand', 'Andaman', 'Ladakh', 'Sikkim'
   ];
 
-  const toggleInterest = (interest: string) => {
-    if (interests.includes(interest)) {
-      setInterests(interests.filter((i) => i !== interest));
+  const interestOptions = [
+    { id: 'Culture', icon: '🏛️', description: 'Heritage sites, museums, local traditions' },
+    { id: 'Adventure', icon: '🎢', description: 'Thrilling activities, sports, exploration' },
+    { id: 'Food', icon: '🍽️', description: 'Local cuisine, food tours, cooking' },
+    { id: 'Nature', icon: '🌿', description: 'Parks, wildlife, natural landscapes' },
+    { id: 'Shopping', icon: '🛍️', description: 'Local markets, crafts, souvenirs' },
+    { id: 'Nightlife', icon: '🌃', description: 'Bars, clubs, evening entertainment' },
+    { id: 'History', icon: '📚', description: 'Historical sites, monuments, stories' },
+    { id: 'Relaxation', icon: '🧘', description: 'Spa, wellness, peaceful activities' },
+  ];
+
+  const toggleInterest = (interestId: string) => {
+    if (interests.includes(interestId)) {
+      setInterests(interests.filter((i) => i !== interestId));
     } else {
-      setInterests([...interests, interest]);
+      setInterests([...interests, interestId]);
     }
   };
 
@@ -48,10 +52,48 @@ export default function HomeScreen() {
     setStep(2);
   };
 
-  const handleGenerate = () => {
+  const handleNext = () => {
     if (!destination || !startDate || !endDate) {
-      Alert.alert('Missing Information', 'Please fill destination and dates.');
+      Alert.alert('Missing Information', 'Please fill in all required fields');
       return;
+    }
+
+    if (!profile || profile.credits < 1) {
+      Alert.alert(
+        'No Credits',
+        'You need credits to generate an itinerary. Purchase credits or upgrade to Pro!'
+      );
+      return;
+    }
+
+    // Validate dates
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (start < today) {
+      Alert.alert('Invalid Date', 'Start date cannot be in the past');
+      return;
+    }
+
+    if (end <= start) {
+      Alert.alert('Invalid Date', 'End date must be after start date');
+      return;
+    }
+
+    const days = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    if (days > 30) {
+      Alert.alert('Too Long', 'Maximum trip duration is 30 days');
+      return;
+    }
+
+    const budgetNum = parseInt(budget) || 0;
+    const travelersNum = parseInt(travelers) || 1;
+    const dailyBudget = budgetNum / days;
+
+    if (budgetNum < 1000 * travelersNum) {
+      Alert.alert('Low Budget', 'Budget seems too low for the number of travelers. Consider increasing it for better recommendations.');
     }
 
     const formData = {
@@ -63,6 +105,7 @@ export default function HomeScreen() {
       personalPrompt,
     };
 
+    console.log('🚀 Generating itinerary with AI:', formData);
     router.push({
       pathname: '/loading',
       params: { data: JSON.stringify(formData) },
@@ -119,6 +162,34 @@ export default function HomeScreen() {
                     onChangeText={setDestination}
                   />
                 </View>
+            <View>
+              <View className="flex-row items-center gap-2 mb-2">
+                <MapPin size={18} color="#FF9933" />
+                <Text className="text-gray-700 font-semibold">Destination</Text>
+              </View>
+              <TextInput
+                className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
+                placeholder="e.g., Goa, Kerala, Rajasthan"
+                value={destination}
+                onChangeText={setDestination}
+              />
+              {destination === '' && (
+                <View className="mt-2">
+                  <Text className="text-xs text-gray-500 mb-2">Popular destinations:</Text>
+                  <View className="flex-row flex-wrap gap-2">
+                    {popularDestinations.slice(0, 4).map((dest) => (
+                      <TouchableOpacity
+                        key={dest}
+                        onPress={() => setDestination(dest)}
+                        className="bg-orange-50 px-3 py-1 rounded-full"
+                      >
+                        <Text className="text-orange-600 text-xs font-medium">{dest}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+              )}
+            </View>
 
                 <View className="flex-row gap-3">
                   <View className="flex-1">
@@ -223,6 +294,76 @@ export default function HomeScreen() {
                     multiline
                   />
                 </View>
+            <View className="flex-row gap-3">
+              <View className="flex-1">
+                <View className="flex-row items-center gap-2 mb-2">
+                  <Users size={18} color="#FF9933" />
+                  <Text className="text-gray-700 font-semibold">Travelers</Text>
+                </View>
+                <TextInput
+                  className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
+                  placeholder="1"
+                  value={travelers}
+                  onChangeText={setTravelers}
+                  keyboardType="number-pad"
+                />
+              </View>
+              <View className="flex-1">
+                <View className="flex-row items-center gap-2 mb-2">
+                  <Wallet size={18} color="#FF9933" />
+                  <Text className="text-gray-700 font-semibold">Budget (₹)</Text>
+                </View>
+                <TextInput
+                  className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
+                  placeholder="50000"
+                  value={budget}
+                  onChangeText={setBudget}
+                  keyboardType="number-pad"
+                />
+                {budget && (
+                  <View className="mt-2 flex-row items-center gap-2">
+                    <Info size={12} color="#6B7280" />
+                    <Text className="text-xs text-gray-500">
+                      Daily budget: ₹{Math.round(parseInt(budget || '0') / Math.max(1, Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1))}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </View>
+
+            <View>
+              <View className="flex-row items-center gap-2 mb-3">
+                <Heart size={18} color="#FF9933" />
+                <Text className="text-gray-700 font-semibold">Your Interests</Text>
+              </View>
+              <View className="flex-row flex-wrap gap-2">
+                {interestOptions.map((interest) => (
+                  <TouchableOpacity
+                    key={interest.id}
+                    onPress={() => toggleInterest(interest.id)}
+                    className={`px-3 py-2 rounded-full border-2 ${
+                      interests.includes(interest.id)
+                        ? 'bg-orange-500 border-orange-500'
+                        : 'bg-white border-gray-300'
+                    }`}
+                  >
+                    <View className="flex-row items-center gap-1">
+                      <Text className="text-sm">{interest.icon}</Text>
+                      <Text
+                        className={`font-semibold text-sm ${
+                          interests.includes(interest.id)
+                            ? 'text-white'
+                            : 'text-gray-600'
+                        }`}
+                      >
+                        {interest.id}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          </View>
 
                 <View className="flex-row gap-3 mt-2">
                   <TouchableOpacity
