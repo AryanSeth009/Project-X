@@ -20,7 +20,7 @@ const loadingMessages = [
 export default function LoadingScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { user, profile, updateProfile, addItinerary, setCurrentItinerary } = useStore();
+  const { user, addItinerary, setCurrentItinerary } = useStore();
   const [messageIndex, setMessageIndex] = useState(0);
   const [fadeAnim] = useState(new Animated.Value(1));
 
@@ -51,18 +51,25 @@ export default function LoadingScreen() {
 
   const generateItinerary = async () => {
     try {
-      if (!profile || !user) return;
+      if (!user) return;
 
-      const formData: ItineraryFormData = JSON.parse(params.data as string);
-      
-      console.log('🚀 Starting AI-powered itinerary generation for:', formData.destination);
+      const formData = JSON.parse(params.data as string);
 
-      // Generate AI-powered itinerary
-      const generatedItinerary = await itineraryGenerator.generateItinerary(formData);
-      
-      console.log('📋 AI generation complete, saving to database...');
+      const mockItinerary = {
+        user_id: user.id,
+        title: `${formData.destination} Adventure`,
+        destination: formData.destination,
+        start_date: formData.startDate,
+        end_date: formData.endDate,
+        budget: parseInt(formData.budget) || 50000,
+        travelers: parseInt(formData.travelers) || 1,
+        preferences: {
+          interests: formData.interests || [],
+          personalPrompt: formData.personalPrompt || '',
+        },
+        status: 'active' as const,
+      };
 
-      // Save to database
       const { data: itinerary, error: itineraryError } = await supabase
         .from('itineraries')
         .insert([{
