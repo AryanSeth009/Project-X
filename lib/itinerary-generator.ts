@@ -175,13 +175,24 @@ class ItineraryGenerator {
   }
 
   private generateTimeSlots(activities: any[], startHour: number = 9): GeneratedActivity[] {
-    let currentHour = startHour;
+    // Work in minutes to avoid fractional hours like 10.5
+    let currentMinutes = startHour * 60;
     const result: GeneratedActivity[] = [];
 
     activities.forEach((activity, index) => {
-      const startHourFormatted = currentHour.toString().padStart(2, '0') + ':00';
-      currentHour += activity.duration;
-      const endHourFormatted = Math.min(currentHour, 21).toString().padStart(2, '0') + ':00';
+      const startH = Math.floor(currentMinutes / 60);
+      const startM = currentMinutes % 60;
+      const startHourFormatted =
+        startH.toString().padStart(2, '0') + ':' + startM.toString().padStart(2, '0');
+
+      const durationHours = activity.duration ?? 1;
+      const durationMinutes = Math.round(durationHours * 60);
+
+      const endMinutes = Math.min(currentMinutes + durationMinutes, 21 * 60);
+      const endH = Math.floor(endMinutes / 60);
+      const endM = endMinutes % 60;
+      const endHourFormatted =
+        endH.toString().padStart(2, '0') + ':' + endM.toString().padStart(2, '0');
 
       result.push({
         title: activity.name,
@@ -195,7 +206,8 @@ class ItineraryGenerator {
         image_url: this.getRandomImage(activity.category)
       });
 
-      currentHour = Math.min(currentHour + 0.5, 21); // 30 min break between activities
+      // 30-minute break between activities
+      currentMinutes = Math.min(endMinutes + 30, 21 * 60);
     });
 
     return result;

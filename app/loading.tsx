@@ -5,9 +5,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import { supabase } from '@/lib/supabase';
 import { useStore } from '@/store/useStore';
-import {
-  itineraryGenerator,
-  type ItineraryFormData,
+import { API_BASE_URL, postJson } from '@/lib/api';
+import type {
+  ItineraryFormData,
+  GeneratedItinerary,
 } from '@/lib/itinerary-generator';
 
 const loadingMessages = [
@@ -79,8 +80,51 @@ export default function LoadingScreen() {
         params.data as string
       );
 
-      // Generate itinerary using AI
-      const generatedItinerary = await itineraryGenerator(formData);
+      // Generate itinerary using backend AI pipeline
+      type GenerateResponse = {
+        success: boolean;
+        data: any;
+        meta?: any;
+      };
+
+      const apiResponse = await postJson<
+        ItineraryFormData,
+        GenerateResponse
+      >('/itinerary/generate', formData);
+
+      if (!apiResponse?.success || !apiResponse.data) {
+        throw new Error('Failed to generate itinerary from API');
+      }
+
+      const apiItinerary = apiResponse.data;
+
+      // Adapt backend response into GeneratedItinerary shape
+      const generatedItinerary: GeneratedItinerary = {
+        title: apiItinerary.title,
+        destination: apiItinerary.destination,
+        start_date: apiItinerary.start_date,
+        end_date: apiItinerary.end_date,
+        budget: apiItinerary.budget,
+        travelers: apiItinerary.travelers,
+        preferences: apiItinerary.preferences,
+        days: (apiItinerary.days || []).map((day: any) => ({
+          day_number: day.day_number,
+          date: day.date,
+          title: day.title,
+          notes: day.notes ?? undefined,
+          activities: (day.activities || []).map((activity: any) => ({
+            title: activity.title,
+            description: activity.description,
+            time_start: activity.time_start,
+            time_end: activity.time_end,
+            location: activity.location,
+            cost: activity.cost,
+            category: activity.category,
+            order_index: activity.order_index,
+            image_url: activity.image_url,
+          })),
+        })),
+      };
 
       if (!generatedItinerary) {
         throw new Error('Failed to generate itinerary');
