@@ -1,0 +1,302 @@
+{
+  "destination": "Goa",
+  "areas": [
+    {
+      "name": "Baga",
+      "type": "Party",
+      "budgetRange": {
+        "hostel": 500,
+        "hotel": 2000
+      },
+      "bestFor": [
+        "Nightlife",
+        "Beaches",
+        "Restaurants",
+        "Water sports",
+        "Beach shacks",
+        "Dinner cruises",
+        "Live music",
+        "Jet skiing",
+        "Paragliding",
+        "Club hopping"
+      ]
+    },
+    {
+      "name": "Anjuna",
+      "type": "Budget Party",
+      "budgetRange": {
+        "hostel": 400,
+        "hotel": 1500
+      },
+      "bestFor": [
+        "Backpackers",
+        "Flea Market",
+        "Nightlife",
+        "Trance parties",
+        "Rocky beaches",
+        "Street food",
+        "Hippie culture",
+        "Wednesday market",
+        "Beach yoga",
+        "Sunset views"
+      ]
+    },
+    {
+      "name": "Palolem",
+      "type": "Relaxation",
+      "budgetRange": {
+        "hostel": 600,
+        "hotel": 1800
+      },
+      "bestFor": [
+        "Peaceful beaches",
+        "Nature",
+        "Yoga classes",
+        "Dolphin spotting",
+        "Swimming",
+        "Meditation",
+        "Kayaking",
+        "Beach massages",
+        "Star gazing",
+        "Silent parties"
+      ]
+    },
+    {
+      "name": "Calangute",
+      "type": "Commercial",
+      "budgetRange": {
+        "hostel": 450,
+        "hotel": 2200
+      },
+      "bestFor": [
+        "Shopping",
+        "Water sports",
+        "Restaurants",
+        "Markets",
+        "Beach activities",
+        "Nightlife"
+      ]
+    },
+    {
+      "name": "Arambol",
+      "type": "Hippie",
+      "budgetRange": {
+        "hostel": 350,
+        "hotel": 1400
+      },
+      "bestFor": [
+        "Drum circles",
+        "Paragliding",
+        "Sweet lake",
+        "Yoga retreats",
+        "Backpackers",
+        "Cheap food"
+      ]
+    },
+    {
+      "name": "Colva",
+      "type": "Family",
+      "budgetRange": {
+        "hostel": 500,
+        "hotel": 1700
+      },
+      "bestFor": [
+        "Family beaches",
+        "Local markets",
+        "Seafood restaurants",
+        "Water sports",
+        "Shopping",
+        "Peaceful evenings"
+      ]
+    }
+  ],
+  "transport": {
+    "scooter": {
+      "costPerDay": 400,
+      "recommended": true,
+      "fuelCost": "₹100-150/day",
+      "parkingTips": "Free at most beaches",
+      "helmet": "Always included",
+      "bestRentalSpots": ["Baga", "Anjuna", "Calangute"]
+    },
+    "taxi": {
+      "avgCostPerTrip": 800,
+      "olaUber": "₹500-700 North Goa",
+      "airportTransfer": "₹1500-2000",
+      "nightCharges": "+25%",
+      "shareTaxis": "₹200/person"
+    }
+  },
+  "attractions": [
+    {
+      "name": "Baga Beach",
+      "type": "Beach",
+      "avgTime": "2-3 hours",
+      "bestTime": "Sunset",
+      "crowdLevel": "High",
+      "waterSports": true
+    },
+    {
+      "name": "Fort Aguada",
+      "type": "Fort",
+      "avgTime": "1-2 hours",
+      "bestTime": "Sunrise",
+      "viewPoint": "Sinquerim Beach",
+      "entryFee": "Free"
+    },
+    {
+      "name": "Anjuna Flea Market",
+      "type": "Market",
+      "avgTime": "2 hours",
+      "daysOpen": "Wednesday",
+      "bestBuys": ["Clothes", "Jewelry", "Handicrafts"],
+      "timing": "4PM-9PM"
+    },
+    {
+      "name": "Chapora Fort",
+      "type": "Fort",
+      "avgTime": "1 hour",
+      "famousFor": "Dil Chahta Hai movie",
+      "viewPoint": "Vagator Beach",
+      "sunsetSpot": true
+    },
+    {
+      "name": "Dudhsagar Waterfall",
+      "type": "Waterfall",
+      "avgTime": "3-4 hours",
+      "bestSeason": "Monsoon",
+      "jeepSafari": "₹400/person",
+      "distance": "60km from Panjim"
+    },
+    {
+      "name": "Cola Beach",
+      "type": "Beach",
+      "avgTime": "2-3 hours",
+      "lagoon": true,
+      "secluded": true,
+      "access": "15min trek"
+    },
+    {
+      "name": "Vagator Beach",
+      "type": "Beach",
+      "avgTime": "2 hours",
+      "nearChapora": true,
+      "ozranExtension": true,
+      "rockyCliffs": true
+    },
+    {
+      "name": "Calangute Beach",
+      "type": "Beach",
+      "avgTime": "2-3 hours",
+      "shopping": true,
+      "waterSports": true,
+      "busyVibe": true
+    },
+    {
+      "name": "Agonda Beach",
+      "type": "Beach",
+      "avgTime": "2 hours",
+      "turtleNesting": true,
+      "quiet": true,
+      "kayaking": true
+    },
+    {
+      "name": "Basilica of Bom Jesus",
+      "type": "Church",
+      "avgTime": "1 hour",
+      "UNESCO": true,
+      "location": "Old Goa",
+      "bestTime": "Morning"
+    },
+    {
+      "name": "Reis Magos Fort",
+      "type": "Fort",
+      "avgTime": "1.5 hours",
+      "viewPoint": "Mandovi River",
+      "restored": "2010",
+      "entryFee": "₹50"
+    },
+    {
+      "name": "Arpora Night Market",
+      "type": "Market",
+      "avgTime": "3 hours",
+      "daysOpen": "Saturday",
+      "bestBuys": ["Clothes", "Jewelry", "Food"],
+      "timing": "6PM-midnight"
+    },
+    {
+      "name": "Spice Plantation",
+      "type": "Farm",
+      "avgTime": "2 hours",
+      "includes": "Lunch buffet",
+      "location": "Ponda",
+      "elephant": "Ride option"
+    },
+    {
+      "name": "Butterfly Beach",
+      "type": "Beach",
+      "avgTime": "3 hours",
+      "access": "Boat only",
+      "secluded": true,
+      "near": "Palolem"
+    }
+  ],
+  "travelClusters": [
+    {
+      "clusterName": "North Goa",
+      "places": [
+        "Baga Beach",
+        "Anjuna Beach",
+        "Fort Aguada",
+        "Chapora Fort",
+        "Calangute Beach",
+        "Vagator Beach",
+        "Anjuna Flea Market",
+        "Arpora Night Market"
+      ],
+      "distanceFromAirport": "45min",
+      "vibe": "Party & Beaches"
+    },
+    {
+      "clusterName": "South Goa",
+      "places": [
+        "Palolem Beach",
+        "Colva Beach",
+        "Cola Beach",
+        "Agonda Beach",
+        "Majorda Beach",
+        "Utorda Beach",
+        "Butterfly Beach"
+      ],
+      "distanceFromAirport": "90min",
+      "vibe": "Relaxation & Nature"
+    },
+    {
+      "clusterName": "Central Goa",
+      "places": [
+        "Basilica of Bom Jesus",
+        "Se Cathedral",
+        "Spice Plantation",
+        "Dudhsagar Waterfall",
+        "Reis Magos Fort"
+      ],
+      "distanceFromAirport": "60min",
+      "vibe": "Culture & History"
+    }
+  ],
+  "budgetTips": [
+    "Use scooter instead of taxi to save money",
+    "Stay in hostels in Anjuna for budget travel",
+    "Avoid peak December for cheaper stays",
+    "Eat at street food stalls and beach shacks",
+    "Rent scooters for ₹300-500/day including fuel",
+    "Visit flea markets for affordable souvenirs",
+    "Book trains 60 days early via IRCTC",
+    "Share auto-rickshaws between beaches",
+    "Drink coconut water instead of bottled drinks",
+    "Negotiate prices everywhere (50% off normal)",
+    "Stay in Arambol for cheapest accommodations",
+    "Eat thalis at local restaurants (₹100/person)",
+    "Use public buses for South Goa travel"
+  ]
+}
