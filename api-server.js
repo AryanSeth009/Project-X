@@ -1,5 +1,8 @@
 const express = require('express');
 const cors = require('cors');
+const { geoService } = require('./lib/geo-service');
+const { perplexityService } = require('./lib/perplexity-service');
+const { aiService } = require('./lib/ai-service');
 const { itineraryGenerator } = require('./lib/itinerary-generator');
 
 const app = express();
@@ -26,6 +29,14 @@ const mockDatabase = {
   profiles: mockUsers
 };
 
+// Ensure time strings are valid for Postgres (HH:MM or HH:MM:SS). Fix fractional hours like "14.5:00".
+function toValidTime(str) {
+  if (str == null || typeof str !== 'string') return str;
+  const m = str.trim().match(/^(\d+)\.5:00$/);
+  if (m) return String(m[1]).padStart(2, '0') + ':30';
+  return str;
+}
+
 // Routes
 app.get('/api/health', (req, res) => {
   res.json({ 
@@ -47,7 +58,7 @@ app.get('/api/users/:userId', (req, res) => {
   res.json(user);
 });
 
-// Generate itinerary (main endpoint)
+// Generate itinerary (old main endpoint, kept for compatibility)
 app.post('/api/itineraries/generate', async (req, res) => {
   try {
     const { 
@@ -147,8 +158,8 @@ app.post('/api/itineraries/generate', async (req, res) => {
           day_id: dayRecord.id,
           title: activity.title,
           description: activity.description,
-          time_start: activity.time_start,
-          time_end: activity.time_end,
+          time_start: toValidTime(activity.time_start),
+          time_end: toValidTime(activity.time_end),
           location: activity.location,
           cost: activity.cost,
           category: activity.category,
@@ -191,6 +202,167 @@ app.post('/api/itineraries/generate', async (req, res) => {
     res.status(500).json({ 
       error: 'Internal server error',
       message: error.message 
+    });
+  }
+});
+
+// STEP 3: Itinerary Generation System (CORE FEATURE)
+// New core endpoint that follows the requested flow:
+// 1) Validate input
+// 2) Call Geo Service
+// 3) Call Perplexity Service
+// 4) Call AI Service
+// 5) Save itinerary in database
+// 6) Return itinerary JSON
+app.post('/itinerary/generate', async (req, res) => {
+  try {
+    const {
+      destination,
+      startDate,
+      endDate,
+      travelers,
+      budget,
+      interests,
+    } = req.body || {};
+
+    // Step 1: Validate input
+    if (!destination || !startDate || !endDate) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required fields',
+        required: ['destination', 'startDate', 'endDate'],
+      });
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid date format. Expected YYYY-MM-DD.',
+      });
+    }
+
+    if (start < today) {
+      return res.status(400).json({
+        success: false,
+        error: 'Start date cannot be in the past',
+      });
+    }
+
+    if (end <= start) {
+      return res.status(400).json({
+        success: false,
+        error: 'End date must be after start date',
+      });
+    }
+
+    const days = Math.ceil(
+      (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24),
+    ) + 1;
+
+    if (days > 30) {
+      return res.status(400).json({
+        success: false,
+        error: 'Maximum trip duration is 30 days',
+      });
+    }
+
+    const formData = {
+      destination,
+      startDate,
+      endDate,
+      travelers: travelers?.toString() || '1',
+      budget: budget?.toString() || '50000',
+      interests: interests || [],
+    };
+
+    // Step 2: Call Geo Service
+    const destinationContext = await geoService.getDestinationContext(
+      destination,
+    );
+
+    // Step 3: Call Perplexity Service
+    const travelInsights = await perplexityService.getTravelInsights(
+      destination,
+    );
+
+    // Step 4: Call AI Service
+    const generatedItinerary = await aiService.generateItinerary({
+      formData,
+      geo: destinationContext,
+      insights: travelInsights,
+    });
+
+    // Step 5: Save itinerary in database (using mock DB here)
+    const itineraryId = `itinerary-${Date.now()}`;
+    const itinerary = {
+      id: itineraryId,
+      user_id: 'test-user-1', // mock user for this core API
+      title: generatedItinerary.title,
+      destination: generatedItinerary.destination,
+      start_date: generatedItinerary.start_date,
+      end_date: generatedItinerary.end_date,
+      budget: generatedItinerary.budget,
+      travelers: generatedItinerary.travelers,
+      preferences: generatedItinerary.preferences,
+      status: 'active',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      meta: generatedItinerary.meta,
+    };
+
+    mockDatabase.itineraries.push(itinerary);
+
+    const daysWithActivities = generatedItinerary.days.map((day, index) => {
+      const dayRecord = {
+        id: `day-${itineraryId}-${index + 1}`,
+        itinerary_id: itineraryId,
+        day_number: day.day_number,
+        date: day.date,
+        title: day.title,
+        notes: day.notes || null,
+        activities: day.activities.map((activity, actIndex) => ({
+          id: `activity-${itineraryId}-${index + 1}-${actIndex + 1}`,
+          day_id: `day-${itineraryId}-${index + 1}`,
+          title: activity.title,
+          description: activity.description,
+          time_start: toValidTime(activity.time_start),
+          time_end: toValidTime(activity.time_end),
+          location: activity.location,
+          cost: activity.cost,
+          category: activity.category,
+          order_index: activity.order_index,
+          image_url: activity.image_url,
+          created_at: new Date().toISOString(),
+        })),
+      };
+
+      mockDatabase.activities.push(...dayRecord.activities);
+      return dayRecord;
+    });
+
+    // Step 6: Return itinerary JSON
+    return res.json({
+      success: true,
+      data: {
+        ...itinerary,
+        days: daysWithActivities,
+      },
+      meta: {
+        geo: destinationContext,
+        insights: travelInsights,
+      },
+    });
+  } catch (error) {
+    console.error('❌ Error in /itinerary/generate:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+      message: error.message,
     });
   }
 });
@@ -289,8 +461,9 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`🚀 YatraAI API Server running on http://localhost:${PORT}`);
+// Bind to 0.0.0.0 so it's reachable from other devices on the network.
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 YatraAI API Server running on http://0.0.0.0:${PORT}`);
   console.log(`📖 API Documentation:`);
   console.log(`   GET  /api/health - Health check`);
   console.log(`   POST /api/itineraries/generate - Generate itinerary`);
