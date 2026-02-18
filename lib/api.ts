@@ -31,7 +31,23 @@ export async function postJson<TReq, TRes>(
     );
   }
 
-  const json = await response.json();
+  const contentType = response.headers.get('content-type') || '';
+  const text = await response.text();
+  let json: any = null;
+  try {
+    json = text ? JSON.parse(text) : null;
+  } catch {
+    // Common when EXPO_PUBLIC_API_URL points to Metro (8081), which returns HTML.
+    const hint =
+      text.trim().startsWith('<')
+        ? ' (Looks like HTML — check EXPO_PUBLIC_API_URL, it must point to your backend port 3001, not Metro 8081.)'
+        : '';
+    throw new Error(
+      `Expected JSON from ${url} but got ${contentType || 'unknown content-type'}${hint}. First 120 chars: ${text
+        .slice(0, 120)
+        .replace(/\s+/g, ' ')}`,
+    );
+  }
 
   if (!response.ok) {
     throw new Error(

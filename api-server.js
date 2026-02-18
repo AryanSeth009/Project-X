@@ -6,6 +6,7 @@ const { geoService } = require('./lib/geo-service');
 const { perplexityService } = require('./lib/perplexity-service');
 const { aiService } = require('./lib/ai-service');
 const { itineraryGenerator } = require('./lib/itinerary-generator');
+const { getGeoContext: getVectorGeoContext } = require('./backend/src/services/geoVectorService.cjs');
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
@@ -243,6 +244,7 @@ app.post('/itinerary/generate', async (req, res) => {
       travelers,
       budget,
       interests,
+      personalPrompt,
     } = req.body || {};
 
     // Step 1: Validate input
@@ -298,6 +300,7 @@ app.post('/itinerary/generate', async (req, res) => {
       travelers: travelers?.toString() || '1',
       budget: budget?.toString() || '50000',
       interests: interests || [],
+      personalPrompt: personalPrompt || '',
     };
 
     // Step 2: Call Geo Service (uses Supabase destination_contexts if configured, else static datasets)
@@ -306,10 +309,33 @@ app.post('/itinerary/generate', async (req, res) => {
       supabase,
     );
 
+    // Step 2b: (Optional) Vector Geo Context via JSON + Pinecone (Goa dataset etc.)
+    // Uses backend/src/geo-data/*.json + embeddings in Pinecone index \"travel-app\".
+    let vectorGeoContext = null;
+    try {
+      const userQuery =
+        (personalPrompt && String(personalPrompt).trim()) ||
+        `Trip to ${destination} for ${travelers || 1} travelers, budget ${budget || '50000'}, interests: ${(interests || []).join(', ')}`;
+
+      vectorGeoContext = await getVectorGeoContext(
+        destination,
+        userQuery,
+      );
+    } catch (e) {
+      console.warn('Vector Geo Service failed or not configured:', e.message);
+    }
+
     // Step 3: Call Perplexity Service
     const travelInsights = await perplexityService.getTravelInsights(
       destination,
+      personalPrompt,
     );
+
+    // Attach vector insights into insights for AI prompt if available
+    if (vectorGeoContext && Array.isArray(vectorGeoContext.vectorInsights)) {
+      travelInsights.vectorInsights = vectorGeoContext.vectorInsights;
+      travelInsights.structuredGeo = vectorGeoContext.structuredData;
+    }
 
     // Step 4: Call AI Service
     const generatedItinerary = await aiService.generateItinerary({
