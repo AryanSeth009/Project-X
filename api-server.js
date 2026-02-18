@@ -1,9 +1,17 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const { createClient } = require('@supabase/supabase-js');
 const { geoService } = require('./lib/geo-service');
 const { perplexityService } = require('./lib/perplexity-service');
 const { aiService } = require('./lib/ai-service');
 const { itineraryGenerator } = require('./lib/itinerary-generator');
+
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+const supabase = (supabaseUrl && supabaseAnonKey)
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : null;
 
 const app = express();
 const PORT = 3001;
@@ -44,6 +52,18 @@ app.get('/api/health', (req, res) => {
     message: 'YatraAI API Server is running',
     timestamp: new Date().toISOString()
   });
+});
+
+// Geo Intelligence: test destination context (best_areas, average_cost, transport_options, popular_attractions)
+app.get('/api/geo/context', async (req, res) => {
+  try {
+    const destination = req.query.destination || 'Goa';
+    const context = await geoService.getDestinationContext(destination, supabase);
+    res.json({ success: true, destination: context.name, data: context });
+  } catch (err) {
+    console.error('Geo context error:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
 });
 
 // Get user profile
@@ -280,9 +300,10 @@ app.post('/itinerary/generate', async (req, res) => {
       interests: interests || [],
     };
 
-    // Step 2: Call Geo Service
+    // Step 2: Call Geo Service (uses Supabase destination_contexts if configured, else static datasets)
     const destinationContext = await geoService.getDestinationContext(
       destination,
+      supabase,
     );
 
     // Step 3: Call Perplexity Service
