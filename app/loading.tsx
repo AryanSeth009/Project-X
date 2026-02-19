@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { View, Text, Animated, Alert } from 'react-native';
+import { View, Text, Animated, Alert, Image, ImageBackground } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -235,40 +235,42 @@ export default function LoadingScreen() {
   };
 
   return (
-    <LinearGradient
-      colors={['#FF9933', '#FFFFFF', '#138808']}
-      className="flex-1 items-center justify-center px-6"
-    >
-      <View className="items-center">
+    <ImageBackground source={require('../assets/images/doodle-loading-page.png')} // update path to your actual image
+  style={{ flex: 1 }}
+  resizeMode="contain"         // keeps ratio, fits fully on screen without stretching
+  imageStyle={{ backgroundColor: '#000' }} // fill letterbox areas with a color of your choice
+>
+  {/* Optional overlay for better text readability */}
+  <View className="flex-1 items-center justify-center px-6 bg-black/30">
+    <View className="items-center">
 
-        <View className="w-40 h-40 bg-white rounded-full items-center justify-center mb-8">
-          <Text className="text-6xl">✨</Text>
-        </View>
-
-        <Text className="font-inter-bold text-3xl text-white mb-4">
-          Creating Your Journey
-        </Text>
-
-        <Animated.View style={{ opacity: fadeAnim }}>
-          <Text className="font-inter-medium text-xl text-white text-center">
-            {loadingMessages[messageIndex]}
-          </Text>
-        </Animated.View>
-
-        <View className="flex-row mt-10 gap-2">
-          {[0, 1, 2, 3].map((i) => (
-            <View
-              key={i}
-              className="w-3 h-3 bg-white rounded-full"
-              style={{
-                opacity:
-                  messageIndex % 4 === i ? 1 : 0.3,
-              }}
-            />
-          ))}
-        </View>
-
+      <View className="w-40 h-40 bg-white/20 rounded-full items-center justify-center mb-8 border-2 border-white/40">
+        <Text className="text-6xl">✨</Text>
       </View>
-    </LinearGradient>
+
+      <Text className="font-inter-bold text-3xl text-white mb-4 text-center drop-shadow-lg">
+        Creating Your Journey
+      </Text>
+
+      <Animated.View style={{ opacity: fadeAnim }}>
+        <Text className="font-inter-medium text-xl text-white text-center opacity-90">
+          {loadingMessages[messageIndex]}
+        </Text>
+      </Animated.View>
+
+      <View className="flex-row mt-10 gap-2">
+        {[0, 1, 2, 3].map((i) => (
+          <View
+            key={i}
+            className="w-3 h-3 bg-white rounded-full"
+            style={{
+              opacity: messageIndex % 4 === i ? 1 : 0.3,
+            }}
+          />
+        ))}
+      </View>
+
+    </View>
+  </View></ImageBackground>
   );
 }

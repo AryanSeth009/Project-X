@@ -1,15 +1,5 @@
 import { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Alert,
-  Image,
-} from 'react-native';
+import {View,Text,TextInput,TouchableOpacity,KeyboardAvoidingView,Platform,ScrollView,Alert,Image} from 'react-native';
 import { useRouter } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 
