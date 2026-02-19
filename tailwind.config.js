@@ -7,6 +7,12 @@ module.exports = {
   presets: [require('nativewind/preset')],
   theme: {
     extend: {
+      fontFamily: {
+        inter: ['Inter24Regular'],
+        'inter-medium': ['Inter24Medium'],
+        'inter-semibold': ['Inter24SemiBold'],
+        'inter-bold': ['Inter24Bold'],
+      },
       colors: {
         saffron: {
           50: '#fff7ed',

@@ -14,8 +14,8 @@ export default function ProScreen() {
             <Crown size={26} color="#FFFFFF" />
           </View>
           <View className="flex-1">
-            <Text className="text-white text-2xl font-black">Pro</Text>
-            <Text className="text-white/90">
+            <Text className="font-inter-bold text-white text-2xl">Pro</Text>
+            <Text className="font-inter text-white/90">
               Optional upgrades will live here.
             </Text>
           </View>
@@ -24,10 +24,10 @@ export default function ProScreen() {
 
       <View className="px-6 py-6">
         <View className="bg-white rounded-3xl p-6 shadow-md">
-          <Text className="text-gray-800 text-lg font-bold mb-2">
+          <Text className="font-inter-bold text-gray-800 text-lg mb-2">
             Coming soon
           </Text>
-          <Text className="text-gray-600 leading-6">
+          <Text className="font-inter text-gray-600 leading-6">
             Your Profile and Home are now subscription-free. Any future Pro
             features can be added on this screen without cluttering the rest of
             the app.

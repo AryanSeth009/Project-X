@@ -2,6 +2,9 @@ import { Tabs } from 'expo-router';
 import { Home, Map, User, Crown } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
 import { View, StyleSheet, Platform } from 'react-native';
+import { FontFamily } from '@/lib/fonts';
+
+const TAB_RADIUS = 26;
 
 export default function TabLayout() {
   return (
@@ -11,19 +14,19 @@ export default function TabLayout() {
         tabBarActiveTintColor: '#1A7A73',
         tabBarInactiveTintColor: '#9CA3AF',
 
-        // ── Floating position ──────────────────────────────────────
+        // Floating, rounded container
         tabBarStyle: {
           position: 'absolute',
           bottom: 24,
           left: 20,
           right: 20,
           height: 70,
-          borderRadius: 28,
+          borderRadius: TAB_RADIUS,
           paddingBottom: 8,
           paddingTop: 8,
-          borderTopWidth: 0,        // remove default top border
+          borderTopWidth: 0,
           backgroundColor: 'transparent',
-          elevation: 0,             // remove Android shadow so BlurView shows
+          elevation: 0,
           ...Platform.select({
             ios: {
               shadowColor: '#000',
@@ -34,53 +37,52 @@ export default function TabLayout() {
           }),
         },
 
-        // ── Glassmorphism background rendered via tabBarBackground ──
+        // Glassmorphism background rendered inside its own rounded container
         tabBarBackground: () => (
-          <BlurView
-            intensity={75}
-            tint="light"
-            style={StyleSheet.absoluteFillObject}
-          >
-            {/* white glass wash */}
-            <View
-              style={{
-                ...StyleSheet.absoluteFillObject,
-                backgroundColor: 'rgba(255, 255, 255, 0.55)',
-                borderRadius: 28,
-              }}
-            />
-            {/* top-half sheen */}
-            <View
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: '50%',
-                backgroundColor: 'rgba(255, 255, 255, 0.25)',
-                borderTopLeftRadius: 28,
-                borderTopRightRadius: 28,
-              }}
-            />
-            {/* 1 px glass-edge highlight */}
-            <View
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: 1,
-                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                borderTopLeftRadius: 28,
-                borderTopRightRadius: 28,
-              }}
-            />
-          </BlurView>
+          <View style={styles.glassContainer}>
+            <BlurView
+              intensity={70}
+              tint="light"
+              style={StyleSheet.absoluteFillObject}
+            >
+              {/* white glass wash */}
+              <View
+                style={[
+                  StyleSheet.absoluteFillObject,
+                  {
+                    backgroundColor: 'rgba(255, 255, 255, 0.55)',
+                  },
+                ]}
+              />
+              {/* top-half sheen */}
+              <View
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '55%',
+                  backgroundColor: 'rgba(255, 255, 255, 0.25)',
+                }}
+              />
+              {/* 1 px glass-edge highlight */}
+              <View
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: StyleSheet.hairlineWidth * 2,
+                  backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                }}
+              />
+            </BlurView>
+          </View>
         ),
 
         tabBarLabelStyle: {
           fontSize: 12,
-          fontWeight: '600',
+          fontFamily: FontFamily.semibold,
         },
       }}
     >
@@ -115,3 +117,12 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  glassContainer: {
+    flex: 1,
+    borderRadius: TAB_RADIUS,
+    overflow: 'hidden',
+    backgroundColor: 'transparent',
+  },
+});

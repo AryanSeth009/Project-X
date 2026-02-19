@@ -80,20 +80,20 @@ export default function HomeScreen() {
       >
         <View className="flex-row items-center justify-between mb-6">
           <View>
-            <Text className="text-white text-3xl font-bold">Project X</Text>
-            <Text className="text-white/90 text-sm">-description-</Text>
+            <Text className="font-inter-bold text-white text-3xl">Project X</Text>
+            <Text className="font-inter text-white/90 text-sm">-description-</Text>
           </View>
           <View className="bg-white/20 rounded-full px-4 py-2 flex-row items-center gap-2">
             <Sparkles size={16} color="#FFFFFF" />
-            <Text className="text-white font-bold">AI Trip Planner</Text>
+            <Text className="font-inter-semibold text-white">AI Trip Planner</Text>
           </View>
         </View>
 
         <View className="bg-[white/10] rounded-2xl p-4 backdrop-blur-lg">
-          <Text className="text-white text-xl font-bold mb-2">
+          <Text className="font-inter-semibold text-white text-xl mb-2">
             Plan Your Dream Trip
           </Text>
-          <Text className="text-white/80">
+          <Text className="font-inter text-white/80">
             Step {step} of 2 — quick details, then personalize.
           </Text>
         </View>
@@ -101,7 +101,7 @@ export default function HomeScreen() {
 
       <View className="px-6 py-6 bg-gradient-to-b from-[#E8D5C0] to-[#F2EFE7]">
         <View className="bg-[#F2EFE7] rounded-3xl p-6 shadow-lg mb-6">
-          <Text className="text-2xl font-bold text-gray-800 mb-6">
+          <Text className="font-inter-bold text-2xl text-gray-800 mb-6">
             Trip Details
           </Text>
 
@@ -111,12 +111,12 @@ export default function HomeScreen() {
                 <View>
                   <View className="flex-row items-center gap-2 mb-2">
                     <MapPin size={18} color="#FF9933" />
-                    <Text className="text-gray-700 font-semibold">
+                    <Text className="font-inter-semibold text-gray-700">
                       Where do you wanna go?
                     </Text>
                   </View>
                   <TextInput
-                    className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
+                    className="font-inter bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
                     placeholder="e.g., Goa, Kerala, Rajasthan"
                     value={destination}
                     onChangeText={setDestination}
@@ -127,10 +127,10 @@ export default function HomeScreen() {
                   <View className="flex-1">
                     <View className="flex-row items-center gap-2 mb-2">
                       <Calendar size={18} color="#FF9933" />
-                      <Text className="text-gray-700 font-semibold">Start</Text>
+                      <Text className="font-inter-semibold text-gray-700">Start</Text>
                     </View>
                     <TextInput
-                      className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
+                      className="font-inter bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
                       placeholder="YYYY-MM-DD"
                       value={startDate}
                       onChangeText={setStartDate}
@@ -139,10 +139,10 @@ export default function HomeScreen() {
                   <View className="flex-1">
                     <View className="flex-row items-center gap-2 mb-2">
                       <Calendar size={18} color="#FF9933" />
-                      <Text className="text-gray-700 font-semibold">End</Text>
+                      <Text className="font-inter-semibold text-gray-700">End</Text>
                     </View>
                     <TextInput
-                      className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
+                      className="font-inter bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
                       placeholder="YYYY-MM-DD"
                       value={endDate}
                       onChangeText={setEndDate}
@@ -153,12 +153,12 @@ export default function HomeScreen() {
                 <View>
                   <View className="flex-row items-center gap-2 mb-2">
                     <Users size={18} color="#FF9933" />
-                    <Text className="text-gray-700 font-semibold">
+                    <Text className="font-inter-semibold text-gray-700">
                       No. of travelers
                     </Text>
                   </View>
                   <TextInput
-                    className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
+                    className="font-inter bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
                     placeholder="1"
                     value={travelers}
                     onChangeText={setTravelers}
@@ -172,7 +172,7 @@ export default function HomeScreen() {
                   onPress={handleNext}
                 >
                   <View className="flex-row items-center justify-center gap-2">
-                    <Text className="text-white text-center font-bold text-lg">
+                    <Text className="font-inter-bold text-white text-center text-lg">
                       Next
                     </Text>
                   </View>
@@ -183,7 +183,7 @@ export default function HomeScreen() {
                 <View>
                   <View className="flex-row items-center gap-2 mb-3">
                     <Heart size={18} color="#FF9933" />
-                    <Text className="text-gray-700 font-semibold">
+                    <Text className="font-inter-semibold text-gray-700">
                       What are you interested in?
                     </Text>
                   </View>
@@ -199,7 +199,7 @@ export default function HomeScreen() {
                         }`}
                       >
                         <Text
-                          className={`font-semibold ${
+                          className={`font-inter-semibold ${
                             interests.includes(interest)
                               ? 'text-white'
                               : 'text-gray-600'
@@ -215,12 +215,12 @@ export default function HomeScreen() {
                 <View>
                   <View className="flex-row items-center gap-2 mb-2">
                     <Wallet size={18} color="#FF9933" />
-                    <Text className="text-gray-700 font-semibold">
+                    <Text className="font-inter-semibold text-gray-700">
                       Budget (optional)
                     </Text>
                   </View>
                   <TextInput
-                    className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
+                    className="font-inter bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
                     placeholder="e.g., 50000"
                     value={budget}
                     onChangeText={setBudget}
@@ -228,7 +228,7 @@ export default function HomeScreen() {
                   />
                   <View className="flex-row items-center gap-2 mt-2">
                     <Info size={14} color="#6B7280" />
-                    <Text className="text-xs text-gray-500 flex-1">
+                    <Text className="font-inter text-xs text-gray-500 flex-1">
                       Leave blank if you want a balanced plan.
                     </Text>
                   </View>
@@ -237,12 +237,12 @@ export default function HomeScreen() {
                 <View>
                   <View className="flex-row items-center gap-2 mb-2">
                     <MessageCircle size={18} color="#FF9933" />
-                    <Text className="text-gray-700 font-semibold">
+                    <Text className="font-inter-semibold text-gray-700">
                       Personalize (optional)
                     </Text>
                   </View>
                   <TextInput
-                    className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
+                    className="font-inter bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
                     placeholder="Chat-style prompt… e.g., 'I love hidden cafes, no temples, and I want a chill pace.'"
                     value={personalPrompt}
                     onChangeText={setPersonalPrompt}
@@ -255,7 +255,7 @@ export default function HomeScreen() {
                     className="flex-1 bg-white border-2 border-gray-200 rounded-xl py-4"
                     onPress={() => setStep(1)}
                   >
-                    <Text className="text-gray-700 text-center font-bold text-lg">
+                    <Text className="font-inter-bold text-gray-700 text-center text-lg">
                       Back
                     </Text>
                   </TouchableOpacity>
@@ -265,7 +265,7 @@ export default function HomeScreen() {
                   >
                     <View className="flex-row items-center justify-center gap-2">
                       <Sparkles size={20} color="#FFFFFF" />
-                      <Text className="text-white text-center font-bold text-lg">
+                      <Text className="font-inter-bold text-white text-center text-lg">
                         Generate Itinerary
                       </Text>
                     </View>
@@ -277,17 +277,17 @@ export default function HomeScreen() {
         </View>
 
         <View className="bg-gradient-to-r from-saffron-50 to-green-50 rounded-2xl p-6 mb-6">
-          <Text className="text-lg font-bold text-gray-800 mb-3">
+          <Text className="font-inter-bold text-lg text-gray-800 mb-3">
             🎉 Demo Itinerary
           </Text>
-          <Text className="text-gray-600 mb-4">
+          <Text className="font-inter text-gray-600 mb-4">
             See how YatraAI creates perfect travel plans. Check out our sample Goa itinerary!
           </Text>
           <TouchableOpacity
             className="bg-white border-2 border-saffron-500 rounded-xl py-3"
             onPress={() => router.push('/(tabs)/itinerary')}
           >
-            <Text className="text-saffron-500 text-center font-bold">
+            <Text className="font-inter-bold text-saffron-500 text-center">
               View Demo
             </Text>
           </TouchableOpacity>

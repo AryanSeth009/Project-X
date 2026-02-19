@@ -245,12 +245,12 @@ export default function LoadingScreen() {
           <Text className="text-6xl">✨</Text>
         </View>
 
-        <Text className="text-3xl font-bold text-white mb-4">
+        <Text className="font-inter-bold text-3xl text-white mb-4">
           Creating Your Journey
         </Text>
 
         <Animated.View style={{ opacity: fadeAnim }}>
-          <Text className="text-xl text-white text-center">
+          <Text className="font-inter-medium text-xl text-white text-center">
             {loadingMessages[messageIndex]}
           </Text>
         </Animated.View>

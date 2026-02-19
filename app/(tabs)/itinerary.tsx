@@ -340,7 +340,7 @@ export default function ItineraryScreen() {
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-gray-50">
-        <Text className="text-gray-500">Loading itinerary...</Text>
+        <Text className="font-inter text-gray-500">Loading itinerary...</Text>
       </View>
     );
   }
@@ -349,17 +349,17 @@ export default function ItineraryScreen() {
     return (
       <View className="flex-1 items-center justify-center bg-gray-50 px-6">
         <Text className="text-6xl mb-4">📋</Text>
-        <Text className="text-2xl font-bold text-gray-800 mb-2">
+        <Text className="font-inter-bold text-2xl text-gray-800 mb-2">
           No Itinerary Yet
         </Text>
-        <Text className="text-gray-500 text-center">
+        <Text className="font-inter text-gray-500 text-center">
           Create your first itinerary from the Home tab
         </Text>
         <TouchableOpacity
           className="mt-6 bg-saffron-500 rounded-xl px-5 py-3"
           onPress={() => router.push('/(tabs)/home')}
         >
-          <Text className="text-white font-bold">Go to Home</Text>
+          <Text className="font-inter-bold text-white">Go to Home</Text>
         </TouchableOpacity>
       </View>
     );
@@ -375,12 +375,12 @@ export default function ItineraryScreen() {
       >
         <View className="flex-row items-start justify-between gap-3">
           <View className="flex-1">
-            <Text className="text-white text-3xl font-bold mb-2">
+            <Text className="font-inter-bold text-white text-3xl mb-2">
               {currentItinerary.title}
             </Text>
             <View className="flex-row items-center gap-2">
               <MapPin size={16} color="#FFFFFF" />
-              <Text className="text-white/90 text-lg">
+              <Text className="font-inter-medium text-white/90 text-lg">
                 {currentItinerary.destination}
               </Text>
             </View>
@@ -394,7 +394,7 @@ export default function ItineraryScreen() {
               onPress={() => setMode('view')}
             >
               <Eye size={16} color="#FFFFFF" />
-              <Text className="text-white font-bold">View</Text>
+              <Text className="font-inter-bold text-white">View</Text>
             </TouchableOpacity>
             <TouchableOpacity
               className={`px-3 py-2 rounded-xl flex-row items-center gap-2 ${
@@ -403,7 +403,7 @@ export default function ItineraryScreen() {
               onPress={() => setMode('edit')}
             >
               <Pencil size={16} color="#FFFFFF" />
-              <Text className="text-white font-bold">Edit</Text>
+              <Text className="font-inter-bold text-white">Edit</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -412,7 +412,7 @@ export default function ItineraryScreen() {
       <View className="px-6 py-4">
         {/* History picker */}
         <View className="mb-6">
-          <Text className="text-sm font-bold text-gray-700 mb-3">History</Text>
+          <Text className="font-inter-bold text-sm text-gray-700 mb-3">History</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View className="flex-row gap-3">
               {(history.length ? history : (itineraries as any)).slice(0, 20).map((it: any) => {
@@ -426,10 +426,10 @@ export default function ItineraryScreen() {
                     onPress={() => loadItineraryById(it.id)}
                     disabled={loadingHistory}
                   >
-                    <Text className="text-gray-800 font-bold" numberOfLines={1}>
+                    <Text className="font-inter-bold text-gray-800" numberOfLines={1}>
                       {it.destination}
                     </Text>
-                    <Text className="text-gray-500 text-xs mt-0.5" numberOfLines={1}>
+                    <Text className="font-inter text-gray-500 text-xs mt-0.5" numberOfLines={1}>
                       {it.start_date} → {it.end_date}
                     </Text>
                   </TouchableOpacity>
@@ -445,7 +445,7 @@ export default function ItineraryScreen() {
               <Calendar size={16} color="#FF9933" />
               <Text className="text-xs text-gray-500">Duration</Text>
             </View>
-            <Text className="text-lg font-bold text-gray-800">
+            <Text className="font-inter-bold text-lg text-gray-800">
               {currentItinerary.days.length} Days
             </Text>
           </View>
@@ -455,7 +455,7 @@ export default function ItineraryScreen() {
               <Wallet size={16} color="#FF9933" />
               <Text className="text-xs text-gray-500">Budget</Text>
             </View>
-            <Text className="text-lg font-bold text-gray-800">
+            <Text className="font-inter-bold text-lg text-gray-800">
               ₹{currentItinerary.budget.toLocaleString()}
             </Text>
           </View>
@@ -487,7 +487,7 @@ export default function ItineraryScreen() {
 
         {mode === 'view' ? (
           <>
-            <Text className="text-2xl font-bold text-gray-800 mb-4">
+            <Text className="font-inter-bold text-2xl text-gray-800 mb-4">
               Your Journey
             </Text>
 
@@ -495,7 +495,7 @@ export default function ItineraryScreen() {
               <View key={day.id} className="mb-6">
                 <View className="bg-white rounded-t-2xl p-4 border-l-4 border-saffron-500">
                   <View className="flex-row items-center justify-between mb-1">
-                    <Text className="text-lg font-bold text-gray-800">
+                    <Text className="font-inter-bold text-lg text-gray-800">
                       Day {day.day_number}
                     </Text>
                     <Text className="text-sm text-gray-500">
@@ -577,14 +577,14 @@ export default function ItineraryScreen() {
           </>
         ) : (
           <>
-            <Text className="text-2xl font-bold text-gray-800 mb-4">
+            <Text className="font-inter-bold text-2xl text-gray-800 mb-4">
               Edit in place
             </Text>
 
             {currentItinerary.days.map((day) => (
               <View key={day.id} className="mb-6">
                 <View className="bg-white rounded-t-2xl p-4 border-l-4 border-saffron-500">
-                  <Text className="text-lg font-bold text-gray-800">
+                  <Text className="font-inter-bold text-lg text-gray-800">
                     Day {day.day_number}: {day.title}
                   </Text>
                   <Text className="text-sm text-gray-500">

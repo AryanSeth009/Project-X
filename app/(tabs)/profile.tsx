@@ -27,7 +27,7 @@ export default function ProfileScreen() {
   if (!user) {
     return (
       <View className="flex-1 items-center justify-center bg-gray-50">
-        <Text className="text-gray-500">Loading profile...</Text>
+        <Text className="font-inter text-gray-500">Loading profile...</Text>
       </View>
     );
   }
@@ -40,8 +40,8 @@ export default function ProfileScreen() {
             <UserIcon size={26} color="#FFFFFF" />
           </View>
           <View className="flex-1">
-            <Text className="text-white text-2xl font-black">Profile</Text>
-            <Text className="text-white/90" numberOfLines={1}>
+            <Text className="font-inter-bold text-white text-2xl">Profile</Text>
+            <Text className="font-inter text-white/90" numberOfLines={1}>
               {user.email}
             </Text>
           </View>
@@ -50,10 +50,10 @@ export default function ProfileScreen() {
 
       <View className="px-6 -mt-6 mb-6">
         <View className="bg-white rounded-3xl p-6 shadow-xl">
-          <Text className="text-gray-500 text-xs font-semibold mb-2 uppercase tracking-wide">
+          <Text className="font-inter-semibold text-gray-500 text-xs mb-2 uppercase tracking-wide">
             Trips saved
           </Text>
-          <Text className="text-4xl font-black text-gray-800">
+          <Text className="font-inter-bold text-4xl text-gray-800">
             {itineraries.length}
           </Text>
 
@@ -63,7 +63,7 @@ export default function ProfileScreen() {
             activeOpacity={0.85}
           >
             <History size={20} color="#FFFFFF" />
-            <Text className="text-white font-black text-base">Open Itineraries</Text>
+            <Text className="font-inter-bold text-white text-base">Open Itineraries</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -75,7 +75,7 @@ export default function ProfileScreen() {
           activeOpacity={0.85}
         >
           <LogOut size={20} color="#EF4444" />
-          <Text className="text-red-600 font-bold text-base">Sign Out</Text>
+          <Text className="font-inter-bold text-red-600 text-base">Sign Out</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

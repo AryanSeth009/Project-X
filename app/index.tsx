@@ -41,17 +41,17 @@ export default function SplashScreen() {
           </View>
           
           {/* App name with modern typography */}
-          <Text className="text-5xl font-black text-white mb-3 tracking-tight">
+          <Text className="font-inter-bold text-5xl text-white mb-3 tracking-tight">
             Project X
           </Text>
           
-          <Text className="text-base text-white/80 font-medium mb-2">
+          <Text className="font-inter-medium text-base text-white/80 mb-2">
             Your *Uncensored*
           </Text>
           
           <View className="flex-row items-center gap-1 mb-12">
             <View className="w-1 h-1 bg-white/60 rounded-full" />
-            <Text className="text-sm text-white/60 font-medium">
+            <Text className="font-inter-medium text-sm text-white/60">
               Smart • Fast • Personalized
             </Text>
             <View className="w-1 h-1 bg-white/60 rounded-full" />
@@ -64,7 +64,7 @@ export default function SplashScreen() {
               <View className="w-2.5 h-2.5 bg-white/70 rounded-full animate-pulse" style={{ animationDelay: '150ms' }} />
               <View className="w-2.5 h-2.5 bg-white/50 rounded-full animate-pulse" style={{ animationDelay: '300ms' }} />
             </View>
-            <Text className="text-xs text-white/50 font-medium tracking-wide">
+            <Text className="font-inter-medium text-xs text-white/50 tracking-wide">
               Loading your experience
             </Text>
           </View>
