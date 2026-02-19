@@ -16,7 +16,7 @@ export default function SplashScreen() {
       } else {
         router.replace('/auth');
       }
-    }, 1000000);
+    }, 100000);
 
     return () => clearTimeout(timer);
   }, [user]);
@@ -50,11 +50,11 @@ export default function SplashScreen() {
           </Text>
 
           <View className="flex-row items-center gap-1 mb-12">
-            <View className="w-1 h-1 bg-white/60 rounded-full" />
+            
             <Text className="font-inter-medium text-sm text-white/60">
-              Smart  Fast  Personalized
+              Smart - Fast - Personalized
             </Text>
-            <View className="w-1 h-1 bg-white/60 rounded-full" />
+            
           </View>
 
           {/* Loading indicator */}
