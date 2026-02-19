@@ -68,22 +68,20 @@ export default function AuthScreen() {
         >
           {/* Modern Header with gradient */}
           <LinearGradient
-            colors={['#FF6B35', '#FF8C42']}
+            colors={['#1A7A73', '#1A7A73']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             className="pt-16 pb-8 px-6"
           >
-            <View className="items-center">
-              <View className="w-16 h-16 bg-white rounded-2xl items-center justify-center mb-4 shadow-lg">
-                <Text className="text-3xl">✈️</Text>
-              </View>
+            <View className="">
+              
               <Text className="text-3xl font-black text-white mb-2">
-                {isLogin ? 'Welcome back!' : 'Get started'}
+                {isLogin ? 'Sign in' : 'Sign up'}
               </Text>
-              <Text className="text-white/80 text-center text-base">
+              <Text className="text-white/80 text-base">
                 {isLogin
-                  ? 'Sign in to continue exploring'
-                  : 'Create your account in seconds'}
+                  ? 'Welcome back you\'ve been missed'
+                  : 'Just a few quick things to get you started'}
               </Text>
             </View>
           </LinearGradient>
@@ -116,13 +114,12 @@ export default function AuthScreen() {
               {/* Email Input */}
               <View>
                 <Text className="text-gray-700 font-semibold mb-2 text-sm">
-                  Email address
+                  Email ID
                 </Text>
-                <View className="bg-white border border-gray-200 rounded-2xl px-4 py-4 flex-row items-center shadow-sm">
-                  <Text className="text-gray-400 mr-3 text-lg">📧</Text>
+                <View className="bg-white border border-gray-200 rounded-2xl px-1 py-1 flex-row items-center shadow-sm">
                   <TextInput
                     className="flex-1 text-gray-800 text-base"
-                    placeholder="name@example.com"
+                    placeholder="Enter Email ID"
                     placeholderTextColor="#9CA3AF"
                     value={email}
                     onChangeText={setEmail}
@@ -137,11 +134,10 @@ export default function AuthScreen() {
                 <Text className="text-gray-700 font-semibold mb-2 text-sm">
                   Password
                 </Text>
-                <View className="bg-white border border-gray-200 rounded-2xl px-4 py-4 flex-row items-center shadow-sm">
-                  <Text className="text-gray-400 mr-3 text-lg">🔒</Text>
+                <View className="bg-white border border-gray-200 rounded-2xl px-1 py-1 flex-row items-center shadow-sm">
                   <TextInput
                     className="flex-1 text-gray-800 text-base"
-                    placeholder="Enter your password"
+                    placeholder="Enter password"
                     placeholderTextColor="#9CA3AF"
                     value={password}
                     onChangeText={setPassword}
@@ -172,7 +168,7 @@ export default function AuthScreen() {
                   colors={loading ? ['#D1D5DB', '#D1D5DB'] : ['#FF6B35', '#FF8C42']}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
-                  className="rounded-2xl py-4"
+                  style={{ borderRadius: 16, paddingVertical: 14 }}  // 16 = rounded-2xl
                 >
                   <Text className="text-white text-center font-bold text-lg">
                     {loading ? (
@@ -197,14 +193,9 @@ export default function AuthScreen() {
               {/* Social Login Options */}
               <View className="flex-row gap-3">
                 <TouchableOpacity className="flex-1 bg-white border border-gray-200 rounded-2xl py-3 items-center shadow-sm">
-                  <Text className="text-2xl">🔍</Text>
+                  <Text className="text-2xl">google</Text>
                 </TouchableOpacity>
-                <TouchableOpacity className="flex-1 bg-white border border-gray-200 rounded-2xl py-3 items-center shadow-sm">
-                  <Text className="text-2xl">📱</Text>
-                </TouchableOpacity>
-                <TouchableOpacity className="flex-1 bg-white border border-gray-200 rounded-2xl py-3 items-center shadow-sm">
-                  <Text className="text-2xl">🍎</Text>
-                </TouchableOpacity>
+                
               </View>
 
               {/* Toggle Auth Mode */}
@@ -215,7 +206,7 @@ export default function AuthScreen() {
                 }}
                 className="py-4"
               >
-                <Text className="text-center text-gray-600 text-base">
+                <Text className="text-center fixed bottom-0 p-4 text-gray-600 text-base">
                   {isLogin
                     ? "Don't have an account? "
                     : 'Already have an account? '}

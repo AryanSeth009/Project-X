@@ -510,7 +510,7 @@ export default function ItineraryScreen() {
 
                 <View className="bg-white rounded-b-2xl px-4 pb-4 shadow-lg">
                   {day.activities.map((activity, actIndex) => (
-                    <View key={activity.id}>
+                    <View key={activity.id || `activity-${day.id}-${actIndex}`}>
                       <View className="flex-row gap-3 py-4">
                         <View className="items-center">
                           <View
@@ -597,9 +597,9 @@ export default function ItineraryScreen() {
                 </View>
 
                 <View className="bg-white rounded-b-2xl shadow-lg">
-                  {day.activities.map((activity) => (
+                  {day.activities.map((activity, actIndex) => (
                     <View
-                      key={activity.id}
+                      key={activity.id || `activity-${day.id}-${actIndex}`}
                       className="border-b border-gray-100 last:border-b-0"
                     >
                       {editingActivity?.id === activity.id ? (

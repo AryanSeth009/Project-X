@@ -42,11 +42,11 @@ export default function SplashScreen() {
           
           {/* App name with modern typography */}
           <Text className="text-5xl font-black text-white mb-3 tracking-tight">
-            YatraAI
+            Project X
           </Text>
           
           <Text className="text-base text-white/80 font-medium mb-2">
-            Your AI Travel Companion
+            Your *Uncensored*
           </Text>
           
           <View className="flex-row items-center gap-1 mb-12">
