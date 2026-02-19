@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Sparkles, MapPin, Calendar, Users, Wallet, Heart, Info, MessageCircle } from 'lucide-react-native';
+import { Sparkles, MapPin, Calendar, Users, Wallet, Heart, Info, MessageCircle, Home } from 'lucide-react-native';
 import { useStore } from '@/store/useStore';
 
 export default function HomeScreen() {
@@ -22,6 +22,8 @@ export default function HomeScreen() {
   const [interests, setInterests] = useState<string[]>([]);
   const [budget, setBudget] = useState('');
   const [personalPrompt, setPersonalPrompt] = useState('');
+  const [stayLocation, setStayLocation] = useState('');
+  const [areaOptions, setAreaOptions] = useState<{ name: string; type: string }[]>([]);
 
   const interestOptions = [
     'Culture',
@@ -32,6 +34,15 @@ export default function HomeScreen() {
     'Nightlife',
     'History',
     'Relaxation',
+    'Beach',
+    'Mountain',
+    'River',
+    'Lake',
+    'Forest',
+    'Desert',
+    'City',
+    'Village',
+    'Temple',
   ];
 
   const toggleInterest = (interest: string) => {
@@ -42,12 +53,27 @@ export default function HomeScreen() {
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (!destination || !startDate || !endDate) {
       Alert.alert('Missing Information', 'Please fill destination and dates.');
       return;
     }
     setStep(2);
+    setStayLocation('');
+    const dest = destination.toLowerCase();
+    if (dest.includes('goa') || dest.includes('manali') || dest.includes('jaipur')) {
+      try {
+        const { API_BASE_URL } = await import('@/lib/api');
+        const res = await fetch(`${API_BASE_URL}/api/geo/areas?destination=${encodeURIComponent(destination)}`);
+        const json = await res.json();
+        if (json?.areas?.length) setAreaOptions(json.areas);
+        else setAreaOptions([]);
+      } catch {
+        setAreaOptions([]);
+      }
+    } else {
+      setAreaOptions([]);
+    }
   };
 
   const handleGenerate = () => {
@@ -64,6 +90,7 @@ export default function HomeScreen() {
       budget,
       interests,
       personalPrompt,
+      stayLocation: stayLocation || undefined,
     };
 
     router.push({
@@ -180,6 +207,45 @@ export default function HomeScreen() {
               </>
             ) : (
               <>
+                {areaOptions.length > 0 && (
+                  <View>
+                    <View className="flex-row items-center gap-2 mb-2">
+                      <Home size={18} color="#FF9933" />
+                      <Text className="font-inter-semibold text-gray-700">
+                        Where are you staying? (optional)
+                      </Text>
+                    </View>
+                    <Text className="font-inter text-xs text-gray-500 mb-2">
+                      We'll tailor Day 1 around your area
+                    </Text>
+                    <View className="flex-row flex-wrap gap-2">
+                      <TouchableOpacity
+                        onPress={() => setStayLocation('')}
+                        className={`px-4 py-2 rounded-full border-2 ${
+                          !stayLocation ? 'bg-saffron-500 border-saffron-500' : 'bg-white border-gray-300'
+                        }`}
+                      >
+                        <Text className={`font-inter-semibold ${!stayLocation ? 'text-white' : 'text-gray-600'}`}>
+                          Skip
+                        </Text>
+                      </TouchableOpacity>
+                      {areaOptions.map((opt) => (
+                        <TouchableOpacity
+                          key={opt.name}
+                          onPress={() => setStayLocation(opt.name)}
+                          className={`px-4 py-2 rounded-full border-2 ${
+                            stayLocation === opt.name ? 'bg-saffron-500 border-saffron-500' : 'bg-white border-gray-300'
+                          }`}
+                        >
+                          <Text className={`font-inter-semibold ${stayLocation === opt.name ? 'text-white' : 'text-gray-600'}`}>
+                            {opt.name}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </View>
+                )}
+
                 <View>
                   <View className="flex-row items-center gap-2 mb-3">
                     <Heart size={18} color="#FF9933" />

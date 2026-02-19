@@ -7,6 +7,7 @@ const { perplexityService } = require('./lib/perplexity-service');
 const { aiService } = require('./lib/ai-service');
 const { itineraryGenerator } = require('./lib/itinerary-generator');
 const { getGeoContext: getVectorGeoContext } = require('./backend/src/services/geoVectorService.cjs');
+const { getGeoContext: buildRichGeoContext } = require('./backend/src/services/contextBuilder.cjs');
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
@@ -55,12 +56,36 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Geo Intelligence: test destination context (best_areas, average_cost, transport_options, popular_attractions)
+// Geo Intelligence: get area options for stay location (optional user input)
+app.get('/api/geo/areas', (req, res) => {
+  try {
+    const destination = String(req.query.destination || '').trim();
+    if (!destination) {
+      return res.json({ success: true, areas: [] });
+    }
+    const { loadGeoDataset } = require('./backend/src/services/contextBuilder.cjs');
+    const data = loadGeoDataset(destination);
+    const areas = (data && data.areas) ? data.areas.map((a) => ({ name: a.name, type: a.type, bestFor: a.bestFor || [] })) : [];
+    res.json({ success: true, destination, areas });
+  } catch (err) {
+    console.error('Geo areas error:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Geo Intelligence: test RICH destination context (specific restaurants, hostels, activities)
 app.get('/api/geo/context', async (req, res) => {
   try {
     const destination = req.query.destination || 'Goa';
-    const context = await geoService.getDestinationContext(destination, supabase);
-    res.json({ success: true, destination: context.name, data: context });
+    const richContext = buildRichGeoContext(destination, `Trip to ${destination}`, null);
+    const basicContext = await geoService.getDestinationContext(destination, supabase);
+    res.json({
+      success: true,
+      destination,
+      richGeo: richContext,
+      basicGeo: basicContext,
+      hasStructuredData: richContext?.specificRestaurants?.length > 0 || richContext?.popularAttractions?.length > 0,
+    });
   } catch (err) {
     console.error('Geo context error:', err);
     res.status(500).json({ success: false, error: err.message });
@@ -245,6 +270,7 @@ app.post('/itinerary/generate', async (req, res) => {
       budget,
       interests,
       personalPrompt,
+      stayLocation,
     } = req.body || {};
 
     // Step 1: Validate input
@@ -301,6 +327,7 @@ app.post('/itinerary/generate', async (req, res) => {
       budget: budget?.toString() || '50000',
       interests: interests || [],
       personalPrompt: personalPrompt || '',
+      stayLocation: stayLocation ? String(stayLocation).trim() : '',
     };
 
     // Step 2: Call Geo Service (uses Supabase destination_contexts if configured, else static datasets)
@@ -311,12 +338,12 @@ app.post('/itinerary/generate', async (req, res) => {
 
     // Step 2b: (Optional) Vector Geo Context via JSON + Pinecone (Goa dataset etc.)
     // Uses backend/src/geo-data/*.json + embeddings in Pinecone index \"travel-app\".
+    const userQuery =
+      (personalPrompt && String(personalPrompt).trim()) ||
+      `Trip to ${destination} for ${travelers || 1} travelers, budget ${budget || '50000'}, interests: ${(interests || []).join(', ')}`;
+    
     let vectorGeoContext = null;
     try {
-      const userQuery =
-        (personalPrompt && String(personalPrompt).trim()) ||
-        `Trip to ${destination} for ${travelers || 1} travelers, budget ${budget || '50000'}, interests: ${(interests || []).join(', ')}`;
-
       vectorGeoContext = await getVectorGeoContext(
         destination,
         userQuery,
@@ -324,6 +351,14 @@ app.post('/itinerary/generate', async (req, res) => {
     } catch (e) {
       console.warn('Vector Geo Service failed or not configured:', e.message);
     }
+
+    // Step 2c: Build RICH geo context (merges structured + vector + specific places)
+    // This creates the competitive advantage: specific restaurants, hostels, exact activities
+    const richGeoContext = buildRichGeoContext(
+      destination,
+      userQuery,
+      vectorGeoContext,
+    );
 
     // Step 3: Call Perplexity Service
     const travelInsights = await perplexityService.getTravelInsights(
@@ -337,10 +372,10 @@ app.post('/itinerary/generate', async (req, res) => {
       travelInsights.structuredGeo = vectorGeoContext.structuredData;
     }
 
-    // Step 4: Call AI Service
+    // Step 4: Call AI Service (pass rich geo context for specific outputs)
     const generatedItinerary = await aiService.generateItinerary({
       formData,
-      geo: destinationContext,
+      geo: richGeoContext || destinationContext, // Use rich context if available
       insights: travelInsights,
     });
 
@@ -400,8 +435,9 @@ app.post('/itinerary/generate', async (req, res) => {
         days: daysWithActivities,
       },
       meta: {
-        geo: destinationContext,
+        geo: richGeoContext || destinationContext,
         insights: travelInsights,
+        vectorEnabled: vectorGeoContext?.meta?.vectorsEnabled || false,
       },
     });
   } catch (error) {

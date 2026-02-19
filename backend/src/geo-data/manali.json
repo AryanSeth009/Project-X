@@ -1,0 +1,189 @@
+{
+  "destination": "Manali",
+  "areas": [
+    {
+      "name": "Old Manali",
+      "type": "Budget Backpacker",
+      "budgetRange": {
+        "hostel": 400,
+        "hotel": 1200
+      },
+      "bestFor": ["Cafes", "Hostels", "Backpackers", "Chill vibe"],
+      "specificPlaces": {
+        "restaurants": [
+          {"name": "Dylan's Toasted & Roasted", "type": "Cafe", "cost": 500, "bestFor": "Israeli food & coffee", "timing": "8AM-10PM"},
+          {"name": "Drifters' Inn Cafe", "type": "Cafe", "cost": 400, "bestFor": "Continental & live music", "timing": "9AM-11PM"},
+          {"name": "Lazy Dog", "type": "Restaurant", "cost": 600, "bestFor": "Tibetan & Indian", "timing": "12PM-10PM"},
+          {"name": "Cafe 1947", "type": "Cafe", "cost": 450, "bestFor": "Breakfast & desserts", "timing": "8AM-9PM"}
+        ],
+        "hostels": [
+          {"name": "Zostel Manali", "cost": 400, "amenities": ["WiFi", "Common area", "Events"], "rating": "4.5"},
+          {"name": "GoStops Manali", "cost": 450, "amenities": ["WiFi", "Mountain views"], "rating": "4.3"},
+          {"name": "The Hosteller Old Manali", "cost": 380, "amenities": ["WiFi", "Cafe"], "rating": "4.2"}
+        ],
+        "activities": [
+          {"name": "Cafe Hopping Old Manali", "cost": 800, "duration": "3 hours", "includes": ["Coffee", "Food", "Music"]},
+          {"name": "Riverside Walk", "cost": 0, "duration": "1 hour", "path": "Along Beas River"},
+          {"name": "Live Music at Drifters'", "cost": 300, "duration": "2 hours", "timing": "Evening"}
+        ]
+      }
+    },
+    {
+      "name": "Mall Road",
+      "type": "Commercial",
+      "budgetRange": {
+        "hostel": 600,
+        "hotel": 2000
+      },
+      "bestFor": ["Shopping", "Restaurants", "Central location"],
+      "specificPlaces": {
+        "restaurants": [
+          {"name": "Johnson's Cafe", "type": "Restaurant", "cost": 700, "bestFor": "Continental & Indian", "timing": "12PM-10PM"},
+          {"name": "Il Forno", "type": "Italian", "cost": 800, "bestFor": "Pizza & pasta", "timing": "12PM-10PM"},
+          {"name": "Mount View Restaurant", "cost": 600, "bestFor": "Himachali cuisine", "timing": "12PM-9PM"}
+        ],
+        "hostels": [
+          {"name": "Hotel Holiday Heights", "cost": 1500, "amenities": ["WiFi", "Heating", "Central"], "rating": "4.0"}
+        ],
+        "activities": [
+          {"name": "Shopping at Mall Road", "cost": 0, "duration": "2 hours", "bestBuys": ["Woolens", "Dry fruits", "Souvenirs"]},
+          {"name": "Manu Temple Visit", "cost": 0, "duration": "1 hour", "location": "Near Mall Road"}
+        ]
+      }
+    },
+    {
+      "name": "Solang Valley",
+      "type": "Adventure",
+      "budgetRange": {
+        "hostel": 800,
+        "hotel": 2500
+      },
+      "bestFor": ["Adventure sports", "Snow", "Day trips"],
+      "specificPlaces": {
+        "restaurants": [
+          {"name": "Solang Valley Cafe", "type": "Cafe", "cost": 500, "bestFor": "Quick meals", "timing": "9AM-6PM"}
+        ],
+        "activities": [
+          {"name": "Paragliding Solang", "cost": 2500, "duration": "15min", "operator": "Local operators"},
+          {"name": "Skiing (Dec-Feb)", "cost": 2000, "duration": "2 hours", "includes": ["Equipment", "Instructor"]},
+          {"name": "Zorbing", "cost": 500, "duration": "10min", "operator": "Adventure operators"},
+          {"name": "ATV Ride", "cost": 800, "duration": "15min", "operator": "Local operators"}
+        ]
+      }
+    },
+    {
+      "name": "Vashisht",
+      "type": "Wellness",
+      "budgetRange": {
+        "hostel": 500,
+        "hotel": 1500
+      },
+      "bestFor": ["Hot springs", "Temples", "Peaceful"],
+      "specificPlaces": {
+        "restaurants": [
+          {"name": "Moonlight Cafe", "type": "Cafe", "cost": 400, "bestFor": "Organic food", "timing": "9AM-8PM"}
+        ],
+        "activities": [
+          {"name": "Vashisht Hot Springs", "cost": 50, "duration": "1 hour", "timing": "6AM-9PM"},
+          {"name": "Vashisht Temple", "cost": 0, "duration": "30min", "bestTime": "Morning"}
+        ]
+      }
+    }
+  ],
+  "transport": {
+    "localTaxi": {
+      "costPerTrip": 500,
+      "recommended": true,
+      "withinManali": "₹200-300",
+      "toSolang": "₹800",
+      "toRohtang": "₹2000"
+    },
+    "bikeRental": {
+      "costPerDay": 1200,
+      "includes": ["Helmet", "Fuel not included"],
+      "bestFor": "Rohtang Pass trip"
+    },
+    "hrtcBus": {
+      "toRohtang": 200,
+      "toSolang": 150,
+      "schedule": "Frequent from Mall Road"
+    }
+  },
+  "attractions": [
+    {
+      "name": "Rohtang Pass",
+      "type": "Mountain Pass",
+      "avgTime": "Full day",
+      "bestTime": "Morning (6AM start)",
+      "distance": "51km from Manali",
+      "permits": "Required (online booking)",
+      "activities": ["Snow play", "Photography", "Scenic views"]
+    },
+    {
+      "name": "Solang Valley",
+      "type": "Adventure",
+      "avgTime": "Half day",
+      "activities": ["Paragliding", "Skiing", "Zorbing", "ATV"],
+      "bestSeason": "Year-round (snow Dec-Feb)"
+    },
+    {
+      "name": "Hadimba Temple",
+      "type": "Temple",
+      "avgTime": "1 hour",
+      "location": "Cedar forest",
+      "entryFee": "₹30",
+      "bestTime": "Morning"
+    },
+    {
+      "name": "Vashisht Hot Springs",
+      "type": "Wellness",
+      "avgTime": "1 hour",
+      "cost": "₹50",
+      "bestTime": "Early morning (6AM-8AM)"
+    },
+    {
+      "name": "Old Manali Cafes",
+      "type": "Food & Culture",
+      "avgTime": "2-3 hours",
+      "vibe": "Hippie, backpacker",
+      "bestCafes": ["Dylan's", "Drifters'", "Cafe 1947"]
+    }
+  ],
+  "travelClusters": [
+    {
+      "clusterName": "Manali Town",
+      "places": ["Mall Road", "Hadimba Temple", "Manu Temple"],
+      "vibe": "Commercial & Cultural",
+      "dayPlan": "Morning: Temples, Afternoon: Shopping, Evening: Restaurants"
+    },
+    {
+      "clusterName": "Adventure Zone",
+      "places": ["Solang Valley", "Rohtang Pass"],
+      "vibe": "Adventure & Snow",
+      "dayPlan": "Full day trip to Solang (paragliding/skiing) or Rohtang (snow)"
+    },
+    {
+      "clusterName": "Old Manali",
+      "places": ["Old Manali Cafes", "Riverside", "Vashisht"],
+      "vibe": "Chill & Backpacker",
+      "dayPlan": "Morning: Vashisht hot springs, Afternoon: Cafe hopping, Evening: Live music"
+    }
+  ],
+  "budgetTips": [
+    "Stay at Zostel Manali Old Manali (₹400/night) for budget",
+    "Eat breakfast at Dylan's or Cafe 1947 (₹400-500)",
+    "Take HRTC bus to Solang (₹150) instead of taxi (₹800)",
+    "Book Rohtang permit online 60 days early (free)",
+    "Rent bike for Rohtang trip (₹1200/day) - cheaper than taxi",
+    "Visit Vashisht hot springs early morning (₹50, less crowded)",
+    "Eat at local dhabas for cheap meals (₹150-200)",
+    "Shop woolens at Mall Road (negotiate 30-40% off)",
+    "Stay in Old Manali hostels for backpacker vibe",
+    "Visit Solang in morning (9AM) to avoid crowds"
+  ],
+  "hiddenGems": [
+    {"name": "Jogini Falls", "access": "2km trek from Vashisht", "cost": 0, "why": "Beautiful waterfall, less crowded"},
+    {"name": "Hampta Pass", "access": "Trekking route", "cost": 0, "why": "Scenic pass, moderate trek"},
+    {"name": "Great Himalayan National Park", "access": "2 hours from Manali", "cost": 200, "why": "UNESCO site, wildlife"}
+  ]
+}

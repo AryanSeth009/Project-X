@@ -6,6 +6,8 @@ export interface ItineraryFormData {
   budget?: string;
   interests?: string[];
   personalPrompt?: string;
+  /** Optional: where user is staying (e.g. Baga, Anjuna) - used to tailor Day 1 */
+  stayLocation?: string;
 }
 
 export interface GeneratedActivity {
@@ -640,7 +642,7 @@ class ItineraryGenerator {
         description: activity.description,
         time_start: startHourFormatted,
         time_end: endHourFormatted,
-        location: `${activity.name} Location`,
+        location: activity.location || activity.name,
         cost: activity.cost,
         category: activity.category,
         order_index: index,
@@ -682,8 +684,105 @@ class ItineraryGenerator {
     return titles[dayNumber - 1] || `Day ${dayNumber} in ${destination}`;
   }
 
+  private createSpecificActivitiesFromGeo(geoContext: any, day: number, dailyBudget: number): any[] {
+    if (!geoContext) return [];
+    
+    const specific: any[] = [];
+    const usedNames = new Set<string>();
+    
+    // Add specific restaurants (breakfast/lunch/dinner)
+    if (geoContext.specificRestaurants && Array.isArray(geoContext.specificRestaurants)) {
+      const restaurants = geoContext.specificRestaurants.filter((r: any) => 
+        (r.cost || 0) <= dailyBudget * 0.3 && !usedNames.has(r.name)
+      );
+      
+      if (restaurants.length > 0) {
+        const breakfast = restaurants.find((r: any) => 
+          r.bestFor?.toLowerCase().includes('breakfast') || 
+          r.timing?.includes('AM')
+        ) || restaurants[0];
+        
+        const lunch = restaurants.find((r: any) => 
+          r.bestFor?.toLowerCase().includes('lunch') || 
+          r.bestFor?.toLowerCase().includes('seafood') ||
+          (r.name !== breakfast.name)
+        ) || restaurants[restaurants.length > 1 ? 1 : 0];
+        
+        if (breakfast && !usedNames.has(breakfast.name)) {
+          specific.push({
+            name: `Breakfast at ${breakfast.name}`,
+            cost: breakfast.cost || 400,
+            duration: 1,
+            category: 'food' as const,
+            description: `${breakfast.type} - ${breakfast.bestFor || 'Local cuisine'} (₹${breakfast.cost})`,
+            location: `${breakfast.area || ''} ${breakfast.name}`.trim(),
+            geoSpecific: true,
+          });
+          usedNames.add(breakfast.name);
+        }
+        
+        if (lunch && lunch.name !== breakfast.name && !usedNames.has(lunch.name)) {
+          specific.push({
+            name: `Lunch at ${lunch.name}`,
+            cost: lunch.cost || 600,
+            duration: 1.5,
+            category: 'food' as const,
+            description: `${lunch.type} - ${lunch.bestFor || 'Local cuisine'} (₹${lunch.cost})`,
+            location: `${lunch.area || ''} ${lunch.name}`.trim(),
+            geoSpecific: true,
+          });
+          usedNames.add(lunch.name);
+        }
+      }
+    }
+    
+    // Add specific activities from geo data
+    if (geoContext.specificActivities && Array.isArray(geoContext.specificActivities)) {
+      geoContext.specificActivities.slice(0, 2).forEach((act: any) => {
+        if ((act.cost || 0) <= dailyBudget * 0.3 && !usedNames.has(act.name)) {
+          const duration = parseFloat(String(act.duration)) || 2;
+          specific.push({
+            name: act.name,
+            cost: act.cost || 0,
+            duration,
+            category: 'activity' as const,
+            description: act.operator ? `${act.description || act.name} (${act.operator})` : (act.description || act.name),
+            location: `${act.area || ''} ${act.name}`.trim(),
+            geoSpecific: true,
+          });
+          usedNames.add(act.name);
+        }
+      });
+    }
+    
+    // Add popular attractions as specific activities
+    if (geoContext.popularAttractions && Array.isArray(geoContext.popularAttractions)) {
+      geoContext.popularAttractions.slice(0, 2).forEach((attr: any) => {
+        if (!usedNames.has(attr.name)) {
+          const avgTimeStr = attr.avgTime || '2';
+          const avgTime = parseFloat(avgTimeStr.split('-')[0]) || 2;
+          const entryFeeStr = attr.entryFee || '0';
+          const entryFee = parseFloat(entryFeeStr.replace(/[^0-9]/g, '')) || 0;
+          specific.push({
+            name: `Visit ${attr.name}`,
+            cost: entryFee,
+            duration: avgTime,
+            category: 'attraction' as const,
+            description: `${attr.type}${attr.bestTime ? ` - Best time: ${attr.bestTime}` : ''}${entryFee > 0 ? ` (Entry: ${attr.entryFee})` : ''}`.trim(),
+            location: attr.name,
+            geoSpecific: true,
+          });
+          usedNames.add(attr.name);
+        }
+      });
+    }
+    
+    return specific;
+  }
+
   async generateItinerary(
     formData: ItineraryFormData,
+    geoContext?: any,
   ): Promise<GeneratedItinerary> {
     const startDate = new Date(formData.startDate);
     const endDate = new Date(formData.endDate);
@@ -698,8 +797,27 @@ class ItineraryGenerator {
     const isGoa = formData.destination.toLowerCase().includes('goa');
 
     const allActivities = this.getDestinationActivities(formData.destination);
+    
+    // Boost activities that match geo intelligence (popular_attractions, best_areas)
+    let geoBoostedActivities = allActivities;
+    if (geoContext?.popular_attractions && Array.isArray(geoContext.popular_attractions)) {
+      const geoAttractionNames = geoContext.popular_attractions.map((a: any) => 
+        String(a?.name || '').toLowerCase()
+      );
+      geoBoostedActivities = allActivities.map((act) => {
+        const nameLower = String(act.name || '').toLowerCase();
+        const matchesGeo = geoAttractionNames.some((geoName: string) => 
+          nameLower.includes(geoName) || geoName.includes(nameLower)
+        );
+        return {
+          ...act,
+          score: (act.score || 1) + (matchesGeo ? 3 : 0), // Strong boost for geo matches
+        };
+      });
+    }
+    
     const filteredByInterests = this.filterByInterests(
-      allActivities,
+      geoBoostedActivities,
       formData.interests || [],
     );
     const filteredByBudget = this.filterByBudget(
@@ -732,11 +850,19 @@ class ItineraryGenerator {
 
       // Less hours on arrival/departure days
 
+      // Create SPECIFIC activities from geo intelligence (restaurants, exact places)
+      const geoSpecificActivities = this.createSpecificActivitiesFromGeo(geoContext, day, dailyBudget);
+      
+      // Mix geo-specific with generic activities
       const remaining = filteredByBudget.filter(
         (a) => !usedActivityNames.has(a?.name),
       );
       const pool = remaining.length > 0 ? remaining : filteredByBudget;
-      const dayActivities = this.optimizeSchedule(pool, availableHours, day);
+      const geoHoursUsed = geoSpecificActivities.reduce((sum: number, a: any) => sum + (a.duration || 0), 0);
+      const genericActivities = this.optimizeSchedule(pool, Math.max(0, availableHours - geoHoursUsed), day);
+      
+      // Combine: geo-specific first (they're more valuable), then generic
+      const dayActivities = [...geoSpecificActivities, ...genericActivities];
       dayActivities.forEach((a) => {
         if (a?.name) usedActivityNames.add(a.name);
       });
