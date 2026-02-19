@@ -19,11 +19,9 @@ export default function HomeScreen() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [travelers, setTravelers] = useState('1');
-  const [budget, setBudget] = useState('');
   const [interests, setInterests] = useState<string[]>([]);
   const [budget, setBudget] = useState('');
   const [personalPrompt, setPersonalPrompt] = useState('');
-  const { profile } = useStore();
 
   const interestOptions = [
     'Culture',
