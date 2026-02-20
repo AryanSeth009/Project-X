@@ -1,0 +1,165 @@
+{
+  "destination": "Jaipur",
+  "areas": [
+    {
+      "name": "MI Road / Bani Park",
+      "type": "Commercial",
+      "budgetRange": {
+        "hostel": 600,
+        "hotel": 2500
+      },
+      "bestFor": ["Hotels", "Restaurants", "Central location"],
+      "specificPlaces": {
+        "restaurants": [
+          {"name": "Laxmi Misthan Bhandar (LMB)", "type": "Traditional", "cost": 400, "bestFor": "Rajasthani thali", "timing": "8AM-10PM"},
+          {"name": "Handi Restaurant", "type": "North Indian", "cost": 600, "bestFor": "Mutton curry", "timing": "12PM-11PM"},
+          {"name": "Tapri Central", "type": "Cafe", "cost": 500, "bestFor": "Tea & snacks", "timing": "8AM-10PM"},
+          {"name": "Peacock Rooftop", "type": "Rooftop", "cost": 800, "bestFor": "Dinner with view", "timing": "7PM-11PM"}
+        ],
+        "hostels": [
+          {"name": "Zostel Jaipur", "cost": 600, "amenities": ["WiFi", "Common area", "Events"], "rating": "4.4"},
+          {"name": "Moustache Hostel", "cost": 550, "amenities": ["WiFi", "Rooftop"], "rating": "4.2"}
+        ],
+        "activities": [
+          {"name": "Shopping at MI Road", "cost": 0, "duration": "2 hours", "bestBuys": ["Textiles", "Jewelry"]},
+          {"name": "Rajasthani Thali at LMB", "cost": 400, "duration": "1 hour", "includes": "Multiple dishes"}
+        ]
+      }
+    },
+    {
+      "name": "Pink City (Old)",
+      "type": "Heritage",
+      "budgetRange": {
+        "hostel": 500,
+        "hotel": 2000
+      },
+      "bestFor": ["Markets", "Heritage", "Bazaars"],
+      "specificPlaces": {
+        "restaurants": [
+          {"name": "Rawat Mishthan Bhandar", "type": "Sweets", "cost": 200, "bestFor": "Pyaz ki kachori", "timing": "7AM-9PM"},
+          {"name": "Chokhi Dhani", "type": "Village experience", "cost": 1500, "bestFor": "Cultural show & dinner", "timing": "5PM-11PM"}
+        ],
+        "markets": [
+          {"name": "Johari Bazaar", "type": "Jewelry", "timing": "10AM-7PM", "bestBuys": ["Kundan jewelry", "Silver"]},
+          {"name": "Bapu Bazaar", "type": "Textiles", "timing": "10AM-8PM", "bestBuys": ["Rajasthani fabrics", "Leather"]},
+          {"name": "Tripolia Bazaar", "type": "Handicrafts", "timing": "10AM-7PM", "bestBuys": ["Blue pottery", "Carpets"]}
+        ],
+        "activities": [
+          {"name": "Heritage Walk Pink City", "cost": 500, "duration": "2 hours", "includes": ["Guide", "Hawa Mahal", "City Palace"]},
+          {"name": "Shopping at Johari Bazaar", "cost": 0, "duration": "2 hours", "negotiate": "30-50% off"}
+        ]
+      }
+    },
+    {
+      "name": "Amer / Jaigarh",
+      "type": "Heritage",
+      "budgetRange": {
+        "hostel": 700,
+        "hotel": 3000
+      },
+      "bestFor": ["Forts", "Heritage stays"],
+      "specificPlaces": {
+        "restaurants": [
+          {"name": "Amber Fort Cafe", "type": "Cafe", "cost": 400, "bestFor": "Quick meals", "timing": "9AM-6PM"}
+        ],
+        "activities": [
+          {"name": "Elephant Ride to Amber Fort", "cost": 1100, "duration": "15min", "timing": "9AM-12PM"},
+          {"name": "Amber Fort Light & Sound Show", "cost": 200, "duration": "1 hour", "timing": "Evening 7PM"},
+          {"name": "Jaigarh Fort Visit", "cost": 150, "duration": "2 hours", "includes": "World's largest cannon"}
+        ]
+      }
+    }
+  ],
+  "transport": {
+    "autoRickshaw": {
+      "costPerTrip": 100,
+      "recommended": true,
+      "withinCity": "₹50-100",
+      "negotiate": "Always negotiate 30% off"
+    },
+    "taxiFullDay": {
+      "cost": 2500,
+      "includes": "Fort circuit (Amber, Jaigarh, Nahargarh)",
+      "duration": "8 hours"
+    },
+    "olaUber": {
+      "costPerTrip": 200,
+      "recommended": true,
+      "toAirport": "₹400"
+    }
+  },
+  "attractions": [
+    {
+      "name": "Amber Fort",
+      "type": "Fort",
+      "avgTime": "3-4 hours",
+      "entryFee": "₹500 (Indians ₹100)",
+      "bestTime": "Morning (9AM-12PM)",
+      "activities": ["Elephant ride", "Palace tour", "Light & sound show"],
+      "nearby": ["Jaigarh Fort", "Panna Meena Ka Kund"]
+    },
+    {
+      "name": "Hawa Mahal",
+      "type": "Palace",
+      "avgTime": "1 hour",
+      "entryFee": "₹50",
+      "bestTime": "Morning (9AM-11AM) for photos",
+      "nearby": ["City Palace", "Jantar Mantar"]
+    },
+    {
+      "name": "City Palace",
+      "type": "Palace",
+      "avgTime": "2-3 hours",
+      "entryFee": "₹500",
+      "includes": ["Museums", "Courtyards", "Royal residence"],
+      "nearby": ["Hawa Mahal", "Jantar Mantar"]
+    },
+    {
+      "name": "Jantar Mantar",
+      "type": "Observatory",
+      "avgTime": "1-2 hours",
+      "entryFee": "₹200",
+      "bestTime": "Morning",
+      "nearby": ["City Palace", "Hawa Mahal"]
+    },
+    {
+      "name": "Nahargarh Fort",
+      "type": "Fort",
+      "avgTime": "2 hours",
+      "entryFee": "₹200",
+      "bestTime": "Sunset (5PM-7PM)",
+      "why": "Best sunset views of Jaipur"
+    }
+  ],
+  "travelClusters": [
+    {
+      "clusterName": "Pink City Heritage",
+      "places": ["Hawa Mahal", "City Palace", "Jantar Mantar", "Johari Bazaar"],
+      "vibe": "Heritage & Shopping",
+      "dayPlan": "Morning: Hawa Mahal & City Palace, Afternoon: Jantar Mantar & shopping, Evening: Bazaars"
+    },
+    {
+      "clusterName": "Fort Circuit",
+      "places": ["Amber Fort", "Jaigarh Fort", "Nahargarh Fort"],
+      "vibe": "History & Views",
+      "dayPlan": "Morning: Amber Fort (elephant ride), Afternoon: Jaigarh Fort, Evening: Nahargarh sunset"
+    }
+  ],
+  "budgetTips": [
+    "Stay at Zostel Jaipur MI Road (₹600/night) for budget",
+    "Eat Rajasthani thali at LMB (₹400) - authentic & filling",
+    "Take auto-rickshaw for short trips (₹50-100, negotiate)",
+    "Book elephant ride at Amber Fort early (9AM, ₹1100)",
+    "Visit forts in morning to avoid crowds",
+    "Shop at Johari Bazaar (negotiate 30-50% off)",
+    "Eat pyaz ki kachori at Rawat (₹50) for breakfast",
+    "Use Ola/Uber for comfort (₹200/trip)",
+    "Visit Nahargarh for sunset (free entry after 5PM)",
+    "Book taxi full day for fort circuit (₹2500, 8 hours)"
+  ],
+  "hiddenGems": [
+    {"name": "Panna Meena Ka Kund", "access": "Near Amber Fort", "cost": 0, "why": "Ancient stepwell, Instagram spot"},
+    {"name": "Patrika Gate", "access": "Jawahar Circle", "cost": 0, "why": "Colorful gate, photography"},
+    {"name": "Galtaji Monkey Temple", "access": "10km from city", "cost": 0, "why": "Monkey temple, less touristy"}
+  ]
+}

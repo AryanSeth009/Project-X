@@ -8,18 +8,24 @@
         "hostel": 500,
         "hotel": 2000
       },
-      "bestFor": [
-        "Nightlife",
-        "Beaches",
-        "Restaurants",
-        "Water sports",
-        "Beach shacks",
-        "Dinner cruises",
-        "Live music",
-        "Jet skiing",
-        "Paragliding",
-        "Club hopping"
-      ]
+      "bestFor": ["Nightlife", "Beaches", "Restaurants", "Water sports"],
+      "specificPlaces": {
+        "restaurants": [
+          {"name": "Britto's", "type": "Beach shack", "cost": 800, "bestFor": "Seafood", "timing": "12PM-11PM"},
+          {"name": "Tito's Lane", "type": "Club & Restaurant", "cost": 1500, "bestFor": "Nightlife", "timing": "7PM-3AM"},
+          {"name": "Curlies", "type": "Beach shack", "cost": 600, "bestFor": "Breakfast & sunset", "timing": "8AM-11PM"},
+          {"name": "Infantaria", "type": "Bakery & Cafe", "cost": 400, "bestFor": "Breakfast & desserts", "timing": "7AM-11PM"}
+        ],
+        "hostels": [
+          {"name": "Zostel Baga", "cost": 500, "amenities": ["AC", "WiFi", "Common area"], "rating": "4.5"},
+          {"name": "Baga Beach Hostel", "cost": 450, "amenities": ["WiFi", "Beach access"], "rating": "4.2"}
+        ],
+        "activities": [
+          {"name": "Jet Ski at Baga Beach", "cost": 800, "duration": "30min", "operator": "Beach vendors"},
+          {"name": "Parasailing at Baga", "cost": 1500, "duration": "15min", "operator": "Water sports operators"},
+          {"name": "Sunset Cruise Mandovi River", "cost": 1200, "duration": "2 hours", "operator": "Cruise operators"}
+        ]
+      }
     },
     {
       "name": "Anjuna",
@@ -28,18 +34,23 @@
         "hostel": 400,
         "hotel": 1500
       },
-      "bestFor": [
-        "Backpackers",
-        "Flea Market",
-        "Nightlife",
-        "Trance parties",
-        "Rocky beaches",
-        "Street food",
-        "Hippie culture",
-        "Wednesday market",
-        "Beach yoga",
-        "Sunset views"
-      ]
+      "bestFor": ["Backpackers", "Flea Market", "Nightlife"],
+      "specificPlaces": {
+        "restaurants": [
+          {"name": "Shiva Valley", "type": "Beach cafe", "cost": 500, "bestFor": "Trance parties", "timing": "24/7"},
+          {"name": "German Bakery", "type": "Cafe", "cost": 300, "bestFor": "Breakfast & coffee", "timing": "7AM-10PM"},
+          {"name": "Anjuna Beach Shack", "type": "Beach shack", "cost": 600, "bestFor": "Seafood", "timing": "12PM-10PM"}
+        ],
+        "hostels": [
+          {"name": "Funky Monkey Hostel", "cost": 400, "amenities": ["WiFi", "Bar", "Events"], "rating": "4.3"},
+          {"name": "Anjuna Backpackers", "cost": 350, "amenities": ["WiFi", "Common kitchen"], "rating": "4.0"}
+        ],
+        "activities": [
+          {"name": "Anjuna Flea Market (Wednesday)", "cost": 0, "duration": "2-3 hours", "timing": "4PM-9PM"},
+          {"name": "Beach Yoga Session", "cost": 500, "duration": "1.5 hours", "operator": "Local instructors"},
+          {"name": "Sunset at Anjuna Beach", "cost": 0, "duration": "1 hour", "bestTime": "6PM-7PM"}
+        ]
+      }
     },
     {
       "name": "Palolem",
@@ -48,18 +59,23 @@
         "hostel": 600,
         "hotel": 1800
       },
-      "bestFor": [
-        "Peaceful beaches",
-        "Nature",
-        "Yoga classes",
-        "Dolphin spotting",
-        "Swimming",
-        "Meditation",
-        "Kayaking",
-        "Beach massages",
-        "Star gazing",
-        "Silent parties"
-      ]
+      "bestFor": ["Peaceful beaches", "Nature", "Yoga"],
+      "specificPlaces": {
+        "restaurants": [
+          {"name": "Dropadi", "type": "Beach restaurant", "cost": 700, "bestFor": "Seafood & sunset", "timing": "12PM-11PM"},
+          {"name": "Magic Italy", "type": "Italian", "cost": 800, "bestFor": "Pizza & pasta", "timing": "12PM-10PM"},
+          {"name": "Café Inn", "type": "Cafe", "cost": 400, "bestFor": "Breakfast", "timing": "8AM-6PM"}
+        ],
+        "hostels": [
+          {"name": "Palolem Beach Resort", "cost": 600, "amenities": ["Beachfront", "AC"], "rating": "4.4"},
+          {"name": "Happy Panda Hostel", "cost": 550, "amenities": ["WiFi", "Yoga classes"], "rating": "4.1"}
+        ],
+        "activities": [
+          {"name": "Dolphin Spotting Boat Trip", "cost": 600, "duration": "2 hours", "operator": "Local boat operators"},
+          {"name": "Kayaking at Palolem", "cost": 800, "duration": "1.5 hours", "operator": "Beach operators"},
+          {"name": "Yoga Class at Palolem", "cost": 500, "duration": "1.5 hours", "operator": "Yoga studios"}
+        ]
+      }
     },
     {
       "name": "Calangute",
@@ -68,46 +84,20 @@
         "hostel": 450,
         "hotel": 2200
       },
-      "bestFor": [
-        "Shopping",
-        "Water sports",
-        "Restaurants",
-        "Markets",
-        "Beach activities",
-        "Nightlife"
-      ]
-    },
-    {
-      "name": "Arambol",
-      "type": "Hippie",
-      "budgetRange": {
-        "hostel": 350,
-        "hotel": 1400
-      },
-      "bestFor": [
-        "Drum circles",
-        "Paragliding",
-        "Sweet lake",
-        "Yoga retreats",
-        "Backpackers",
-        "Cheap food"
-      ]
-    },
-    {
-      "name": "Colva",
-      "type": "Family",
-      "budgetRange": {
-        "hostel": 500,
-        "hotel": 1700
-      },
-      "bestFor": [
-        "Family beaches",
-        "Local markets",
-        "Seafood restaurants",
-        "Water sports",
-        "Shopping",
-        "Peaceful evenings"
-      ]
+      "bestFor": ["Shopping", "Water sports", "Restaurants"],
+      "specificPlaces": {
+        "restaurants": [
+          {"name": "Souza Lobo", "type": "Beach restaurant", "cost": 900, "bestFor": "Goan cuisine", "timing": "12PM-11PM"},
+          {"name": "Infantaria Calangute", "type": "Bakery", "cost": 400, "bestFor": "Pastries", "timing": "7AM-10PM"}
+        ],
+        "hostels": [
+          {"name": "Calangute Backpackers", "cost": 450, "amenities": ["WiFi", "Central location"], "rating": "4.0"}
+        ],
+        "activities": [
+          {"name": "Water Sports at Calangute", "cost": 2000, "duration": "2 hours", "includes": ["Banana ride", "Jet ski"]},
+          {"name": "Shopping at Calangute Market", "cost": 0, "duration": "1-2 hours", "bestBuys": ["Cashews", "Spices"]}
+        ]
+      }
     }
   ],
   "transport": {
@@ -115,16 +105,13 @@
       "costPerDay": 400,
       "recommended": true,
       "fuelCost": "₹100-150/day",
-      "parkingTips": "Free at most beaches",
-      "helmet": "Always included",
-      "bestRentalSpots": ["Baga", "Anjuna", "Calangute"]
+      "bestRentalSpots": ["Baga", "Anjuna", "Calangute"],
+      "operators": ["Local shops", "Hotel concierge"]
     },
     "taxi": {
       "avgCostPerTrip": 800,
       "olaUber": "₹500-700 North Goa",
-      "airportTransfer": "₹1500-2000",
-      "nightCharges": "+25%",
-      "shareTaxis": "₹200/person"
+      "airportTransfer": "₹1500-2000"
     }
   },
   "attractions": [
@@ -132,73 +119,42 @@
       "name": "Baga Beach",
       "type": "Beach",
       "avgTime": "2-3 hours",
-      "bestTime": "Sunset",
-      "crowdLevel": "High",
-      "waterSports": true
-    },
-    {
-      "name": "Fort Aguada",
-      "type": "Fort",
-      "avgTime": "1-2 hours",
-      "bestTime": "Sunrise",
-      "viewPoint": "Sinquerim Beach",
-      "entryFee": "Free"
+      "bestTime": "Sunset (6PM)",
+      "specificActivities": ["Jet skiing", "Parasailing", "Beach volleyball"],
+      "nearbyRestaurants": ["Britto's", "Curlies", "Infantaria"]
     },
     {
       "name": "Anjuna Flea Market",
       "type": "Market",
       "avgTime": "2 hours",
       "daysOpen": "Wednesday",
+      "timing": "4PM-9PM",
       "bestBuys": ["Clothes", "Jewelry", "Handicrafts"],
-      "timing": "4PM-9PM"
+      "nearby": ["Anjuna Beach", "German Bakery"]
+    },
+    {
+      "name": "Fort Aguada",
+      "type": "Fort",
+      "avgTime": "1-2 hours",
+      "bestTime": "Sunrise (6AM)",
+      "entryFee": "Free",
+      "nearby": ["Sinquerim Beach", "Taj Fort Aguada"]
     },
     {
       "name": "Chapora Fort",
       "type": "Fort",
       "avgTime": "1 hour",
       "famousFor": "Dil Chahta Hai movie",
-      "viewPoint": "Vagator Beach",
-      "sunsetSpot": true
+      "sunsetSpot": true,
+      "nearby": ["Vagator Beach"]
     },
     {
       "name": "Dudhsagar Waterfall",
       "type": "Waterfall",
       "avgTime": "3-4 hours",
-      "bestSeason": "Monsoon",
       "jeepSafari": "₹400/person",
-      "distance": "60km from Panjim"
-    },
-    {
-      "name": "Cola Beach",
-      "type": "Beach",
-      "avgTime": "2-3 hours",
-      "lagoon": true,
-      "secluded": true,
-      "access": "15min trek"
-    },
-    {
-      "name": "Vagator Beach",
-      "type": "Beach",
-      "avgTime": "2 hours",
-      "nearChapora": true,
-      "ozranExtension": true,
-      "rockyCliffs": true
-    },
-    {
-      "name": "Calangute Beach",
-      "type": "Beach",
-      "avgTime": "2-3 hours",
-      "shopping": true,
-      "waterSports": true,
-      "busyVibe": true
-    },
-    {
-      "name": "Agonda Beach",
-      "type": "Beach",
-      "avgTime": "2 hours",
-      "turtleNesting": true,
-      "quiet": true,
-      "kayaking": true
+      "distance": "60km from Panjim",
+      "bestSeason": "Monsoon"
     },
     {
       "name": "Basilica of Bom Jesus",
@@ -206,97 +162,43 @@
       "avgTime": "1 hour",
       "UNESCO": true,
       "location": "Old Goa",
-      "bestTime": "Morning"
-    },
-    {
-      "name": "Reis Magos Fort",
-      "type": "Fort",
-      "avgTime": "1.5 hours",
-      "viewPoint": "Mandovi River",
-      "restored": "2010",
-      "entryFee": "₹50"
-    },
-    {
-      "name": "Arpora Night Market",
-      "type": "Market",
-      "avgTime": "3 hours",
-      "daysOpen": "Saturday",
-      "bestBuys": ["Clothes", "Jewelry", "Food"],
-      "timing": "6PM-midnight"
-    },
-    {
-      "name": "Spice Plantation",
-      "type": "Farm",
-      "avgTime": "2 hours",
-      "includes": "Lunch buffet",
-      "location": "Ponda",
-      "elephant": "Ride option"
-    },
-    {
-      "name": "Butterfly Beach",
-      "type": "Beach",
-      "avgTime": "3 hours",
-      "access": "Boat only",
-      "secluded": true,
-      "near": "Palolem"
+      "bestTime": "Morning (9AM-12PM)"
     }
   ],
   "travelClusters": [
     {
       "clusterName": "North Goa",
-      "places": [
-        "Baga Beach",
-        "Anjuna Beach",
-        "Fort Aguada",
-        "Chapora Fort",
-        "Calangute Beach",
-        "Vagator Beach",
-        "Anjuna Flea Market",
-        "Arpora Night Market"
-      ],
+      "places": ["Baga Beach", "Anjuna Beach", "Fort Aguada", "Chapora Fort", "Calangute Beach"],
       "distanceFromAirport": "45min",
-      "vibe": "Party & Beaches"
+      "vibe": "Party & Beaches",
+      "recommendedStay": "Baga or Anjuna",
+      "dayPlan": "Morning: Beach, Afternoon: Fort/Water sports, Evening: Market/Nightlife"
     },
     {
       "clusterName": "South Goa",
-      "places": [
-        "Palolem Beach",
-        "Colva Beach",
-        "Cola Beach",
-        "Agonda Beach",
-        "Majorda Beach",
-        "Utorda Beach",
-        "Butterfly Beach"
-      ],
+      "places": ["Palolem Beach", "Colva Beach", "Agonda Beach"],
       "distanceFromAirport": "90min",
-      "vibe": "Relaxation & Nature"
-    },
-    {
-      "clusterName": "Central Goa",
-      "places": [
-        "Basilica of Bom Jesus",
-        "Se Cathedral",
-        "Spice Plantation",
-        "Dudhsagar Waterfall",
-        "Reis Magos Fort"
-      ],
-      "distanceFromAirport": "60min",
-      "vibe": "Culture & History"
+      "vibe": "Relaxation & Nature",
+      "recommendedStay": "Palolem",
+      "dayPlan": "Morning: Yoga/Dolphin spotting, Afternoon: Beach relaxation, Evening: Sunset dinner"
     }
   ],
   "budgetTips": [
-    "Use scooter instead of taxi to save money",
-    "Stay in hostels in Anjuna for budget travel",
-    "Avoid peak December for cheaper stays",
-    "Eat at street food stalls and beach shacks",
-    "Rent scooters for ₹300-500/day including fuel",
-    "Visit flea markets for affordable souvenirs",
-    "Book trains 60 days early via IRCTC",
-    "Share auto-rickshaws between beaches",
-    "Drink coconut water instead of bottled drinks",
-    "Negotiate prices everywhere (50% off normal)",
-    "Stay in Arambol for cheapest accommodations",
-    "Eat thalis at local restaurants (₹100/person)",
-    "Use public buses for South Goa travel"
+    "Stay at Funky Monkey Hostel Anjuna (₹400/night) for budget travel",
+    "Eat breakfast at German Bakery Anjuna (₹300) or Infantaria (₹400)",
+    "Rent scooter from Baga/Anjuna for ₹400/day including fuel",
+    "Visit Anjuna Flea Market on Wednesday (4PM-9PM) for souvenirs",
+    "Eat seafood at beach shacks (₹600-800) instead of restaurants",
+    "Book Dudhsagar jeep safari in advance (₹400/person)",
+    "Use Ola/Uber for North Goa trips (₹500-700) instead of taxis",
+    "Stay in Arambol for cheapest hostels (₹350/night)",
+    "Eat thalis at local restaurants (₹100-150/person)",
+    "Visit Arpora Night Market on Saturday (6PM-midnight)"
+  ],
+  "hiddenGems": [
+    {"name": "Butterfly Beach", "access": "Boat from Palolem", "cost": 800, "why": "Secluded, pristine beach"},
+    {"name": "Cola Beach Lagoon", "access": "15min trek", "cost": 0, "why": "Freshwater lagoon meets sea"},
+    {"name": "Sweet Lake Arambol", "access": "10min walk from beach", "cost": 0, "why": "Freshwater lake, peaceful"},
+    {"name": "Reis Magos Fort", "access": "Near Panjim", "cost": 50, "why": "Less crowded, great views"}
   ]
 }
