@@ -1,15 +1,8 @@
 import { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-} from 'react-native';
+import {View,Text,TextInput,TouchableOpacity,ScrollView,Alert,Modal} from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Sparkles, MapPin, Calendar, Users, Wallet, Heart, Info, MessageCircle, Home } from 'lucide-react-native';
+import { Sparkles, MapPin, Calendar, Users, Wallet, Heart, Info, MessageCircle, Home, X, ChevronLeft, ChevronRight } from 'lucide-react-native';
 import { useStore } from '@/store/useStore';
 
 export default function HomeScreen() {
@@ -99,6 +92,12 @@ export default function HomeScreen() {
     });
   };
 
+const [showCalendar, setShowCalendar] = useState(false);
+const today = new Date();
+const [calendarMonth, setCalendarMonth] = useState(today.getMonth());
+const [calendarYear, setCalendarYear] = useState(today.getFullYear());
+
+
   return (
     <ScrollView className="flex-1 bg-gray-50">
       <LinearGradient
@@ -150,32 +149,150 @@ export default function HomeScreen() {
                   />
                 </View>
 
-                <View className="flex-row gap-3">
-                  <View className="flex-1">
-                    <View className="flex-row items-center gap-2 mb-2">
-                      <Calendar size={18} color="#FF9933" />
-                      <Text className="font-inter-semibold text-gray-700">Start</Text>
-                    </View>
-                    <TextInput
-                      className="font-inter bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
-                      placeholder="YYYY-MM-DD"
-                      value={startDate}
-                      onChangeText={setStartDate}
-                    />
-                  </View>
-                  <View className="flex-1">
-                    <View className="flex-row items-center gap-2 mb-2">
-                      <Calendar size={18} color="#FF9933" />
-                      <Text className="font-inter-semibold text-gray-700">End</Text>
-                    </View>
-                    <TextInput
-                      className="font-inter bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800"
-                      placeholder="YYYY-MM-DD"
-                      value={endDate}
-                      onChangeText={setEndDate}
-                    />
-                  </View>
-                </View>
+                <View className="flex-1">
+  <View className="flex-row items-center gap-2 mb-2">
+    <Calendar size={18} color="#FF9933" />
+    <Text className="font-inter-semibold text-gray-700">Date Range</Text>
+  </View>
+  <TouchableOpacity
+    className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 flex-row items-center justify-between"
+    onPress={() => setShowCalendar(true)}
+  >
+    <Text className={`font-inter ${startDate && endDate ? 'text-gray-800' : 'text-gray-400'}`}>
+      {startDate && endDate
+        ? `${startDate}  →  ${endDate}`
+        : startDate
+        ? `${startDate}  →  Select end`
+        : 'Select dates'}
+    </Text>
+    <Calendar size={16} color="#9CA3AF" />
+  </TouchableOpacity>
+
+  {/* Calendar Modal */}
+  <Modal
+    visible={showCalendar}
+    transparent
+    animationType="fade"
+    onRequestClose={() => setShowCalendar(false)}
+  >
+    <View className="flex-1 bg-black/50 justify-end">
+      <View className="bg-white rounded-t-3xl px-5 pt-5 pb-8">
+        {/* Header */}
+        <View className="flex-row justify-between items-center mb-1">
+          <Text className="font-inter-semibold text-gray-900 text-lg">Select Dates</Text>
+          <TouchableOpacity onPress={() => setShowCalendar(false)}>
+            <X size={22} color="#6B7280" />
+          </TouchableOpacity>
+        </View>
+        <Text className="font-inter text-gray-400 text-sm mb-4">
+          {!startDate ? 'Pick a start date' : !endDate ? 'Pick an end date' : `${startDate}  →  ${endDate}`}
+        </Text>
+
+        {/* Month Navigation */}
+        <View className="flex-row justify-between items-center mb-4">
+          <TouchableOpacity
+            onPress={() => {
+              const d = new Date(calendarYear, calendarMonth - 1);
+              setCalendarMonth(d.getMonth());
+              setCalendarYear(d.getFullYear());
+            }}
+            className="p-2"
+          >
+            <ChevronLeft size={20} color="#374151" />
+          </TouchableOpacity>
+          <Text className="font-inter-semibold text-gray-800 text-base">
+            {new Date(calendarYear, calendarMonth).toLocaleString('default', { month: 'long', year: 'numeric' })}
+          </Text>
+          <TouchableOpacity
+            onPress={() => {
+              const d = new Date(calendarYear, calendarMonth + 1);
+              setCalendarMonth(d.getMonth());
+              setCalendarYear(d.getFullYear());
+            }}
+            className="p-2"
+          >
+            <ChevronRight size={20} color="#374151" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Day Labels */}
+        <View className="flex-row mb-2">
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+            <View key={day} className="flex-1 items-center">
+              <Text className="font-inter text-gray-400 text-xs">{day}</Text>
+            </View>
+          ))}
+        </View>
+
+        {/* Calendar Grid */}
+        {(() => {
+          const firstDay = new Date(calendarYear, calendarMonth, 1).getDay();
+          const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+          const today = new Date().toISOString().split('T')[0];
+          const cells: (number | null)[] = [
+            ...Array(firstDay).fill(null),
+            ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
+          ];
+          const rows: (number | null)[][] = [];
+          for (let i = 0; i < cells.length; i += 7) rows.push(cells.slice(i, i + 7));
+
+          return rows.map((row, ri) => (
+            <View key={ri} className="flex-row mb-1">
+              {row.map((day, di) => {
+                if (!day) return <View key={di} className="flex-1" />;
+                const dateStr = `${calendarYear}-${String(calendarMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const isStart = dateStr === startDate;
+                const isEnd = dateStr === endDate;
+                const isInRange = startDate && endDate && dateStr > startDate && dateStr < endDate;
+                const isPast = dateStr < today;
+
+                return (
+                  <TouchableOpacity
+                    key={di}
+                    className={`flex-1 items-center py-2 mx-0.5 rounded-full
+                      ${isStart || isEnd ? 'bg-orange-500' : ''}
+                      ${isInRange ? 'bg-orange-100 rounded-none' : ''}
+                      ${isPast ? 'opacity-30' : ''}`}
+                    onPress={() => {
+                      if (isPast) return;
+                      if (!startDate || (startDate && endDate)) {
+                        setStartDate(dateStr);
+                        setEndDate('');
+                      } else if (dateStr > startDate) {
+                        setEndDate(dateStr);
+                      } else {
+                        setStartDate(dateStr);
+                        setEndDate('');
+                      }
+                    }}
+                    disabled={isPast}
+                  >
+                    <Text className={`font-inter text-sm ${isStart || isEnd ? 'text-white font-inter-semibold' : 'text-gray-700'}`}>
+                      {day}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          ));
+        })()}
+
+        {/* Done Button */}
+        <TouchableOpacity
+          className={`mt-5 rounded-2xl py-3.5 items-center ${startDate && endDate ? 'bg-orange-500' : 'bg-gray-200'}`}
+          onPress={() => {
+            if (startDate && endDate) setShowCalendar(false);
+          }}
+          disabled={!startDate || !endDate}
+        >
+          <Text className={`font-inter-semibold text-base ${startDate && endDate ? 'text-white' : 'text-gray-400'}`}>
+            {startDate && endDate ? 'Confirm Dates' : 'Select both dates'}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </Modal>
+</View>
 
                 <View>
                   <View className="flex-row items-center gap-2 mb-2">

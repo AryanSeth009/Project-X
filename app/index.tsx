@@ -42,7 +42,7 @@ export default function SplashScreen() {
 
           {/* App name */}
           <Text className="font-inter-bold text-5xl text-white mb-3 tracking-tight">
-            SafarYatraAI
+            Project X AI
           </Text>
 
           <Text className="font-inter-medium text-base text-white/80 mb-2">
