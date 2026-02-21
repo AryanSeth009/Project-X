@@ -50,7 +50,7 @@ export default function AuthScreen() {
 
   return (
     <LinearGradient
-      colors={['#F2EFE7', '#E8D5C0']}
+      colors={['#1A1C19', '#242922']}
       start={{ x: 0, y: 0 }}
       end={{ x: 0, y: 1 }}
       className="flex-1"
@@ -64,10 +64,10 @@ export default function AuthScreen() {
           showsVerticalScrollIndicator={false}>
           {/* Simple Header - transparent to show gradient */}
           <View className="pt-16 pb-8 px-6">
-            <Text className="font-inter-bold text-3xl text-gray-900 mb-2">
+            <Text className="font-inter-bold text-3xl text-[#F5F5DC] mb-2">
               {isLogin ? 'Sign In' : 'Sign Up'}
             </Text>
-            <Text className="font-inter text-gray-500 text-base">
+            <Text className="font-inter text-[#F5F5DC]/70 text-base">
               {isLogin
                 ? 'Welcome back you\'ve been missed'
                 : 'Just a few quick things to get you started'}
@@ -77,41 +77,37 @@ export default function AuthScreen() {
           {/* Main Content */}
           <View className="flex-1 px-6">
             {error ? (
-              <View className="bg-red-50 border-l-4 border-red-500 rounded-xl p-4 mb-6 flex-row items-center">
+              <View className="border-l-4 border-red-500 rounded-xl p-4 mb-6 flex-row items-center" style={{ backgroundColor: 'rgba(239, 68, 68, 0.15)' }}>
                 <Text className="text-2xl mr-3">⚠️</Text>
-                <Text className="font-inter-medium text-red-700 flex-1">{error}</Text>
+                <Text className="font-inter-medium flex-1" style={{ color: '#FCA5A5' }}>{error}</Text>
               </View>
             ) : null}
 
             {/* Sign-up bonus banner */}
             {!isLogin && (
   <View className="mb-6 rounded-2xl overflow-hidden">
-    {/* Gradient-style layered background */}
-    <View className="bg-orange-500 p-px rounded-2xl">
-      <View className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl px-4 py-3 flex-row items-center gap-3"
-        style={{ backgroundColor: '#fff8f0' }}>
+    <View className="p-px rounded-2xl" style={{ backgroundColor: '#F39C12' }}>
+      <View className="rounded-2xl px-4 py-3 flex-row items-center gap-3"
+        style={{ backgroundColor: '#242922' }}>
         
-        {/* Left: Icon with glow ring */}
         <View className="relative">
           <View className="w-12 h-12 rounded-2xl items-center justify-center"
-            style={{ backgroundColor: '#FF6B35' }}>
+            style={{ backgroundColor: '#F39C12' }}>
             <Text className="text-2xl">🎁</Text>
           </View>
         </View>
 
-        {/* Middle: Text */}
         <View className="flex-1">
-          <Text className="font-inter-bold text-xs text-orange-400 uppercase tracking-widest mb-0.5">
+          <Text className="font-inter-bold text-xs text-[#F39C12] uppercase tracking-widest mb-0.5">
             New Account Offer
           </Text>
-          <Text className="font-inter-bold text-gray-900 text-base leading-tight">
+          <Text className="font-inter-bold text-[#F5F5DC] text-base leading-tight">
             Get 3 Free Credits
           </Text>
         </View>
 
-        {/* Right: Badge pill */}
-        <View className="bg-orange-500 rounded-full px-3 py-1.5">
-          <Text className="font-inter-bold text-white text-xs">FREE</Text>
+        <View className="rounded-full px-3 py-1.5" style={{ backgroundColor: '#4CAF50' }}>
+          <Text className="font-inter-bold text-[#1A1C19] text-xs">FREE</Text>
         </View>
 
       </View>
@@ -122,12 +118,13 @@ export default function AuthScreen() {
             <View className="gap-4">
               {/* Email Input */}
               <View>
-                <Text className="font-inter-semibold text-gray-800 mb-2 text-sm">
+                <Text className="font-inter-semibold text-[#F5F5DC] mb-2 text-sm">
                   Email ID
                 </Text>
-                <View className="bg-white border border-gray-300 rounded-xl px-4 py-2">
+                <View className="rounded-xl px-4 py-2 border border-[#242922]" style={{ backgroundColor: '#242922' }}>
                   <TextInput
-                    className="font-inter text-gray-800 text-base"
+                    className="font-inter text-base"
+                    style={{ color: '#F5F5DC' }}
                     placeholder="Enter Email ID"
                     placeholderTextColor="#9CA3AF"
                     value={email}
@@ -140,19 +137,20 @@ export default function AuthScreen() {
 
               {/* Password Input */}
               <View>
-                <Text className="font-inter-semibold text-gray-800 mb-2 text-sm">
+                <Text className="font-inter-semibold text-[#F5F5DC] mb-2 text-sm">
                   Password
                 </Text>
-                <View className="bg-white border border-gray-300 rounded-xl px-4 py-2 flex-row items-center">
+                <View className="rounded-xl px-4 py-2 flex-row items-center border border-[#242922]" style={{ backgroundColor: '#242922' }}>
                   <TextInput
-                    className="font-inter flex-1 text-gray-800 text-base"
+                    className="font-inter flex-1 text-base"
+                    style={{ color: '#F5F5DC' }}
                     placeholder="Enter Password"
                     placeholderTextColor="#9CA3AF"
                     value={password}
                     onChangeText={setPassword}
                     secureTextEntry
                   />
-                  <Text className="text-gray-400 text-xl">👁</Text>
+                  <Text className="text-[#F5F5DC]/60 text-xl">👁</Text>
                 </View>
               </View>
 
@@ -164,15 +162,15 @@ export default function AuthScreen() {
                     onPress={() => setRememberMe(!rememberMe)}
                   >
                     <View className={`w-5 h-5 rounded border-2 items-center justify-center ${
-                      rememberMe ? 'bg-[#1A7A73] border-[#1A7A73]' : 'border-gray-300 bg-white'
-                    }`}>
-                      {rememberMe && <Text className="text-white text-xs">✓</Text>}
+                      rememberMe ? 'border-[#4CAF50]' : 'border-[#242922]'
+                    }`} style={rememberMe ? { backgroundColor: '#4CAF50' } : { backgroundColor: '#242922' }}>
+                      {rememberMe && <Text className="text-[#1A1C19] text-xs">✓</Text>}
                     </View>
-                    <Text className="font-inter text-gray-700 text-sm">Remember Me</Text>
+                    <Text className="font-inter text-[#F5F5DC] text-sm">Remember Me</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity>
-                    <Text className="font-inter-medium text-gray-700 text-sm">
+                    <Text className="font-inter-medium text-[#F5F5DC]/80 text-sm">
                       Forgot Password?
                     </Text>
                   </TouchableOpacity>
@@ -187,10 +185,10 @@ export default function AuthScreen() {
                 activeOpacity={0.8}
               >
                 <View 
-                  style={{ backgroundColor: loading ? '#1A7A73' : '#1A7A73' }}
+                  style={{ backgroundColor: '#4CAF50' }}
                   className="rounded-xl py-4"
                 >
-                  <Text className="font-inter-bold text-white text-center text-base">
+                  <Text className="font-inter-bold text-[#1A1C19] text-center text-base">
                     {loading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Create account')}
                   </Text>
                 </View>
@@ -198,17 +196,17 @@ export default function AuthScreen() {
 
               {/* Divider */}
               <View className="flex-row items-center my-4">
-                <View className="flex-1 h-px bg-gray-400" />
-                <Text className="font-inter px-4 text-gray-400 text-sm">Or with</Text>
-                <View className="flex-1 h-px bg-gray-400" />
+                <View className="flex-1 h-px bg-[#242922]" />
+                <Text className="font-inter px-4 text-[#F5F5DC]/60 text-sm">Or with</Text>
+                <View className="flex-1 h-px bg-[#242922]" />
               </View>
 
               {/* Social Login Options */}
               <View className="flex-row gap-3">
 
-                <TouchableOpacity className="flex-1 bg-white border border-gray-300 rounded-xl py-3.5 items-center justify-center flex-row gap-2">
+                <TouchableOpacity className="flex-1 rounded-xl py-3.5 items-center justify-center flex-row gap-2 border border-[#242922]" style={{ backgroundColor: '#242922' }}>
                   <GoogleLogo size={22} />
-                  <Text className="font-inter-semibold text-gray-700 text-sm">Continue with Google</Text>
+                  <Text className="font-inter-semibold text-[#F5F5DC] text-sm">Continue with Google</Text>
                 </TouchableOpacity>
                 </View>
                 </View>
@@ -223,11 +221,11 @@ export default function AuthScreen() {
               setError('');
             }}
           >
-            <Text className="font-inter text-center text-gray-600 text-sm">
+            <Text className="font-inter text-center text-[#F5F5DC]/80 text-sm">
               {isLogin
                 ? "Don't have an account? "
                 : 'Already have an account? '}
-              <Text className="font-inter-bold text-gray-900">
+              <Text className="font-inter-bold text-[#4CAF50]">
                 {isLogin ? 'Sign Up' : 'Sign In'}
               </Text>
             </Text>
