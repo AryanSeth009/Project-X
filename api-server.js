@@ -65,7 +65,13 @@ app.get('/api/geo/areas', (req, res) => {
     }
     const { loadGeoDataset } = require('./backend/src/services/contextBuilder.cjs');
     const data = loadGeoDataset(destination);
-    const areas = (data && data.areas) ? data.areas.map((a) => ({ name: a.name, type: a.type, bestFor: a.bestFor || [] })) : [];
+    
+    let areasRaw = [];
+    if (data) {
+      areasRaw = data.areas || data.completeTravelerGuide?.areas || [];
+    }
+    
+    const areas = areasRaw.map((a) => ({ name: a.name, type: a.type, bestFor: a.bestFor || [] }));
     res.json({ success: true, destination, areas });
   } catch (err) {
     console.error('Geo areas error:', err);
