@@ -11,9 +11,18 @@ const { getGeoContext: buildRichGeoContext } = require('./backend/src/services/c
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+// Regular anon client (respects RLS) — used for normal app queries
 const supabase = (supabaseUrl && supabaseAnonKey)
   ? createClient(supabaseUrl, supabaseAnonKey)
   : null;
+
+// Service role client (bypasses RLS) — used ONLY for trusted server-side operations
+// like ownership checks in collaboration endpoints. Never expose this key to the client.
+const supabaseAdmin = (supabaseUrl && supabaseServiceKey && supabaseServiceKey !== 'your_service_role_key_here')
+  ? createClient(supabaseUrl, supabaseServiceKey, { auth: { autoRefreshToken: false, persistSession: false } })
+  : supabase; // fallback to anon if no service key yet
 
 const app = express();
 const PORT = 3001;
@@ -551,11 +560,432 @@ app.post('/api/suggestions', async (req, res) => {
   }
 });
 
+
+// ─────────────────────────────────────────────────────────────────────────────
+// COLLABORATION ROUTES
+// All routes expect the caller to pass `userId` in the request body / query
+// (in production this would come from a verified JWT; here we trust the client
+//  while Supabase RLS enforces the actual security).
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * POST /api/itineraries/:id/invite
+ * Body: { userId, email, role: 'editor'|'viewer' }
+ * Creates a pending collaborator row with a unique token.
+ * Returns the deep-link the owner can share (works for new & existing users).
+ */
+app.post('/api/itineraries/:id/invite', async (req, res) => {
+  if (!supabaseAdmin) return res.status(503).json({ error: 'Database not configured' });
+  const { id: itineraryId } = req.params;
+  const { userId, email, role = 'viewer' } = req.body || {};
+
+  if (!userId || !email) {
+    return res.status(400).json({ error: 'userId and email are required' });
+  }
+
+  try {
+    // Verify the requester owns this itinerary (uses supabaseAdmin to bypass RLS)
+    const { data: itin, error: itinErr } = await supabaseAdmin
+      .from('itineraries')
+      .select('id, title, destination')
+      .eq('id', itineraryId)
+      .eq('user_id', userId)
+      .single();
+
+    if (itinErr || !itin) {
+      return res.status(403).json({ error: 'Itinerary not found or not owned by you' });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+
+    // Check if invite already exists for this email on this itinerary
+    const { data: existing } = await supabaseAdmin
+      .from('itinerary_collaborators')
+      .select('id, invite_token')
+      .eq('itinerary_id', itineraryId)
+      .eq('email', normalizedEmail)
+      .maybeSingle();
+
+    let collab;
+    if (existing) {
+      // Re-invite: reset to pending with a fresh token
+      const newToken = crypto.randomUUID();
+      const { data: updated, error: updateErr } = await supabaseAdmin
+        .from('itinerary_collaborators')
+        .update({ status: 'pending', role, invite_token: newToken, invited_at: new Date().toISOString() })
+        .eq('id', existing.id)
+        .select()
+        .single();
+      if (updateErr) throw updateErr;
+      collab = updated;
+    } else {
+      // New invite
+      const { data: inserted, error: insertErr } = await supabaseAdmin
+        .from('itinerary_collaborators')
+        .insert({ itinerary_id: itineraryId, email: normalizedEmail, role, status: 'pending' })
+        .select()
+        .single();
+      if (insertErr) throw insertErr;
+      collab = inserted;
+    }
+
+    // ── Smart invite routing ─────────────────────────────────────────────────
+    // Check if this email already belongs to a Supabase Auth user.
+    const appScheme = process.env.APP_SCHEME || 'projectx';
+    const inviteLink  = `${appScheme}://invite?token=${collab.invite_token}`;
+
+    const { data: { users: existingUsers } } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 });
+    const existingUser = (existingUsers || []).find(u => u.email?.toLowerCase() === normalizedEmail);
+
+    if (existingUser) {
+      // ── Existing user: link user_id immediately + send in-app notification ──
+      await supabaseAdmin
+        .from('itinerary_collaborators')
+        .update({ user_id: existingUser.id })
+        .eq('id', collab.id);
+
+      await supabaseAdmin
+        .from('notifications')
+        .insert({
+          user_id: existingUser.id,
+          type: 'collab_invite',
+          title: `Trip invite: ${itin.destination}`,
+          body: `You've been invited to collaborate on "${itin.title}". Tap to accept or decline.`,
+          data: {
+            invite_token: collab.invite_token,
+            itinerary_id: itineraryId,
+            itinerary_title: itin.title,
+            destination: itin.destination,
+            role,
+          },
+          is_read: false,
+        });
+
+      console.log(`🔔 In-app notification sent to existing user: ${normalizedEmail}`);
+    } else {
+      // ── New user: send Supabase Auth invite email ────────────────────────
+      const redirectTo = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/auth/v1/callback?invite_token=${collab.invite_token}&itinerary=${itineraryId}`;
+
+      const { error: emailErr } = await supabaseAdmin.auth.admin.inviteUserByEmail(normalizedEmail, {
+        redirectTo,
+        data: {
+          invite_token: collab.invite_token,
+          itinerary_id: itineraryId,
+          itinerary_title: itin.title,
+          destination: itin.destination,
+          role,
+        },
+      });
+
+      if (emailErr) {
+        console.warn('⚠️  Invite email failed:', emailErr.message);
+      } else {
+        console.log(`📩 Invite email sent to new user: ${normalizedEmail}`);
+      }
+    }
+
+    return res.json({
+      success: true,
+      inviteLink,
+      collaborator: collab,
+      isExistingUser: !!existingUser,
+      message: existingUser
+        ? `${normalizedEmail} is already on the app — they'll get an in-app notification`
+        : `Invite email sent to ${normalizedEmail}`,
+    });
+  } catch (err) {
+    console.error('Invite error:', err);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * GET /api/invitations/claim/:token?userId=<uuid>
+ * Called when the app opens with a deep-link token.
+ * Links the invite to the now-authenticated user and marks it accepted.
+ */
+app.get('/api/invitations/claim/:token', async (req, res) => {
+  if (!supabaseAdmin) return res.status(503).json({ error: 'Database not configured' });
+  const { token } = req.params;
+  const { userId } = req.query;
+
+  if (!userId) return res.status(400).json({ error: 'userId query param required' });
+
+  try {
+    // Find the invite row
+    const { data: invite, error: findErr } = await supabaseAdmin
+      .from('itinerary_collaborators')
+      .select('*, itineraries(title, destination)')
+      .eq('invite_token', token)
+      .single();
+
+    if (findErr || !invite) {
+      return res.status(404).json({ error: 'Invite not found or already used' });
+    }
+
+    if (invite.status === 'accepted') {
+      return res.json({ success: true, alreadyAccepted: true, itinerary: invite.itineraries });
+    }
+
+    // Claim: set user_id and mark accepted
+    const { error: updateErr } = await supabaseAdmin
+      .from('itinerary_collaborators')
+      .update({ user_id: userId, status: 'accepted', joined_at: new Date().toISOString() })
+      .eq('invite_token', token);
+
+    if (updateErr) throw updateErr;
+
+    return res.json({
+      success: true,
+      itineraryId: invite.itinerary_id,
+      itinerary: invite.itineraries,
+      role: invite.role,
+      message: 'You have joined the itinerary!',
+    });
+  } catch (err) {
+    console.error('Claim invite error:', err);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * PATCH /api/itineraries/:id/collaborators/:collabId
+ * Body: { userId, role: 'editor'|'viewer' }
+ * Owner changes a collaborator's role.
+ */
+app.patch('/api/itineraries/:id/collaborators/:collabId', async (req, res) => {
+  if (!supabaseAdmin) return res.status(503).json({ error: 'Database not configured' });
+  const { id: itineraryId, collabId } = req.params;
+  const { userId, role } = req.body || {};
+
+  if (!userId || !role) return res.status(400).json({ error: 'userId and role required' });
+  if (!['editor', 'viewer'].includes(role)) {
+    return res.status(400).json({ error: 'role must be editor or viewer' });
+  }
+
+  try {
+    const { data: itin } = await supabaseAdmin
+      .from('itineraries')
+      .select('id')
+      .eq('id', itineraryId)
+      .eq('user_id', userId)
+      .single();
+
+    if (!itin) return res.status(403).json({ error: 'Not authorised' });
+
+    const { data, error } = await supabaseAdmin
+      .from('itinerary_collaborators')
+      .update({ role })
+      .eq('id', collabId)
+      .eq('itinerary_id', itineraryId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return res.json({ success: true, collaborator: data });
+  } catch (err) {
+    console.error('Update role error:', err);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * DELETE /api/itineraries/:id/collaborators/:collabId
+ * Body: { userId }
+ * Owner removes a collaborator.
+ */
+app.delete('/api/itineraries/:id/collaborators/:collabId', async (req, res) => {
+  if (!supabaseAdmin) return res.status(503).json({ error: 'Database not configured' });
+  const { id: itineraryId, collabId } = req.params;
+  const { userId } = req.body || {};
+
+  if (!userId) return res.status(400).json({ error: 'userId required' });
+
+  try {
+    const { data: itin } = await supabaseAdmin
+      .from('itineraries')
+      .select('id')
+      .eq('id', itineraryId)
+      .eq('user_id', userId)
+      .single();
+
+    if (!itin) return res.status(403).json({ error: 'Not authorised' });
+
+    const { error } = await supabaseAdmin
+      .from('itinerary_collaborators')
+      .delete()
+      .eq('id', collabId)
+      .eq('itinerary_id', itineraryId);
+
+    if (error) throw error;
+    return res.json({ success: true });
+  } catch (err) {
+    console.error('Remove collaborator error:', err);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/activities/:activityId/vote
+ * Body: { userId, vote: 1 | -1 }
+ * Casts, changes, or removes (toggle) a vote on an activity.
+ */
+app.post('/api/activities/:activityId/vote', async (req, res) => {
+  if (!supabaseAdmin) return res.status(503).json({ error: 'Database not configured' });
+  const { activityId } = req.params;
+  const { userId, vote } = req.body || {};
+
+  if (!userId || ![1, -1].includes(Number(vote))) {
+    return res.status(400).json({ error: 'userId and vote (1 or -1) required' });
+  }
+
+  try {
+    // Check if user already voted
+    const { data: existing } = await supabaseAdmin
+      .from('activity_votes')
+      .select('id, vote')
+      .eq('activity_id', activityId)
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (existing) {
+      if (existing.vote === Number(vote)) {
+        // Toggle off — remove the vote
+        await supabaseAdmin.from('activity_votes').delete().eq('id', existing.id);
+      } else {
+        await supabaseAdmin.from('activity_votes').update({ vote: Number(vote) }).eq('id', existing.id);
+      }
+    } else {
+      await supabaseAdmin.from('activity_votes').insert({ activity_id: activityId, user_id: userId, vote: Number(vote) });
+    }
+
+    const { data: votes } = await supabaseAdmin
+      .from('activity_votes')
+      .select('vote')
+      .eq('activity_id', activityId);
+
+    const up = (votes || []).filter(v => v.vote === 1).length;
+    const down = (votes || []).filter(v => v.vote === -1).length;
+
+    return res.json({ success: true, tally: { up, down, net: up - down } });
+  } catch (err) {
+    console.error('Vote error:', err);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+
+// ── Notification routes ───────────────────────────────────────────────────────
+
+/**
+ * GET /api/notifications?userId=<uuid>
+ * Returns all unread notifications for a user.
+ */
+app.get('/api/notifications', async (req, res) => {
+  if (!supabaseAdmin) return res.status(503).json({ error: 'Database not configured' });
+  const { userId } = req.query;
+  if (!userId) return res.status(400).json({ error: 'userId required' });
+
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('notifications')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(50);
+
+    if (error) throw error;
+    return res.json({ success: true, notifications: data || [] });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * PATCH /api/notifications/:id/read
+ * Body: { userId }
+ * Mark a notification as read.
+ */
+app.patch('/api/notifications/:id/read', async (req, res) => {
+  if (!supabaseAdmin) return res.status(503).json({ error: 'Database not configured' });
+  const { id } = req.params;
+  const { userId } = req.body || {};
+  if (!userId) return res.status(400).json({ error: 'userId required' });
+
+  try {
+    const { error } = await supabaseAdmin
+      .from('notifications')
+      .update({ is_read: true })
+      .eq('id', id)
+      .eq('user_id', userId);
+
+    if (error) throw error;
+    return res.json({ success: true });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/notifications/:id/respond
+ * Body: { userId, action: 'accept' | 'decline' }
+ * Accept or decline a collab_invite notification.
+ */
+app.post('/api/notifications/:id/respond', async (req, res) => {
+  if (!supabaseAdmin) return res.status(503).json({ error: 'Database not configured' });
+  const { id } = req.params;
+  const { userId, action } = req.body || {};
+
+  if (!userId || !['accept', 'decline'].includes(action)) {
+    return res.status(400).json({ error: 'userId and action (accept|decline) required' });
+  }
+
+  try {
+    // Fetch notification to get invite token
+    const { data: notif, error: notifErr } = await supabaseAdmin
+      .from('notifications')
+      .select('*')
+      .eq('id', id)
+      .eq('user_id', userId)
+      .single();
+
+    if (notifErr || !notif) return res.status(404).json({ error: 'Notification not found' });
+
+    const token = notif.data?.invite_token;
+    if (!token) return res.status(400).json({ error: 'Invalid notification data' });
+
+    const newStatus = action === 'accept' ? 'accepted' : 'declined';
+    const { error: collabErr } = await supabaseAdmin
+      .from('itinerary_collaborators')
+      .update({
+        status: newStatus,
+        user_id: userId,
+        ...(action === 'accept' ? { joined_at: new Date().toISOString() } : {}),
+      })
+      .eq('invite_token', token);
+
+    if (collabErr) throw collabErr;
+
+    // Mark notification as read
+    await supabaseAdmin.from('notifications').update({ is_read: true }).eq('id', id);
+
+    return res.json({
+      success: true,
+      status: newStatus,
+      itineraryId: notif.data?.itinerary_id,
+    });
+  } catch (err) {
+    console.error('Respond error:', err);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 // Error handler
 app.use((err, req, res, next) => {
   console.error('❌ Unhandled error:', err);
   res.status(500).json({ error: 'Internal server error' });
 });
+
 
 // Start server
 // Bind to 0.0.0.0 so it's reachable from other devices on the network.

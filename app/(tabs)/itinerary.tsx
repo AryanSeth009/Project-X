@@ -32,7 +32,17 @@ import {
   ChevronDown,
   Navigation,
   ExternalLink,
+  Users2,
+  ThumbsUp,
+  ThumbsDown,
+  Copy,
+  X,
+  Send,
+  Bell,
+  CheckCircle,
+  XCircle,
 } from 'lucide-react-native';
+import * as Clipboard from 'expo-clipboard';
 import { useStore } from '@/store/useStore';
 import { supabase } from '@/lib/supabase';
 
@@ -84,6 +94,179 @@ export default function ItineraryScreen() {
     cost: '',
     category: 'activity' as const,
   });
+
+  // ── Collaboration state ────────────────────────────────────────────────────
+  const [showCollabModal, setShowCollabModal] = useState(false);
+  const [collaborators, setCollaborators] = useState<any[]>([]);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteLink, setInviteLink] = useState('');
+  const [inviteSending, setInviteSending] = useState(false);
+  const [votes, setVotes] = useState<Record<string, { up: number; down: number; myVote: number }>>({});
+
+  // ── Notification state ──────────────────────────────────────────────────────
+  const [showNotifModal, setShowNotifModal] = useState(false);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const unreadCount = notifications.filter(n => !n.is_read).length;
+
+  // ── Collaboration helpers ─────────────────────────────────────────────────
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3001';
+
+  const loadCollaborators = async (itineraryId: string) => {
+    if (!supabase) return;
+    const { data } = await supabase
+      .from('itinerary_collaborators')
+      .select('*')
+      .eq('itinerary_id', itineraryId)
+      .order('invited_at', { ascending: true });
+    setCollaborators(data || []);
+  };
+
+  const loadVotesForItinerary = async (itineraryId: string) => {
+    if (!supabase || !user) return;
+    // Collect all activity ids
+    const { data: days } = await supabase
+      .from('itinerary_days')
+      .select('id')
+      .eq('itinerary_id', itineraryId);
+    if (!days?.length) return;
+    const dayIds = days.map((d: any) => d.id);
+    const { data: acts } = await supabase
+      .from('activities')
+      .select('id')
+      .in('day_id', dayIds);
+    if (!acts?.length) return;
+    const actIds = acts.map((a: any) => a.id);
+    const { data: voteRows } = await supabase
+      .from('activity_votes')
+      .select('activity_id, vote, user_id')
+      .in('activity_id', actIds);
+    const map: Record<string, { up: number; down: number; myVote: number }> = {};
+    for (const v of voteRows || []) {
+      if (!map[v.activity_id]) map[v.activity_id] = { up: 0, down: 0, myVote: 0 };
+      if (v.vote === 1) map[v.activity_id].up++;
+      else map[v.activity_id].down++;
+      if (v.user_id === user.id) map[v.activity_id].myVote = v.vote;
+    }
+    setVotes(map);
+  };
+
+  const sendInvite = async () => {
+    if (!inviteEmail.trim() || !currentItinerary || !user) return;
+    setInviteSending(true);
+    try {
+      const resp = await fetch(`${apiUrl}/api/itineraries/${currentItinerary.id}/invite`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id, email: inviteEmail.trim(), role: 'viewer' }),
+      });
+      const json = await resp.json();
+      if (json.success) {
+        setInviteLink(json.inviteLink || '');
+        setInviteEmail('');
+        await loadCollaborators(currentItinerary.id);
+        Alert.alert('Invite sent!', `${inviteEmail} has been invited.`);
+      } else {
+        Alert.alert('Error', json.error || 'Failed to send invite');
+      }
+    } catch (e: any) {
+      Alert.alert('Error', e.message);
+    } finally {
+      setInviteSending(false);
+    }
+  };
+
+  const handleRemoveCollaborator = async (collabId: string) => {
+    if (!currentItinerary || !user) return;
+    Alert.alert('Remove', 'Remove this collaborator?', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Remove', style: 'destructive', onPress: async () => {
+        await fetch(`${apiUrl}/api/itineraries/${currentItinerary.id}/collaborators/${collabId}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: user.id }),
+        });
+        await loadCollaborators(currentItinerary.id);
+      }},
+    ]);
+  };
+
+  const handleChangeRole = async (collabId: string, newRole: string) => {
+    if (!currentItinerary || !user) return;
+    await fetch(`${apiUrl}/api/itineraries/${currentItinerary.id}/collaborators/${collabId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: user.id, role: newRole }),
+    });
+    await loadCollaborators(currentItinerary.id);
+  };
+
+  const handleVote = async (activityId: string, vote: 1 | -1) => {
+    if (!user) return;
+    try {
+      const resp = await fetch(`${apiUrl}/api/activities/${activityId}/vote`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id, vote }),
+      });
+      const json = await resp.json();
+      if (json.success) {
+        setVotes(prev => ({
+          ...prev,
+          [activityId]: {
+            up: json.tally.up,
+            down: json.tally.down,
+            myVote: prev[activityId]?.myVote === vote ? 0 : vote,
+          },
+        }));
+      }
+    } catch (e) {
+      // silent fail — votes are best-effort
+    }
+  };
+
+  // ── Notification helpers ─────────────────────────────────────────────────
+  const loadNotifications = async () => {
+    if (!user) return;
+    try {
+      const resp = await fetch(`${apiUrl}/api/notifications?userId=${user.id}`);
+      const json = await resp.json();
+      if (json.success) setNotifications(json.notifications || []);
+    } catch (_) {}
+  };
+
+  const respondToNotification = async (notifId: string, action: 'accept' | 'decline') => {
+    if (!user) return;
+    try {
+      const resp = await fetch(`${apiUrl}/api/notifications/${notifId}/respond`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id, action }),
+      });
+      const json = await resp.json();
+      if (json.success) {
+        await loadNotifications();
+        if (action === 'accept' && json.itineraryId) {
+          setShowNotifModal(false);
+          Alert.alert('🎉 Joined!', 'You have joined the itinerary.', [
+            { text: 'View', onPress: () => loadItineraryById(json.itineraryId) },
+            { text: 'OK' },
+          ]);
+        } else {
+          Alert.alert('Done', 'Invite declined.');
+        }
+      }
+    } catch (e: any) {
+      Alert.alert('Error', e.message);
+    }
+  };
+
+  // Poll notifications every 15s
+  useEffect(() => {
+    if (!user) return;
+    loadNotifications();
+    const interval = setInterval(loadNotifications, 15000);
+    return () => clearInterval(interval);
+  }, [user?.id]);
 
   const requestedId = useMemo(() => {
     const id = params.id;
@@ -245,8 +428,7 @@ export default function ItineraryScreen() {
             day_id: dayId,
             title: newActivity.title,
             description: newActivity.description,
-            time_start: newActivity.time_start,
-            time_end: newActivity.time_end,
+           
             location: newActivity.location,
             cost: parseFloat(newActivity.cost) || 0,
             category: newActivity.category,
@@ -520,26 +702,191 @@ export default function ItineraryScreen() {
             )}
           </View>
 
-          <View className="flex-row rounded-2xl p-1" style={{ backgroundColor: 'rgba(36, 41, 34, 0.8)' }}>
+          <View className="flex-row items-center gap-2">
+            {/* Collab icon with collaborator count badge */}
             <TouchableOpacity
-              className={`px-3 py-2 rounded-xl flex-row items-center gap-2 ${mode === 'view' ? '' : ''}`}
-              style={mode === 'view' ? { backgroundColor: 'rgba(76, 175, 80, 0.3)' } : {}}
-              onPress={() => setMode('view')}
+              className="relative w-10 h-10 rounded-xl items-center justify-center"
+              style={{ backgroundColor: 'rgba(36, 41, 34, 0.8)' }}
+              onPress={() => {
+                if (currentItinerary) loadCollaborators(currentItinerary.id);
+                setShowCollabModal(true);
+              }}
             >
-              <Eye size={16} color="#F5F5DC" />
-              <Text className="font-inter-bold" style={{ color: '#F5F5DC' }}>View</Text>
+              <Users2 size={20} color="#4CAF50" />
+              {collaborators.filter(c => c.status === 'accepted').length > 0 && (
+                <View
+                  className="absolute -top-1 -right-1 w-4 h-4 rounded-full items-center justify-center"
+                  style={{ backgroundColor: '#4CAF50' }}
+                >
+                  <Text className="text-xs font-bold" style={{ color: '#1A1C19', fontSize: 9 }}>
+                    {collaborators.filter(c => c.status === 'accepted').length}
+                  </Text>
+                </View>
+              )}
             </TouchableOpacity>
+
+            {/* 🔔 Notification bell with unread badge */}
             <TouchableOpacity
-              className={`px-3 py-2 rounded-xl flex-row items-center gap-2 ${mode === 'edit' ? '' : ''}`}
-              style={mode === 'edit' ? { backgroundColor: 'rgba(76, 175, 80, 0.3)' } : {}}
-              onPress={() => setMode('edit')}
+              className="relative w-10 h-10 rounded-xl items-center justify-center"
+              style={{ backgroundColor: 'rgba(36, 41, 34, 0.8)' }}
+              onPress={() => { setShowNotifModal(true); loadNotifications(); }}
             >
-              <Pencil size={16} color="#F5F5DC" />
-              <Text className="font-inter-bold" style={{ color: '#F5F5DC' }}>Edit</Text>
+              <Bell size={20} color={unreadCount > 0 ? '#F39C12' : '#9CA3AF'} />
+              {unreadCount > 0 && (
+                <View
+                  className="absolute -top-1 -right-1 w-4 h-4 rounded-full items-center justify-center"
+                  style={{ backgroundColor: '#EF4444' }}
+                >
+                  <Text style={{ color: '#fff', fontSize: 9, fontWeight: 'bold' }}>{unreadCount}</Text>
+                </View>
+              )}
             </TouchableOpacity>
+
+            <View className="flex-row rounded-2xl p-1" style={{ backgroundColor: 'rgba(36, 41, 34, 0.8)' }}>
+              <TouchableOpacity
+                className={`px-3 py-2 rounded-xl flex-row items-center gap-2 ${mode === 'view' ? '' : ''}`}
+                style={mode === 'view' ? { backgroundColor: 'rgba(76, 175, 80, 0.3)' } : {}}
+                onPress={() => setMode('view')}
+              >
+                <Eye size={16} color="#F5F5DC" />
+                <Text className="font-inter-bold" style={{ color: '#F5F5DC' }}>View</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                className={`px-3 py-2 rounded-xl flex-row items-center gap-2 ${mode === 'edit' ? '' : ''}`}
+                style={mode === 'edit' ? { backgroundColor: 'rgba(76, 175, 80, 0.3)' } : {}}
+                onPress={() => setMode('edit')}
+              >
+                <Pencil size={16} color="#F5F5DC" />
+                <Text className="font-inter-bold" style={{ color: '#F5F5DC' }}>Edit</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </LinearGradient>
+
+      {/* ── Collaborator Bottom Sheet Modal ─────────────────────────────── */}
+      <Modal
+        visible={showCollabModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowCollabModal(false)}
+      >
+        <View className="flex-1 justify-end" style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}>
+          <View className="rounded-t-3xl" style={{ backgroundColor: '#242922', maxHeight: '85%' }}>
+            {/* Header */}
+            <View className="flex-row items-center justify-between px-6 pt-6 pb-4">
+              <View className="flex-row items-center gap-2">
+                <Users2 size={22} color="#4CAF50" />
+                <Text className="font-inter-bold text-xl" style={{ color: '#F5F5DC' }}>Collaborators</Text>
+              </View>
+              <TouchableOpacity onPress={() => setShowCollabModal(false)}>
+                <X size={22} color="#9CA3AF" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false} className="px-6">
+              {/* Current collaborators */}
+              {collaborators.length === 0 ? (
+                <Text className="text-center py-4 font-inter" style={{ color: '#9CA3AF' }}>
+                  No collaborators yet. Invite someone below!
+                </Text>
+              ) : (
+                collaborators.map((c) => (
+                  <View
+                    key={c.id}
+                    className="flex-row items-center justify-between py-3 border-b"
+                    style={{ borderColor: '#1A1C19' }}
+                  >
+                    {/* Avatar + info */}
+                    <View className="flex-row items-center gap-3">
+                      <View
+                        className="w-10 h-10 rounded-full items-center justify-center"
+                        style={{ backgroundColor: c.status === 'accepted' ? 'rgba(76,175,80,0.3)' : 'rgba(156,163,175,0.2)' }}
+                      >
+                        <Text className="font-inter-bold" style={{ color: c.status === 'accepted' ? '#4CAF50' : '#9CA3AF' }}>
+                          {c.email?.[0]?.toUpperCase() || '?'}
+                        </Text>
+                      </View>
+                      <View>
+                        <Text className="font-inter-medium" style={{ color: '#F5F5DC' }} numberOfLines={1}>
+                          {c.email}
+                        </Text>
+                        <View
+                          className="self-start px-2 py-0.5 rounded-full mt-0.5"
+                          style={{ backgroundColor: c.status === 'pending' ? 'rgba(243,156,18,0.2)' : 'rgba(76,175,80,0.2)' }}
+                        >
+                          <Text className="text-xs" style={{ color: c.status === 'pending' ? '#F39C12' : '#4CAF50' }}>
+                            {c.status === 'pending' ? 'Pending' : c.role === 'editor' ? 'Editor' : 'Viewer'}
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+
+                    {/* Owner controls */}
+                    {currentItinerary?.user_id === user?.id && (
+                      <View className="flex-row items-center gap-2">
+                        <TouchableOpacity
+                          className="px-2 py-1 rounded-lg"
+                          style={{ backgroundColor: 'rgba(76,175,80,0.15)' }}
+                          onPress={() => handleChangeRole(c.id, c.role === 'editor' ? 'viewer' : 'editor')}
+                        >
+                          <Text className="text-xs font-bold" style={{ color: '#4CAF50' }}>
+                            {c.role === 'editor' ? '→ Viewer' : '→ Editor'}
+                          </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => handleRemoveCollaborator(c.id)}>
+                          <X size={16} color="#EF4444" />
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                  </View>
+                ))
+              )}
+
+              {/* Invite section */}
+              <View className="mt-6 mb-4">
+                <Text className="font-inter-bold mb-3" style={{ color: '#F5F5DC' }}>Invite by email</Text>
+                <View className="flex-row gap-2">
+                  <TextInput
+                    className="flex-1 rounded-xl px-4 py-3 font-inter"
+                    style={{ backgroundColor: '#1A1C19', color: '#F5F5DC', borderWidth: 1, borderColor: '#333' }}
+                    placeholder="friend@example.com"
+                    placeholderTextColor="#9CA3AF"
+                    value={inviteEmail}
+                    onChangeText={setInviteEmail}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                  />
+                  <TouchableOpacity
+                    className="rounded-xl px-4 items-center justify-center"
+                    style={{ backgroundColor: inviteSending ? '#333' : '#4CAF50' }}
+                    onPress={sendInvite}
+                    disabled={inviteSending}
+                  >
+                    <Send size={18} color="#1A1C19" />
+                  </TouchableOpacity>
+                </View>
+
+                {/* Copy invite link */}
+                {inviteLink ? (
+                  <TouchableOpacity
+                    className="flex-row items-center justify-center gap-2 mt-3 py-3 rounded-xl border"
+                    style={{ borderColor: '#4CAF50' }}
+                    onPress={() => { Clipboard.setStringAsync(inviteLink); Alert.alert('Copied!', 'Invite link copied to clipboard.'); }}
+                  >
+                    <Copy size={16} color="#4CAF50" />
+                    <Text className="font-inter-medium" style={{ color: '#4CAF50' }}>Copy Invite Link</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <Text className="text-xs mt-2 text-center" style={{ color: '#9CA3AF' }}>
+                    Send an invite to get a shareable link — works for new users too
+                  </Text>
+                )}
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
 
       <View className="px-6 py-4">
         {/* History picker */}
@@ -609,16 +956,6 @@ export default function ItineraryScreen() {
             </View>
             <Text className="font-inter-bold text-lg" style={{ color: '#F5F5DC' }}>
               ₹{currentItinerary.budget.toLocaleString()}
-            </Text>
-          </View>
-          <View className="w-px" style={{ backgroundColor: '#1A1C19' }} />
-          <View className="items-center">
-            <View className="flex-row items-center gap-1 mb-1">
-              <Wallet size={16} color="#4CAF50" />
-              <Text className="text-xs" style={{ color: '#9CA3AF' }}>Estimated</Text>
-            </View>
-            <Text className="text-lg font-bold" style={{ color: '#4CAF50' }}>
-              ₹{totalCost.toLocaleString()}
             </Text>
           </View>
         </View>
@@ -705,9 +1042,10 @@ export default function ItineraryScreen() {
                                 </Text>
                               </View>
                             </View>
-                            <View className="px-3 py-1 rounded-full" style={{ backgroundColor: 'rgba(76, 175, 80, 0.2)' }}>
-                              <Text className="font-bold text-sm" style={{ color: '#4CAF50' }}>
-                                ₹{activity.cost}
+                            <View className="px-3 py-1 rounded-full flex-row items-center gap-1" style={{ backgroundColor: 'rgba(243, 156, 18, 0.15)' }}>
+                              <Clock size={11} color="#F39C12" />
+                              <Text className="font-bold text-xs" style={{ color: '#F39C12' }}>
+                                {activity.time_start}–{activity.time_end}
                               </Text>
                             </View>
                             <View className="ml-2 self-center">
@@ -726,6 +1064,30 @@ export default function ItineraryScreen() {
                           <Text className="text-sm leading-5" numberOfLines={2} style={{ color: 'rgba(245, 245, 220, 0.8)' }}>
                             {activity.description}
                           </Text>
+
+                          {/* 👍👎 Vote buttons */}
+                          <View className="flex-row gap-3 mt-3">
+                            <TouchableOpacity
+                              className="flex-row items-center gap-1 px-3 py-1.5 rounded-full"
+                              style={{ backgroundColor: votes[activity.id]?.myVote === 1 ? 'rgba(76,175,80,0.3)' : 'rgba(255,255,255,0.06)' }}
+                              onPress={() => handleVote(activity.id, 1)}
+                            >
+                              <ThumbsUp size={13} color={votes[activity.id]?.myVote === 1 ? '#4CAF50' : '#9CA3AF'} />
+                              <Text className="text-xs font-bold" style={{ color: votes[activity.id]?.myVote === 1 ? '#4CAF50' : '#9CA3AF' }}>
+                                {votes[activity.id]?.up || 0}
+                              </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              className="flex-row items-center gap-1 px-3 py-1.5 rounded-full"
+                              style={{ backgroundColor: votes[activity.id]?.myVote === -1 ? 'rgba(239,68,68,0.2)' : 'rgba(255,255,255,0.06)' }}
+                              onPress={() => handleVote(activity.id, -1)}
+                            >
+                              <ThumbsDown size={13} color={votes[activity.id]?.myVote === -1 ? '#EF4444' : '#9CA3AF'} />
+                              <Text className="text-xs font-bold" style={{ color: votes[activity.id]?.myVote === -1 ? '#EF4444' : '#9CA3AF' }}>
+                                {votes[activity.id]?.down || 0}
+                              </Text>
+                            </TouchableOpacity>
+                          </View>
                         </View>
                       </TouchableOpacity>
                       {actIndex < day.activities.length - 1 && (
@@ -736,6 +1098,88 @@ export default function ItineraryScreen() {
                 </View>
               </View>
             ))}
+
+            {/* 🔔 Notification Panel Modal */}
+            <Modal
+              visible={showNotifModal}
+              transparent
+              animationType="slide"
+              onRequestClose={() => setShowNotifModal(false)}
+            >
+              <View className="flex-1 justify-end" style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}>
+                <View className="rounded-t-3xl pt-4 pb-10 px-4" style={{ backgroundColor: '#1A1C19', maxHeight: '80%' }}>
+                  {/* Handle bar */}
+                  <View className="w-10 h-1 rounded-full self-center mb-4" style={{ backgroundColor: '#333' }} />
+
+                  <View className="flex-row items-center justify-between mb-4">
+                    <Text className="text-xl font-bold" style={{ color: '#F5F5DC' }}>Notifications</Text>
+                    <TouchableOpacity onPress={() => setShowNotifModal(false)}>
+                      <X size={22} color="#9CA3AF" />
+                    </TouchableOpacity>
+                  </View>
+
+                  <ScrollView showsVerticalScrollIndicator={false}>
+                    {notifications.length === 0 ? (
+                      <View className="items-center py-12">
+                        <Bell size={40} color="#333" />
+                        <Text className="mt-3 text-sm" style={{ color: '#9CA3AF' }}>No notifications yet</Text>
+                      </View>
+                    ) : (
+                      notifications.map((notif) => (
+                        <View
+                          key={notif.id}
+                          className="rounded-2xl p-4 mb-3"
+                          style={{
+                            backgroundColor: notif.is_read ? 'rgba(36,41,34,0.5)' : 'rgba(243,156,18,0.08)',
+                            borderWidth: notif.is_read ? 0 : 1,
+                            borderColor: 'rgba(243,156,18,0.3)',
+                          }}
+                        >
+                          <View className="flex-row items-start gap-3">
+                            <View className="w-10 h-10 rounded-full items-center justify-center" style={{ backgroundColor: 'rgba(243,156,18,0.15)' }}>
+                              <Bell size={18} color="#F39C12" />
+                            </View>
+                            <View className="flex-1">
+                              <Text className="font-bold text-sm mb-0.5" style={{ color: '#F5F5DC' }}>{notif.title}</Text>
+                              <Text className="text-xs leading-4 mb-3" style={{ color: '#9CA3AF' }}>{notif.body}</Text>
+
+                              {notif.type === 'collab_invite' && !notif.is_read && (
+                                <View className="flex-row gap-2">
+                                  <TouchableOpacity
+                                    className="flex-1 py-2 rounded-xl items-center"
+                                    style={{ backgroundColor: 'rgba(76,175,80,0.25)' }}
+                                    onPress={() => respondToNotification(notif.id, 'accept')}
+                                  >
+                                    <View className="flex-row items-center gap-1">
+                                      <CheckCircle size={14} color="#4CAF50" />
+                                      <Text className="text-xs font-bold" style={{ color: '#4CAF50' }}>Accept</Text>
+                                    </View>
+                                  </TouchableOpacity>
+                                  <TouchableOpacity
+                                    className="flex-1 py-2 rounded-xl items-center"
+                                    style={{ backgroundColor: 'rgba(239,68,68,0.15)' }}
+                                    onPress={() => respondToNotification(notif.id, 'decline')}
+                                  >
+                                    <View className="flex-row items-center gap-1">
+                                      <XCircle size={14} color="#EF4444" />
+                                      <Text className="text-xs font-bold" style={{ color: '#EF4444' }}>Decline</Text>
+                                    </View>
+                                  </TouchableOpacity>
+                                </View>
+                              )}
+
+                              {notif.is_read && (
+                                <Text className="text-xs" style={{ color: 'rgba(76,175,80,0.7)' }}>✓ Responded</Text>
+                              )}
+                            </View>
+                          </View>
+                        </View>
+                      ))
+                    )}
+                  </ScrollView>
+                </View>
+              </View>
+            </Modal>
 
             {/* Activity Detail Modal */}
             <Modal
