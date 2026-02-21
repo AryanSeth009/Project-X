@@ -1,10 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as WebBrowser from 'expo-web-browser';
+import * as Linking from 'expo-linking';
 import { GoogleLogo } from '@/components/GoogleLogo';
 import { supabase } from '@/lib/supabase';
 import { useTheme } from '@/context/ThemeContext';
+
+// Handle redirect for deep linking
+WebBrowser.maybeCompleteAuthSession();
 
 export default function AuthScreen() {
   const { colors } = useTheme();
@@ -45,6 +50,51 @@ export default function AuthScreen() {
       }
     } catch (error: any) {
       setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    setError('');
+    
+    try {
+      // Create a deep link to return to the app
+      const redirectTo = Linking.createURL('/');
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo,
+          skipBrowserRedirect: true, // Let Expo WebBrowser handle the open
+        },
+      });
+
+      if (error) throw error;
+      
+      if (data?.url) {
+        // Open the system browser for auth
+        const res = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
+        
+        if (res.type === 'success' && res.url) {
+          // Parse the URL hash fragment returned by Supabase
+          const urlParams = new URL(res.url.replace('#', '?')).searchParams;
+          const access_token = urlParams.get('access_token');
+          const refresh_token = urlParams.get('refresh_token');
+
+          if (access_token && refresh_token) {
+            const { error: sessionError } = await supabase.auth.setSession({
+              access_token,
+              refresh_token,
+            });
+            if (sessionError) throw sessionError;
+            // Router replacement to home is handled by the global auth listener in _layout.tsx
+          }
+        }
+      }
+    } catch (e: any) {
+      setError(e.message || 'Google login failed');
     } finally {
       setLoading(false);
     }
@@ -207,7 +257,12 @@ export default function AuthScreen() {
               {/* Social Login Options */}
               <View className="flex-row gap-3">
 
-                <TouchableOpacity className="flex-1 rounded-xl py-3.5 items-center justify-center flex-row gap-2 border" style={{ backgroundColor: colors.card, borderColor: colors.border }}>
+                <TouchableOpacity
+                  className="flex-1 rounded-xl py-3.5 items-center justify-center flex-row gap-2 border"
+                  style={{ backgroundColor: colors.card, borderColor: colors.border }}
+                  onPress={handleGoogleLogin}
+                  disabled={loading}
+                >
                   <GoogleLogo size={22} />
                   <Text className="font-inter-semibold text-sm" style={{ color: colors.text }}>Continue with Google</Text>
                 </TouchableOpacity>
