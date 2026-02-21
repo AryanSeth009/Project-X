@@ -1,0 +1,58 @@
+{
+    "destination": "Jaisalmer",
+    "areas": [
+      {
+        "name": "Fort Area",
+        "type": "Heritage",
+        "budgetRange": {
+          "hostel": 400,
+          "hotel": 2000
+        },
+        "bestFor": ["Living fort", "Havelis", "Rooftop cafes"]
+      },
+      {
+        "name": "Sam Sand Dunes",
+        "type": "Desert",
+        "budgetRange": {
+          "hostel": 600,
+          "hotel": 3000
+        },
+        "bestFor": ["Camel safari", "Desert camping"]
+      }
+    ],
+    "transport": {
+      "scooter": {
+        "costPerDay": 500,
+        "recommended": true
+      },
+      "taxi": {
+        "desertTrip": "₹3500 roundtrip"
+      }
+    },
+    "attractions": [
+      {
+        "name": "Jaisalmer Fort",
+        "type": "Living Fort",
+        "openingHours": "24 hours",
+        "entryFee": "₹50"
+      },
+      {
+        "name": "Patwon Ki Haveli",
+        "type": "Haveli",
+        "openingHours": "9AM-5PM",
+        "entryFee": "₹20"
+      },
+      {
+        "name": "Sam Sand Dunes",
+        "type": "Desert",
+        "camelSafari": "₹500",
+        "jeepSafari": "₹1500"
+      }
+    ],
+    "budgetTips": [
+      "Stay fort haveli hostels (₹400/night)",
+      "Shared jeep to Sam (₹500/person)",
+      "Camel safari ₹500 sunset"
+    ]
+  }
+  

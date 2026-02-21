@@ -1,0 +1,206 @@
+{
+    "destination": "Kashmir",
+    "areas": [
+      {
+        "name": "Srinagar",
+        "type": "Cultural",
+        "budgetRange": {
+          "hostel": 600,
+          "hotel": 2500
+        },
+        "bestFor": ["Houseboats", "Shikara rides", "Markets", "Mughal Gardens"],
+        "specificPlaces": {
+          "restaurants": [
+            {"name": "Ahdoos", "type": "Traditional Kashmiri", "cost": 800, "bestFor": "Rogan Josh"},
+            {"name": "Chai Shai", "type": "Cafe", "cost": 300, "bestFor": "Kahwa & pastries"},
+            {"name": "Gulmarg Road Dhaba", "type": "Street food", "cost": 200, "bestFor": "Kashmiri thali"},
+            {"name": "Houseboat Kitchen", "type": "Houseboat dining", "cost": 1000, "bestFor": "Floating dinner"}
+          ],
+          "hostels": [
+            {"name": "Zostel Srinagar", "cost": 600, "amenities": ["WiFi", "Dal Lake view"], "rating": "4.4"},
+            {"name": "Kashmir Backpackers", "cost": 550, "amenities": ["Shikara access", "Common room"], "rating": "4.2"}
+          ],
+          "activities": [
+            {"name": "Shikara Ride Dal Lake", "cost": 500, "duration": "1 hour"},
+            {"name": "Nishat Bagh Visit", "cost": 20, "duration": "1.5 hours", "openingHours": "9:30AM-6:30PM"},
+            {"name": "Pashmina Shopping", "cost": 2000, "duration": "1 hour", "location": "Polo View Market"}
+          ]
+        }
+      },
+      {
+        "name": "Gulmarg",
+        "type": "Adventure",
+        "budgetRange": {
+          "hostel": 800,
+          "hotel": 3500
+        },
+        "bestFor": ["Skiing", "Cable car", "Meadows", "Snow activities"],
+        "specificPlaces": {
+          "restaurants": [
+            {"name": "Snow View Restaurant", "type": "Cable car station", "cost": 600, "bestFor": "Panoramic views"},
+            {"name": "Gulmarg Dhaba", "type": "Local", "cost": 250, "bestFor": "Momos & Maggie"},
+            {"name": "Highland Park Cafe", "type": "Hotel cafe", "cost": 700, "bestFor": "Hot chocolate"}
+          ],
+          "hostels": [
+            {"name": "Gulmarg Youth Hostel", "cost": 800, "amenities": ["Ski storage", "Hot water"], "rating": "4.3"},
+            {"name": "Meadow View Guesthouse", "cost": 750, "amenities": ["Cable car proximity"], "rating": "4.1"}
+          ],
+          "activities": [
+            {"name": "Gondola Cable Car", "cost": 1600, "duration": "30min", "openingHours": "9AM-5PM"},
+            {"name": "Skiing/Snowboarding", "cost": 2500, "duration": "3 hours", "season": "Dec-Mar"},
+            {"name": "Horse Riding", "cost": 800, "duration": "1 hour", "operator": "Local ponywallas"}
+          ]
+        }
+      },
+      {
+        "name": "Pahalgam",
+        "type": "Nature",
+        "budgetRange": {
+          "hostel": 500,
+          "hotel": 2000
+        },
+        "bestFor": ["Trekking", "Rafting", "Pine forests", "Lidder River"],
+        "specificPlaces": {
+          "restaurants": [
+            {"name": "Lidder View Restaurant", "type": "Riverfront", "cost": 600, "bestFor": "Trout fish"},
+            {"name": "Betaab Valley Cafe", "type": "Movie location", "cost": 400, "bestFor": "Valley views"},
+            {"name": "Pahalgam Kitchen", "type": "Local", "cost": 300, "bestFor": "Kashmiri wazwan"}
+          ],
+          "hostels": [
+            {"name": "Pahalgam Backpackers", "cost": 500, "amenities": ["River view", "Bonfire"], "rating": "4.2"},
+            {"name": "Lidder Valley Hostel", "cost": 450, "amenities": ["Trekking info"], "rating": "4.0"}
+          ],
+          "activities": [
+            {"name": "River Rafting Lidder", "cost": 1200, "duration": "45min", "season": "Apr-Oct"},
+            {"name": "Aru Valley Trek", "cost": 0, "duration": "3-4 hours", "guide": "Recommended"},
+            {"name": "Betaab Valley Visit", "cost": 100, "duration": "2 hours", "openingHours": "8AM-6PM"}
+          ]
+        }
+      },
+      {
+        "name": "Sonmarg",
+        "type": "High Altitude",
+        "budgetRange": {
+          "hostel": 700,
+          "hotel": 2800
+        },
+        "bestFor": ["Zero Point", "Thajiwas Glacier", "Snow sledging"],
+        "specificPlaces": {
+          "restaurants": [
+            {"name": "Zero Point Dhaba", "type": "High altitude", "cost": 400, "bestFor": "Maggi & tea"},
+            {"name": "Sonmarg Market Eatery", "type": "Street food", "cost": 200, "bestFor": "Local bread"}
+          ],
+          "hostels": [
+            {"name": "Sonmarg Guesthouse", "cost": 700, "amenities": ["Glacier views"], "rating": "4.1"}
+          ],
+          "activities": [
+            {"name": "Thajiwas Glacier Trek", "cost": 600, "duration": "2 hours", "pony": "Optional"},
+            {"name": "Snow Sledging", "cost": 500, "duration": "30min", "season": "Nov-Mar"},
+            {"name": "ATV Ride", "cost": 1500, "duration": "30min", "location": "Zero Point road"}
+          ]
+        }
+      }
+    ],
+    "transport": {
+      "scooter": {
+        "costPerDay": 0,
+        "recommended": false,
+        "note": "Not practical due to terrain"
+      },
+      "taxi": {
+        "avgCostPerTrip": 2500,
+        "srinagarLocal": "₹1500-2000/day",
+        "airportTransfer": "₹800-1200",
+        "sharedTaxi": "Srinagar-Gulmarg ₹400/person"
+      }
+    },
+    "attractions": [
+      {
+        "name": "Dal Lake",
+        "type": "Lake",
+        "avgTime": "2-3 hours",
+        "openingHours": "24 hours",
+        "specificActivities": ["Shikara ride", "Floating market", "Houseboat visit"],
+        "nearbyRestaurants": ["Ahdoos", "Chai Shai"]
+      },
+      {
+        "name": "Gulmarg Gondola",
+        "type": "Cable Car",
+        "avgTime": "3 hours",
+        "cost": "₹1600 Phase 1+2",
+        "altitude": "13500ft",
+        "openingHours": "9AM-5PM",
+        "nearby": ["Snow View Restaurant"]
+      },
+      {
+        "name": "Nishat Bagh",
+        "type": "Mughal Garden",
+        "avgTime": "1.5 hours",
+        "entryFee": "₹20",
+        "openingHours": "9:30AM-6:30PM",
+        "nearby": ["Dal Lake", "Shalimar Bagh"]
+      },
+      {
+        "name": "Betaab Valley",
+        "type": "Valley",
+        "avgTime": "2 hours",
+        "entryFee": "₹100/vehicle",
+        "famousFor": "Bollywood filming",
+        "openingHours": "8AM-6PM",
+        "nearby": ["Lidder River"]
+      },
+      {
+        "name": "Thajiwas Glacier",
+        "type": "Glacier",
+        "avgTime": "3-4 hours",
+        "access": "Pony trek",
+        "cost": "₹600 pony",
+        "location": "Sonmarg"
+      },
+      {
+        "name": "Pari Mahal",
+        "type": "Palace",
+        "avgTime": "1 hour",
+        "viewPoint": "Srinagar city",
+        "entryFee": "Free",
+        "openingHours": "All day"
+      }
+    ],
+    "travelClusters": [
+      {
+        "clusterName": "Srinagar & Surroundings",
+        "places": ["Dal Lake", "Nishat Bagh", "Pari Mahal", "Shalimar Bagh"],
+        "distanceFromAirport": "20min",
+        "vibe": "Cultural & Lakes",
+        "recommendedStay": "Srinagar houseboats",
+        "dayPlan": "Morning: Shikara, Afternoon: Gardens, Evening: Boulevard walk"
+      },
+      {
+        "clusterName": "Gulmarg",
+        "places": ["Gondola", "Golf Course", "St Mary Church"],
+        "distanceFromAirport": "2.5 hours",
+        "vibe": "Adventure & Snow",
+        "recommendedStay": "Gulmarg hotels",
+        "dayPlan": "Morning: Gondola, Afternoon: Pony ride, Evening: Snow activities"
+      }
+    ],
+    "budgetTips": [
+      "Stay at Zostel Srinagar (₹600/night) for houseboat views",
+      "Eat at local dhabas (₹200-300) instead of tourist restaurants",
+      "Share taxis Srinagar-Gulmarg (₹400/person)",
+      "Book gondola tickets online to avoid queues (₹1600)",
+      "Eat trout fish at Lidder River restaurants (₹600)",
+      "Stay in Pahalgam guesthouses (₹500/night) during shoulder season",
+      "Drink Kahwa tea (₹50/cup) instead of imported coffee",
+      "Trek Thajiwas Glacier with pony (₹600) instead of ATV (₹1500)",
+      "Visit Mughal Gardens (₹20 entry) instead of paid tours",
+      "Shop handicrafts at local markets, not fixed shops"
+    ],
+    "hiddenGems": [
+      {"name": "Dachigam Park", "access": "1hr from Srinagar", "cost": 100, "why": "Hangul deer sanctuary"},
+      {"name": "Yusmarg", "access": "2hr from Srinagar", "cost": 0, "why": "Offbeat meadow destination"},
+      {"name": "Aharbal Waterfall", "access": "3hr from Srinagar", "cost": 0, "why": "Mini Niagara of Kashmir"},
+      {"name": "Gadsar Lake", "access": "High altitude trek", "cost": 0, "why": "Pristine alpine lake"}
+    ]
+  }
+  
