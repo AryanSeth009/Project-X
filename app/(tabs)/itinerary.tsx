@@ -13,8 +13,10 @@ import {
   Platform,
 } from 'react-native';
 import DraggableFlatList from 'react-native-draggable-flatlist';
-import { BlurView } from 'expo-blur';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+
+// Only use expo-blur on iOS; it causes "String cannot be cast to Boolean" on Android
+const BlurView = Platform.OS === 'ios' ? require('expo-blur').BlurView : null;
 import { LinearGradient } from 'expo-linear-gradient';
 import {
   MapPin,
@@ -321,11 +323,11 @@ export default function ItineraryScreen() {
 
     setLoading(true);
     try {
+      // Load by id only — RLS allows if user is owner OR accepted collaborator
       const { data: itineraryData, error: itineraryError } = await supabase
         .from('itineraries')
         .select('*')
         .eq('id', itineraryId)
-        .eq('user_id', user.id)
         .maybeSingle();
 
       if (itineraryError || !itineraryData) {
@@ -650,21 +652,118 @@ export default function ItineraryScreen() {
 
   if (!currentItinerary) {
     return (
-      <View className="flex-1 items-center justify-center px-6" style={{ backgroundColor: colors.background }}>
-        <Text className="text-6xl mb-4">📋</Text>
-        <Text className="font-inter-bold text-2xl mb-2" style={{ color: colors.text }}>
-          No Itinerary Yet
-        </Text>
-        <Text className="font-inter text-center" style={{ color: colors.textMuted }}>
-          Create your first itinerary from the Home tab
-        </Text>
-        <TouchableOpacity
-          className="mt-6 rounded-xl px-5 py-3"
-          style={{ backgroundColor: colors.green }}
-          onPress={() => router.push('/(tabs)/home')}
+      <View className="flex-1" style={{ backgroundColor: colors.background }}>
+        {/* Same top-right layout as when there is an itinerary — notification bell in same position */}
+        <View className="pt-12 px-6 pb-2 flex-row items-center justify-end">
+          <TouchableOpacity
+            className="relative w-10 h-10 rounded-xl items-center justify-center"
+            style={{ backgroundColor: colors.card + 'CC' }}
+            onPress={() => { setShowNotifModal(true); loadNotifications(); }}
+          >
+            <Bell size={20} color={unreadCount > 0 ? colors.orange : colors.textMuted} />
+            {unreadCount > 0 && (
+              <View
+                className="absolute -top-1 -right-1 w-4 h-4 rounded-full items-center justify-center"
+                style={{ backgroundColor: colors.error }}
+              >
+                <Text style={{ color: '#fff', fontSize: 9, fontWeight: 'bold' }}>{unreadCount}</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
+        <View className="flex-1 items-center justify-center px-6">
+          <Text className="text-6xl mb-4">📋</Text>
+          <Text className="font-inter-bold text-2xl mb-2" style={{ color: colors.text }}>
+            No Itinerary Yet
+          </Text>
+          <Text className="font-inter text-center" style={{ color: colors.textMuted }}>
+            Create your first itinerary from the Home tab
+          </Text>
+          <TouchableOpacity
+            className="mt-6 rounded-xl px-5 py-3"
+            style={{ backgroundColor: colors.green }}
+            onPress={() => router.push('/(tabs)/home')}
+          >
+            <Text className="font-inter-bold" style={{ color: colors.onGreen }}>Go to Home</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Notifications modal — same as when itinerary exists, so bell works from empty state */}
+        <Modal
+          visible={showNotifModal}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setShowNotifModal(false)}
         >
-          <Text className="font-inter-bold" style={{ color: colors.onGreen }}>Go to Home</Text>
-        </TouchableOpacity>
+          <View className="flex-1 justify-end" style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}>
+            <View className="rounded-t-3xl pt-4 pb-10 px-4" style={{ backgroundColor: colors.background, maxHeight: '80%' }}>
+              <View className="w-10 h-1 rounded-full self-center mb-4" style={{ backgroundColor: '#333' }} />
+              <View className="flex-row items-center justify-between mb-4">
+                <Text className="text-xl font-bold" style={{ color: colors.text }}>Notifications</Text>
+                <TouchableOpacity onPress={() => setShowNotifModal(false)}>
+                  <X size={22} color={colors.textMuted} />
+                </TouchableOpacity>
+              </View>
+              <ScrollView showsVerticalScrollIndicator={false}>
+                {notifications.length === 0 ? (
+                  <View className="items-center py-12">
+                    <Bell size={40} color="#333" />
+                    <Text className="mt-3 text-sm" style={{ color: colors.textMuted }}>No notifications yet</Text>
+                  </View>
+                ) : (
+                  notifications.map((notif) => (
+                    <View
+                      key={notif.id}
+                      className="rounded-2xl p-4 mb-3"
+                      style={{
+                        backgroundColor: notif.is_read ? colors.card + '80' : colors.orangeMuted,
+                        borderWidth: notif.is_read ? 0 : 1,
+                        borderColor: colors.orangeBorder,
+                      }}
+                    >
+                      <View className="flex-row items-start gap-3">
+                        <View className="w-10 h-10 rounded-full items-center justify-center" style={{ backgroundColor: colors.orangeMuted }}>
+                          <Bell size={18} color={colors.orange} />
+                        </View>
+                        <View className="flex-1">
+                          <Text className="font-bold text-sm mb-0.5" style={{ color: colors.text }}>{notif.title}</Text>
+                          <Text className="text-xs leading-4 mb-3" style={{ color: colors.textMuted }}>{notif.body}</Text>
+                          {notif.type === 'collab_invite' && !notif.is_read && (
+                            <View className="flex-row gap-2">
+                              <TouchableOpacity
+                                className="flex-1 py-2 rounded-xl items-center"
+                                style={{ backgroundColor: colors.greenMuted }}
+                                onPress={() => respondToNotification(notif.id, 'accept')}
+                              >
+                                <View className="flex-row items-center gap-1">
+                                  <CheckCircle size={14} color={colors.green} />
+                                  <Text className="text-xs font-bold" style={{ color: colors.green }}>Accept</Text>
+                                </View>
+                              </TouchableOpacity>
+                              <TouchableOpacity
+                                className="flex-1 py-2 rounded-xl items-center"
+                                style={{ backgroundColor: colors.errorMuted }}
+                                onPress={() => respondToNotification(notif.id, 'decline')}
+                              >
+                                <View className="flex-row items-center gap-1">
+                                  <XCircle size={14} color={colors.error} />
+                                  <Text className="text-xs font-bold" style={{ color: colors.error }}>Decline</Text>
+                                </View>
+                              </TouchableOpacity>
+                            </View>
+                          )}
+                          {notif.is_read && (
+                            <Text className="text-xs" style={{ color: colors.green }}>✓ Responded</Text>
+                          )}
+                        </View>
+                      </View>
+                    </View>
+                  ))
+                )}
+              </ScrollView>
+            </View>
+          </View>
+        </Modal>
       </View>
     );
   }
@@ -762,16 +861,6 @@ export default function ItineraryScreen() {
               )}
             </TouchableOpacity>
 
-            {mode === 'edit' && (
-              <TouchableOpacity
-                className="px-3 py-2 rounded-xl flex-row items-center gap-2"
-                style={{ backgroundColor: colors.greenMuted }}
-                onPress={() => setMode('view')}
-              >
-                <CheckCircle size={16} color={colors.green} />
-                <Text className="font-inter-bold" style={{ color: colors.green }}>Done</Text>
-              </TouchableOpacity>
-            )}
           </View>
         </View>
       </LinearGradient>
@@ -1047,7 +1136,7 @@ export default function ItineraryScreen() {
                       <TouchableOpacity
                         className="flex-row items-center gap-1 px-2 py-1 rounded-lg"
                         style={{ backgroundColor: colors.greenMuted }}
-                        onPress={() => setMode('edit')}
+                        onPress={() => { setEditingDay(day); setMode('edit'); }}
                       >
                         <Pencil size={12} color={colors.green} />
                         <Text className="font-inter-bold text-xs" style={{ color: colors.green }}>Edit</Text>
@@ -1274,21 +1363,31 @@ export default function ItineraryScreen() {
               <View className="flex-1 justify-end" style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}>
                 <View className="h-[90%] rounded-t-[40px] overflow-hidden" style={{ backgroundColor: colors.card }}>
                   <ScrollView showsVerticalScrollIndicator={false}>
-                    {/* Header Image */}
-                    <View className="h-80 w-full relative">
+                    {/* Header Image — software-rendered to avoid hardware bitmap crash with BlurView on iOS */}
+                    <View className="h-80 w-full relative" renderToHardwareTextureAndroid={false}>
                       <Image
                         source={{ uri: selectedActivity?.image_url || `https://source.unsplash.com/800x600/?${encodeURIComponent(selectedActivity?.title || 'travel')}` }}
                         className="w-full h-full"
                         resizeMode="cover"
                       />
-                      <BlurView intensity={30} className="absolute top-12 left-6 rounded-full overflow-hidden">
+                      {BlurView ? (
+                        <BlurView intensity={30} className="absolute top-12 left-6 rounded-full overflow-hidden">
+                          <TouchableOpacity 
+                            onPress={() => setShowDetailModal(false)}
+                            className="w-12 h-12 items-center justify-center"
+                          >
+                            <ChevronRight size={24} color={colors.text} style={{ transform: [{rotate: '180deg'}] }} />
+                          </TouchableOpacity>
+                        </BlurView>
+                      ) : (
                         <TouchableOpacity 
                           onPress={() => setShowDetailModal(false)}
-                          className="w-12 h-12 items-center justify-center"
+                          className="absolute top-12 left-6 w-12 h-12 rounded-full overflow-hidden items-center justify-center"
+                          style={{ backgroundColor: 'rgba(0,0,0,0.35)' }}
                         >
                           <ChevronRight size={24} color={colors.text} style={{ transform: [{rotate: '180deg'}] }} />
                         </TouchableOpacity>
-                      </BlurView>
+                      )}
 
                       <LinearGradient
                         colors={['transparent', colors.card]}
@@ -1364,16 +1463,31 @@ export default function ItineraryScreen() {
             {currentItinerary.days.map((day) => (
               <View key={day.id} className="mb-6">
                 <View className="rounded-t-2xl p-4 border-l-4" style={{ backgroundColor: colors.card, borderLeftColor: colors.green }}>
-                  <Text className="font-inter-bold text-lg" style={{ color: colors.text }}>
-                    Day {day.day_number}: {day.title}
-                  </Text>
-                  <Text className="text-sm" style={{ color: colors.textMuted }}>
-                    {new Date(day.date).toLocaleDateString('en-IN', {
-                      weekday: 'long',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </Text>
+                  <View className="flex-row items-center justify-between gap-2">
+                    <View className="flex-1">
+                      <Text className="font-inter-bold text-lg" style={{ color: colors.text }}>
+                        Day {day.day_number}: {day.title}
+                      </Text>
+                      <Text className="text-sm" style={{ color: colors.textMuted }}>
+                        {new Date(day.date).toLocaleDateString('en-IN', {
+                          weekday: 'long',
+                          month: 'long',
+                          day: 'numeric',
+                        })}
+                      </Text>
+                    </View>
+                    {/* Done only on the day that was edited (the one that triggered edit mode) */}
+                    {mode === 'edit' && editingDay?.id === day.id && (
+                      <TouchableOpacity
+                        className="px-3 py-2 rounded-xl flex-row items-center gap-2"
+                        style={{ backgroundColor: colors.greenMuted }}
+                        onPress={() => { setMode('view'); setEditingDay(null); setShowAddActivity(false); setEditingActivity(null); }}
+                      >
+                        <CheckCircle size={16} color={colors.green} />
+                        <Text className="font-inter-bold" style={{ color: colors.green }}>Done</Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
                 </View>
 
                 <View className="rounded-b-2xl shadow-lg overflow-hidden" style={{ backgroundColor: colors.card }}>

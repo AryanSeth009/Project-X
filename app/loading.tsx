@@ -170,7 +170,7 @@ export default function LoadingScreen() {
         ...(generatedItinerary.preferences || {}),
         ...(apiItinerary.costBreakdown && {
           costBreakdown: apiItinerary.costBreakdown,
-          checkTickets: apiItinerary.checkTickets,
+          checkTickets: apiItinerary.checkTickets === true || apiItinerary.checkTickets === 'true',
           departurePlace: apiItinerary.departurePlace,
           transportOption: apiItinerary.transportOption,
         }),

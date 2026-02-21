@@ -1,15 +1,64 @@
 import { Tabs } from 'expo-router';
 import { Home, Map, User, Crown } from 'lucide-react-native';
-import { BlurView } from 'expo-blur';
 import { View, StyleSheet, Platform } from 'react-native';
 import { FontFamily } from '@/lib/fonts';
 import { useTheme } from '@/context/ThemeContext';
 
 const TAB_RADIUS = 32;
 
+// Only use expo-blur on iOS; it causes "String cannot be cast to Boolean" on Android
+const BlurView = Platform.OS === 'ios' ? require('expo-blur').BlurView : null;
+
 export default function TabLayout() {
   const { colors, resolvedScheme } = useTheme();
   const isDark = resolvedScheme === 'dark';
+
+  const tabBarBackground = () => (
+    <View style={styles.glassContainer}>
+      {/* iOS: native blur. Android: solid frosted-style background (expo-blur crashes on Android) */}
+      {BlurView ? (
+        <BlurView
+          intensity={85}
+          tint={isDark ? 'systemChromeMaterialDark' : 'systemChromeMaterialLight'}
+          style={StyleSheet.absoluteFillObject}
+        />
+      ) : (
+        <View
+          style={[
+            StyleSheet.absoluteFillObject,
+            {
+              backgroundColor: isDark
+                ? 'rgba(28, 30, 28, 0.92)'
+                : 'rgba(248, 250, 248, 0.92)',
+            },
+          ]}
+        />
+      )}
+
+      {/* Subtle tint over the blur — keep opacity LOW so blur shows */}
+      <View
+        style={[
+          StyleSheet.absoluteFillObject,
+          { backgroundColor: isDark ? 'rgba(18, 20, 18, 0.35)' : 'rgba(255, 255, 255, 0.5)' },
+        ]}
+      />
+
+      {/* Very faint green tint — brand accent without killing the glass */}
+      <View
+        style={[
+          StyleSheet.absoluteFillObject,
+          { backgroundColor: isDark ? 'rgba(76, 175, 80, 0.04)' : 'rgba(34, 139, 34, 0.04)' },
+        ]}
+      />
+
+      {/* Top border highlight — the key to real glassmorphism */}
+      <View style={styles.topBorder} />
+
+      {/* Bottom inner shadow / depth line */}
+      <View style={styles.bottomBorder} />
+    </View>
+  );
+
   return (
     <Tabs
       screenOptions={{
@@ -39,38 +88,7 @@ export default function TabLayout() {
           }),
         },
 
-        tabBarBackground: () => (
-          <View style={styles.glassContainer}>
-            {/* Core iOS-style blur */}
-            <BlurView
-              intensity={85}
-              tint={isDark ? 'systemChromeMaterialDark' : 'systemChromeMaterialLight'}
-              style={StyleSheet.absoluteFillObject}
-            />
-
-            {/* Subtle tint over the blur — keep opacity LOW so blur shows */}
-            <View
-              style={[
-                StyleSheet.absoluteFillObject,
-                { backgroundColor: isDark ? 'rgba(18, 20, 18, 0.35)' : 'rgba(255, 255, 255, 0.5)' },
-              ]}
-            />
-
-            {/* Very faint green tint — brand accent without killing the glass */}
-            <View
-              style={[
-                StyleSheet.absoluteFillObject,
-                { backgroundColor: isDark ? 'rgba(76, 175, 80, 0.04)' : 'rgba(34, 139, 34, 0.04)' },
-              ]}
-            />
-
-            {/* Top border highlight — the key to real glassmorphism */}
-            <View style={styles.topBorder} />
-
-            {/* Bottom inner shadow / depth line */}
-            <View style={styles.bottomBorder} />
-          </View>
-        ),
+        tabBarBackground,
 
         tabBarLabelStyle: {
           fontSize: 10,

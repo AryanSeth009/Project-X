@@ -336,10 +336,11 @@ app.post('/itinerary/generate', async (req, res) => {
       personalPrompt,
       stayLocation,
       itineraryStyle,
-      checkTickets,
       departurePlace,
       transportOption,
     } = req.body || {};
+    // Normalize to boolean so native/consumers never get string "true"/"false"
+    const checkTickets = req.body?.checkTickets === true || req.body?.checkTickets === 'true';
 
     // Step 1: Validate input
     if (!destination || !startDate || !endDate) {
@@ -529,7 +530,7 @@ app.post('/itinerary/generate', async (req, res) => {
         days: daysWithActivities,
         meta: generatedItinerary.meta,
         costBreakdown,
-        checkTickets: !!checkTickets,
+        checkTickets: Boolean(checkTickets),
         departurePlace: departurePlace || null,
         transportOption: transportOption || null,
       },

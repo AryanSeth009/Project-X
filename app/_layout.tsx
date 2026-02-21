@@ -72,7 +72,10 @@ function RootLayoutContent() {
       .maybeSingle();
 
     if (data && !error) {
-      setProfile(data);
+      setProfile({
+        ...data,
+        is_pro: data.is_pro === true || data.is_pro === 'true',
+      });
     }
   };
 
