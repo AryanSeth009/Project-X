@@ -37,18 +37,21 @@ export default function LoadingScreen() {
   const [messageIndex, setMessageIndex] = useState(0);
 
   const fadeAnim = useRef(new Animated.Value(1)).current;
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+  const rotateAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
+    // Message cycle and fade
     const interval = setInterval(() => {
       Animated.sequence([
         Animated.timing(fadeAnim, {
           toValue: 0,
-          duration: 300,
+          duration: 400,
           useNativeDriver: true,
         }),
         Animated.timing(fadeAnim, {
           toValue: 1,
-          duration: 300,
+          duration: 400,
           useNativeDriver: true,
         }),
       ]).start();
@@ -56,12 +59,42 @@ export default function LoadingScreen() {
       setMessageIndex((prev) =>
         prev < loadingMessages.length - 1 ? prev + 1 : prev
       );
-    }, 2000);
+    }, 3000);
+
+    // Breathing pulse animation
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1.1,
+          duration: 1500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 1500,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+
+    // Subtle rotation for orbital effect
+    Animated.loop(
+      Animated.timing(rotateAnim, {
+        toValue: 1,
+        duration: 8000,
+        useNativeDriver: true,
+      })
+    ).start();
 
     generateItinerary();
 
     return () => clearInterval(interval);
   }, []);
+
+  const spin = rotateAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
 
   const generateItinerary = async () => {
     try {
@@ -238,38 +271,60 @@ export default function LoadingScreen() {
 
   return (
     <LinearGradient
-      colors={['#FF9933', '#FFFFFF', '#138808']}
+      colors={['#0f172a', '#1e1b4b', '#312e81']}
       className="flex-1 items-center justify-center px-6"
     >
-      <View className="items-center">
+      <View className="items-center justify-center">
+        {/* Orbital Ring */}
+        <Animated.View
+          style={{
+            transform: [{ rotate: spin }],
+            position: 'absolute',
+          }}
+          className="w-64 h-64 border-2 border-indigo-500/20 rounded-full border-dashed"
+        />
 
-        <View className="w-40 h-40 bg-white rounded-full items-center justify-center mb-8">
+        {/* Outer Glow */}
+        <View className="w-48 h-48 bg-indigo-500/10 rounded-full absolute shadow-2xl shadow-indigo-500/50" />
+
+        {/* Central Icon Container */}
+        <Animated.View
+          style={{
+            transform: [{ scale: pulseAnim }],
+          }}
+          className="w-36 h-36 bg-white/10 backdrop-blur-md rounded-full items-center justify-center border border-white/20 shadow-xl"
+        >
           <Text className="text-6xl">✨</Text>
-        </View>
-
-        <Text className="font-inter-bold text-3xl text-white mb-4">
-          Creating Your Journey
-        </Text>
-
-        <Animated.View style={{ opacity: fadeAnim }}>
-          <Text className="font-inter-medium text-xl text-white text-center">
-            {loadingMessages[messageIndex]}
-          </Text>
         </Animated.View>
 
-        <View className="flex-row mt-10 gap-2">
-          {[0, 1, 2, 3].map((i) => (
-            <View
-              key={i}
-              className="w-3 h-3 bg-white rounded-full"
-              style={{
-                opacity:
-                  messageIndex % 4 === i ? 1 : 0.3,
-              }}
-            />
-          ))}
-        </View>
+        <View className="mt-12 items-center">
+          <Text className="font-inter-bold text-3xl text-white mb-2 tracking-tight">
+            Magical Planning
+          </Text>
+          <Text className="font-inter-medium text-indigo-200/60 text-sm uppercase tracking-[4px] mb-8">
+            AI Assistant
+          </Text>
 
+          <Animated.View style={{ opacity: fadeAnim }} className="h-12 justify-center">
+            <Text className="font-inter-medium text-lg text-white/90 text-center px-4">
+              {loadingMessages[messageIndex]}
+            </Text>
+          </Animated.View>
+
+          {/* New Progress Indicators */}
+          <View className="flex-row mt-12 gap-3 items-center">
+            {[0, 1, 2, 3].map((i) => (
+              <Animated.View
+                key={i}
+                className="w-2 h-2 rounded-full bg-indigo-400"
+                style={{
+                  opacity: messageIndex % 4 === i ? 1 : 0.2,
+                  transform: [{ scale: messageIndex % 4 === i ? 1.2 : 1 }],
+                }}
+              />
+            ))}
+          </View>
+        </View>
       </View>
     </LinearGradient>
   );

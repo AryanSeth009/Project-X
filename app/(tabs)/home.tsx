@@ -16,6 +16,7 @@ export default function HomeScreen() {
   const [budget, setBudget] = useState('');
   const [personalPrompt, setPersonalPrompt] = useState('');
   const [stayLocation, setStayLocation] = useState('');
+  const [itineraryStyle, setItineraryStyle] = useState<'day-wise' | 'top-10'>('day-wise');
   const [areaOptions, setAreaOptions] = useState<{ name: string; type: string }[]>([]);
 
   const interestOptions = [
@@ -84,6 +85,7 @@ export default function HomeScreen() {
       interests,
       personalPrompt,
       stayLocation: stayLocation || undefined,
+      itineraryStyle,
     };
 
     router.push({
@@ -147,6 +149,54 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
                     value={destination}
                     onChangeText={setDestination}
                   />
+                </View>
+
+                <View>
+                  <View className="flex-row items-center gap-2 mb-3">
+                    <Sparkles size={18} color="#FF9933" />
+                    <Text className="font-inter-semibold text-gray-700">
+                      Itinerary Style
+                    </Text>
+                  </View>
+                  <View className="flex-row gap-3">
+                    <TouchableOpacity
+                      onPress={() => setItineraryStyle('day-wise')}
+                      className="flex-1 p-4 rounded-2xl border-2"
+                      style={{
+                        backgroundColor: itineraryStyle === 'day-wise' ? '#FFF7ED' : '#FFFFFF',
+                        borderColor: itineraryStyle === 'day-wise' ? '#F97316' : '#F3F4F6'
+                      }}
+                    >
+                      <View className="flex-row items-center gap-2 mb-1">
+                        <Calendar size={18} color={itineraryStyle === 'day-wise' ? '#F97316' : '#9CA3AF'} />
+                        <Text className={`font-inter-bold ${itineraryStyle === 'day-wise' ? 'text-orange-950' : 'text-gray-500'}`}>
+                          Daily Plan
+                        </Text>
+                      </View>
+                      <Text className={`font-inter text-xs leading-4 ${itineraryStyle === 'day-wise' ? 'text-orange-950/60' : 'text-gray-400'}`}>
+                        Day-by-day complete schedule
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      onPress={() => setItineraryStyle('top-10')}
+                      className="flex-1 p-4 rounded-2xl border-2"
+                      style={{
+                        backgroundColor: itineraryStyle === 'top-10' ? '#ECFDF5' : '#FFFFFF',
+                        borderColor: itineraryStyle === 'top-10' ? '#10B981' : '#F3F4F6'
+                      }}
+                    >
+                      <View className="flex-row items-center gap-2 mb-1">
+                        <Sparkles size={18} color={itineraryStyle === 'top-10' ? '#10B981' : '#9CA3AF'} />
+                        <Text className={`font-inter-bold ${itineraryStyle === 'top-10' ? 'text-emerald-950' : 'text-gray-500'}`}>
+                          Top 10 Spots
+                        </Text>
+                      </View>
+                      <Text className={`font-inter text-xs leading-4 ${itineraryStyle === 'top-10' ? 'text-emerald-950/60' : 'text-gray-400'}`}>
+                        Curated list of best places
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
 
                 <View className="flex-1">
