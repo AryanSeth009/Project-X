@@ -1,0 +1,199 @@
+{
+    "destination": "Shimla",
+    "areas": [
+      {
+        "name": "Mall Road",
+        "type": "Commercial",
+        "budgetRange": {
+          "hostel": 500,
+          "hotel": 2000
+        },
+        "bestFor": ["Shopping", "Restaurants", "Colonial vibe", "Walking"],
+        "specificPlaces": {
+          "restaurants": [
+            {"name": "Wake & Bake", "type": "Cafe", "cost": 400, "bestFor": "Pasta & coffee"},
+            {"name": "The Devicos", "type": "Multi-cuisine", "cost": 800, "bestFor": "Italian & continental"},
+            {"name": "Cafe Simla Times", "type": "Budget cafe", "cost": 300, "bestFor": "Street food"},
+            {"name": "Havana Coffee House", "type": "Historic", "cost": 500, "bestFor": "Traditional cafe"}
+          ],
+          "hostels": [
+            {"name": "Zostel Shimla", "cost": 500, "amenities": ["Ridge view", "Common area"], "rating": "4.3"},
+            {"name": "Mall Road Backpackers", "cost": 450, "amenities": ["Central location", "WiFi"], "rating": "4.1"}
+          ],
+          "activities": [
+            {"name": "Shopping Lakkar Bazaar", "cost": 0, "duration": "2 hours"},
+            {"name": "Ridge Walk", "cost": 0, "duration": "1 hour"},
+            {"name": "Toy Train Ride", "cost": 400, "duration": "1 hour"}
+          ]
+        }
+      },
+      {
+        "name": "Mashobra",
+        "type": "Nature",
+        "budgetRange": {
+          "hostel": 600,
+          "hotel": 2500
+        },
+        "bestFor": ["Forests", "Trekking", "Craigslist", "Wildlife"],
+        "specificPlaces": {
+          "restaurants": [
+            {"name": "Mashobra Dhaba", "type": "Local", "cost": 250, "bestFor": "Himachali thali"},
+            {"name": "Wildflower Hall Cafe", "type": "Oberoi hotel", "cost": 1200, "bestFor": "Luxury dining"}
+          ],
+          "hostels": [
+            {"name": "Mashobra Guesthouse", "cost": 600, "amenities": ["Forest views"], "rating": "4.2"}
+          ],
+          "activities": [
+            {"name": "Craigslist Reserve Trek", "cost": 100, "duration": "2 hours"},
+            {"name": "Mahasu Peak Trek", "cost": 0, "duration": "3 hours"}
+          ]
+        }
+      },
+      {
+        "name": "Kufri",
+        "type": "Adventure",
+        "budgetRange": {
+          "hostel": 700,
+          "hotel": 3000
+        },
+        "bestFor": ["Horse riding", "Snow activities", "Himalayan views"],
+        "specificPlaces": {
+          "restaurants": [
+            {"name": "Kufri Dhaba", "type": "Mountain", "cost": 300, "bestFor": "Maggi & tea"},
+            {"name": "Himalayan Cafe", "cost": 500, "bestFor": "Panoramic views"}
+          ],
+          "hostels": [
+            {"name": "Kufri Guesthouse", "cost": 700, "amenities": ["Snow activities"], "rating": "4.0"}
+          ],
+          "activities": [
+            {"name": "Horse Riding", "cost": 600, "duration": "1 hour"},
+            {"name": "Snow Sledging", "cost": 400, "duration": "30min", "season": "Dec-Feb"},
+            {"name": "Himalayan Nature Park", "cost": 50, "openingHours": "9AM-5PM"}
+          ]
+        }
+      },
+      {
+        "name": "Chail",
+        "type": "Hidden Gem",
+        "budgetRange": {
+          "hostel": 550,
+          "hotel": 2200
+        },
+        "bestFor": ["Highest cricket ground", "Palace", "Forests"],
+        "specificPlaces": {
+          "restaurants": [
+            {"name": "Chail Palace Restaurant", "cost": 800, "bestFor": "Royal dining"},
+            {"name": "Kali Ka Tibba Dhaba", "cost": 300, "bestFor": "Mountain views"}
+          ],
+          "hostels": [
+            {"name": "Chail Backpackers", "cost": 550, "amenities": ["Forest trails"], "rating": "4.2"}
+          ],
+          "activities": [
+            {"name": "Chail Palace Visit", "cost": 250, "openingHours": "9AM-5PM"},
+            {"name": "Highest Cricket Ground", "cost": 0, "duration": "1 hour"}
+          ]
+        }
+      }
+    ],
+    "transport": {
+      "scooter": {
+        "costPerDay": 700,
+        "recommended": true,
+        "fuelCost": "₹100-150/day",
+        "bestRentalSpots": ["Mall Road", "Vijay Nagar"],
+        "operators": ["Local rental shops"]
+      },
+      "taxi": {
+        "avgCostPerTrip": 1200,
+        "local8hr": "₹2000-2500",
+        "kufriRoundTrip": "₹3000",
+        "sharedTaxi": "₹150/person"
+      }
+    },
+    "attractions": [
+      {
+        "name": "The Ridge",
+        "type": "Plaza",
+        "openingHours": "24 hours",
+        "events": "Summer Festival (May)",
+        "nearby": ["Christ Church", "Mall Road"]
+      },
+      {
+        "name": "Christ Church",
+        "type": "Church",
+        "openingHours": "10AM-5PM",
+        "closed": "Mondays",
+        "architecture": "Neo-Gothic",
+        "nearby": ["The Ridge"]
+      },
+      {
+        "name": "Jakhoo Temple",
+        "type": "Temple",
+        "openingHours": "5AM-11PM",
+        "entryFee": "Ropeway ₹250",
+        "highestStatue": "108ft Hanuman",
+        "nearby": ["Highest point Shimla"]
+      },
+      {
+        "name": "Himachal State Museum",
+        "type": "Museum",
+        "openingHours": "10AM-5PM",
+        "closed": "Mondays",
+        "entryFee": "₹10 Indians",
+        "nearby": ["Oak Overlook"]
+      },
+      {
+        "name": "Kufri Himalayan Park",
+        "type": "Wildlife Park",
+        "openingHours": "9AM-5PM",
+        "entryFee": "₹50",
+        "animals": ["Himalayan bear", "Snow leopard"],
+        "nearby": ["Horse riding"]
+      },
+      {
+        "name": "Chail Palace",
+        "type": "Heritage Palace",
+        "openingHours": "9AM-5PM",
+        "entryFee": "₹250",
+        "built": "1891 Maharaja of Patiala",
+        "nearby": ["Cricket ground"]
+      }
+    ],
+    "travelClusters": [
+      {
+        "clusterName": "Mall Road & Ridge",
+        "places": ["The Ridge", "Christ Church", "Mall Road", "Lakkar Bazaar"],
+        "distanceFromBusStand": "1km",
+        "vibe": "Colonial & Shopping",
+        "recommendedStay": "Mall Road hotels",
+        "dayPlan": "Morning: Ridge walk, Afternoon: Shopping, Evening: Cafe hopping"
+      },
+      {
+        "clusterName": "Kufri & Chail",
+        "places": ["Kufri", "Mashobra", "Chail Palace", "Himalayan Park"],
+        "distanceFromBusStand": "16-45km",
+        "vibe": "Adventure & Nature",
+        "recommendedStay": "Kufri guesthouses",
+        "dayPlan": "Morning: Horse riding, Afternoon: Nature trails, Evening: Palace visit"
+      }
+    ],
+    "budgetTips": [
+      "Stay at Zostel Mall Road (₹500/night) for central location",
+      "Eat at Cafe Simla Times (₹300) instead of fancy restaurants",
+      "Rent scooter Mall Road (₹700/day) for Kufri day trips",
+      "Walk The Ridge (free) instead of taxi (₹200)",
+      "Shop Lakkar Bazaar for souvenirs (bargain 40%)",
+      "Share taxi to Kufri (₹150/person)",
+      "Jakhoo Temple ropeway ₹250 roundtrip vs trekking (free but tiring)",
+      "Museum entry ₹10 vs guided tours (₹800)",
+      "Chail Palace ₹250 entry vs luxury hotels (₹5000+)",
+      "Street momos ₹50 vs restaurants (₹300)"
+    ],
+    "hiddenGems": [
+      {"name": "Annandale", "access": "10km", "cost": 0, "why": "British sports ground, quiet walks"},
+      {"name": "Summer Hill", "access": "5km", "cost": 0, "why": "Toy train station, peaceful"},
+      {"name": "Sanjauli", "access": "4km", "cost": 0, "why": "Local vibe, Kali Bari Temple"},
+      {"name": "Fagu", "access": "20km", "cost": 0, "why": "Apple orchards, less crowded"}
+    ]
+  }
+  

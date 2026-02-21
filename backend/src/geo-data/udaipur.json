@@ -1,0 +1,152 @@
+{
+    "destination": "Udaipur",
+    "areas": [
+      {
+        "name": "Lake Pichola Area",
+        "type": "Heritage",
+        "budgetRange": {
+          "hostel": 500,
+          "hotel": 2500
+        },
+        "bestFor": ["City Palace", "Boat rides", "Sunset views", "Restaurants"],
+        "specificPlaces": {
+          "restaurants": [
+            {"name": "Ambrai Restaurant", "type": "Lakeside", "cost": 800, "bestFor": "Lake Pichola views"},
+            {"name": "Millets of Mewar", "type": "Organic", "cost": 400, "bestFor": "Healthy thalis"},
+            {"name": "Natraj Dining Hall", "type": "Budget", "cost": 250, "bestFor": "Dal baati"}
+          ],
+          "hostels": [
+            {"name": "Zostel Udaipur", "cost": 500, "amenities": ["Lake view", "Rooftop"], "rating": "4.4"},
+            {"name": "Pichola Backpackers", "cost": 450, "amenities": ["Walking distance to palace"], "rating": "4.2"}
+          ],
+          "activities": [
+            {"name": "Lake Pichola Boat Ride", "cost": 400, "duration": "45min"},
+            {"name": "Gangaur Ghat Walk", "cost": 0, "duration": "1 hour"}
+          ]
+        }
+      },
+      {
+        "name": "Fateh Sagar Area",
+        "type": "Modern",
+        "budgetRange": {
+          "hostel": 400,
+          "hotel": 1800
+        },
+        "bestFor": ["Lake activities", "Shopping", "Budget stays"],
+        "specificPlaces": {
+          "restaurants": [
+            {"name": "Lake View Cafe", "type": "Lakeside", "cost": 500, "bestFor": "Sunset dining"},
+            {"name": "Fateh Sagar Dhaba", "type": "Street food", "cost": 200, "bestFor": "Pyaaz kachori"}
+          ],
+          "hostels": [
+            {"name": "Fateh Backpackers", "cost": 400, "amenities": ["Lake proximity"], "rating": "4.1"}
+          ],
+          "activities": [
+            {"name": "Fateh Sagar Boating", "cost": 200, "duration": "30min"},
+            {"name": "Nehru Park Visit", "cost": 20, "openingHours": "9AM-6PM"}
+          ]
+        }
+      },
+      {
+        "name": "Shilpgram",
+        "type": "Cultural",
+        "budgetRange": {
+          "hostel": 450,
+          "hotel": 2000
+        },
+        "bestFor": ["Folk culture", "Crafts", "Festivals"],
+        "specificPlaces": {
+          "restaurants": [
+            {"name": "Shilpgram Food Court", "type": "Rajasthani", "cost": 300, "bestFor": "Folk flavors"}
+          ],
+          "hostels": [
+            {"name": "Shilpgram Guesthouse", "cost": 450, "amenities": ["Cultural events"], "rating": "4.0"}
+          ],
+          "activities": [
+            {"name": "Shilpgram Museum", "cost": 100, "openingHours": "11AM-7PM"},
+            {"name": "Folk Dance Shows", "cost": 200, "duration": "1 hour"}
+          ]
+        }
+      }
+    ],
+    "transport": {
+      "scooter": {
+        "costPerDay": 500,
+        "recommended": true,
+        "fuelCost": "₹80-120/day",
+        "bestRentalSpots": ["Fateh Sagar", "City Palace area"],
+        "operators": ["Local shops"]
+      },
+      "taxi": {
+        "avgCostPerTrip": 600,
+        "local8hr": "₹1800-2200",
+        "airportTransfer": "₹1000"
+      }
+    },
+    "attractions": [
+      {
+        "name": "City Palace",
+        "type": "Palace",
+        "openingHours": "9:30AM-5:30PM",
+        "entryFee": "₹300",
+        "museum": true,
+        "nearby": ["Jagdish Temple"]
+      },
+      {
+        "name": "Jagdish Temple",
+        "type": "Temple",
+        "openingHours": "5AM-8PM",
+        "entryFee": "Free",
+        "architecture": "Indo-Aryan",
+        "nearby": ["City Palace"]
+      },
+      {
+        "name": "Sajjangarh Palace",
+        "type": "Fort",
+        "openingHours": "10AM-5PM",
+        "entryFee": "₹10+₹20 vehicle",
+        "sunsetViews": true,
+        "nearby": ["Lake Fatehsagar"]
+      },
+      {
+        "name": "Saheliyon Ki Bari",
+        "type": "Garden",
+        "openingHours": "9AM-5PM",
+        "entryFee": "₹10",
+        "fountains": true,
+        "nearby": ["Fateh Sagar Lake"]
+      },
+      {
+        "name": "Bagore Ki Haveli",
+        "type": "Museum",
+        "openingHours": "10AM-5PM",
+        "entryFee": "₹100",
+        "eveningShow": "₹250",
+        "nearby": ["Lake Pichola"]
+      }
+    ],
+    "travelClusters": [
+      {
+        "clusterName": "Lake Pichola Core",
+        "places": ["City Palace", "Jagdish Temple", "Bagore Ki Haveli"],
+        "distanceFromBusStand": "2km",
+        "vibe": "Heritage & Romantic",
+        "recommendedStay": "Lake Pichola hostels",
+        "dayPlan": "Morning: Palace, Afternoon: Temple, Evening: Boat ride"
+      }
+    ],
+    "budgetTips": [
+      "Stay Zostel Lake Pichola (₹500/night)",
+      "Eat at Natraj Dining Hall (₹250 thali)",
+      "Rent scooter near Fateh Sagar (₹500/day)",
+      "City Palace combo ticket ₹700 (museum+palace)",
+      "Walk Gangaur Ghat (free sunset)",
+      "Saheliyon Ki Bari ₹10 entry"
+    ],
+    "hiddenGems": [
+      {"name": "Karni Mata Ropeway", "access": "Near City Palace", "cost": 90, "why": "Panoramic city views"},
+      {"name": "Ahar Cenotaphs", "access": "3km", "cost": 0, "why": "Ancient royal memorials"},
+      {"name": "Dudh Talai Garden", "access": "Lake Pichola", "cost": 20, "why": "Musical fountain"}
+    ]
+  }
+  

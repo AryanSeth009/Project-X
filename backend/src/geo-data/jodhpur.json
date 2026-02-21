@@ -1,0 +1,54 @@
+{
+    "destination": "Jodhpur",
+    "areas": [
+      {
+        "name": "Clock Tower Area",
+        "type": "Commercial",
+        "budgetRange": {
+          "hostel": 400,
+          "hotel": 1800
+        },
+        "bestFor": ["Markets", "Street food", "Budget stays"],
+        "specificPlaces": {
+          "restaurants": [
+            {"name": "Janta Sweet Home", "type": "Street food", "cost": 200, "bestFor": "Makhaniya lassi"},
+            {"name": "Gypsy Restaurant", "type": "Rooftop", "cost": 500, "bestFor": "Fort views"}
+          ],
+          "hostels": [
+            {"name": "Zostel Jodhpur", "cost": 400, "amenities": ["Clock Tower view"], "rating": "4.5"}
+          ]
+        }
+      },
+      {
+        "name": "Rajasthan Royals",
+        "type": "Heritage",
+        "budgetRange": {
+          "hostel": 500,
+          "hotel": 2500
+        },
+        "bestFor": ["Mehrangarh Fort", "Museums", "Palaces"]
+      }
+    ],
+    "transport": {
+      "scooter": {
+        "costPerDay": 450,
+        "recommended": true,
+        "fuelCost": "₹100/day"
+      }
+    },
+    "attractions": [
+      {
+        "name": "Mehrangarh Fort",
+        "type": "Fort",
+        "openingHours": "9AM-5PM",
+        "entryFee": "₹100",
+        "audioGuide": "₹200"
+      }
+    ],
+    "budgetTips": [
+      "Stay Zostel Clock Tower (₹400/night)",
+      "Mehrangarh Fort ₹100 Indians",
+      "Janta Lassi ₹40/glass"
+    ]
+  }
+  
