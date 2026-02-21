@@ -264,7 +264,7 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
       >
         <View className="flex-row items-center justify-between mb-6">
           <View>
-            <Text className="font-inter-bold text-3xl" style={{ color: '#F5F5DC' }}>Project X</Text>
+            <Text className="font-inter-bold text-3xl" style={{ color: '#F5F5DC' }}>SafarYatraAI</Text>
             <Text className="font-inter text-sm" style={{ color: 'rgba(245, 245, 220, 0.9)' }}>Your One Tap Itinerary Planner</Text>
           </View>
           <View className="rounded-full px-4 py-2 flex-row items-center gap-2" style={{ backgroundColor: 'rgba(76, 175, 80, 0.25)' }}>

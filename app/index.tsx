@@ -9,19 +9,19 @@ const { width } = Dimensions.get('window');
 
 const PLACES = [
   {
-    image: 'https://i.pinimg.com/736x/ed/4b/4a/ed4b4ad24bcbe3c3a27b14cdb8fbb3cf.jpg',
+    image: 'https://images.unsplash.com/photo-1496566084516-c5b96fcbd5c8?q=80&w=1172&auto=format&fit=crop',
     location: 'Goa, India'
   },
   {
-    image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=2000&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1711359940524-ed5e0ad9b89b?q=80&w=687&auto=format&fit=crop',
     location: 'Manali, India'
   },
   {
-    image: 'https://images.unsplash.com/photo-1506929113675-b82f1fefd81a?q=80&w=2000&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1524230507669-5ff97982bb5e?q=80&w=664&auto=format&fit=crop',
     location: 'Jaipur, India'
   },
   {
-    image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2000&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1627370778723-4d26700cd972?q=80&w=687&auto=format&fit=crop',
     location: 'Kerala, India'
   }
 ];
