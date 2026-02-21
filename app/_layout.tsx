@@ -1,6 +1,7 @@
 import '../global.css';
 import { useEffect } from 'react';
 import { Text } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
@@ -75,11 +76,8 @@ function RootLayoutContent() {
     }
   };
 
-  if (!fontsLoaded) {
-    // Keep splash screen visible until Inter has loaded
-    return null;
-  }
-
+  // Always render the Stack on first render so the slot/navigator is mounted.
+  // Splash screen stays visible until fonts load (SplashScreen.hideAsync in useEffect).
   return (
     <>
       <Stack screenOptions={{ headerShown: false }}>
@@ -96,8 +94,10 @@ function RootLayoutContent() {
 
 export default function RootLayout() {
   return (
-    <ThemeProvider>
-      <RootLayoutContent />
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider>
+        <RootLayoutContent />
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }

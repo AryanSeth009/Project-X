@@ -12,6 +12,7 @@ import {
   Linking,
   Platform,
 } from 'react-native';
+import DraggableFlatList from 'react-native-draggable-flatlist';
 import { BlurView } from 'expo-blur';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -23,13 +24,10 @@ import {
   Download,
   Share2,
   Pencil,
-  Eye,
   Plus,
   Trash2,
   GripVertical,
   ChevronRight,
-  ChevronUp,
-  ChevronDown,
   Navigation,
   ExternalLink,
   Users2,
@@ -87,6 +85,7 @@ export default function ItineraryScreen() {
   const [showAddActivity, setShowAddActivity] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState<any>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [fullImageUri, setFullImageUri] = useState<string | null>(null);
   const [newActivity, setNewActivity] = useState({
     title: '',
     description: '',
@@ -622,6 +621,25 @@ export default function ItineraryScreen() {
     }
   };
 
+  const handleDragEnd = async (dayId: string, newOrder: any[]) => {
+    if (!currentItinerary) return;
+    const activitiesWithOrder = newOrder.map((a, i) => ({ ...a, order_index: i }));
+    try {
+      await Promise.all(
+        activitiesWithOrder.map((a) =>
+          supabase.from('activities').update({ order_index: a.order_index }).eq('id', a.id)
+        )
+      );
+      const updatedDays = currentItinerary.days.map((d) =>
+        d.id === dayId ? { ...d, activities: activitiesWithOrder } : d
+      );
+      setCurrentItinerary({ ...currentItinerary, days: updatedDays });
+    } catch (e) {
+      console.error('Error reordering activities:', e);
+      Alert.alert('Error', 'Failed to reorder activities.');
+    }
+  };
+
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center" style={{ backgroundColor: colors.background }}>
@@ -744,24 +762,16 @@ export default function ItineraryScreen() {
               )}
             </TouchableOpacity>
 
-            <View className="flex-row rounded-2xl p-1" style={{ backgroundColor: colors.card + 'CC' }}>
+            {mode === 'edit' && (
               <TouchableOpacity
-                className={`px-3 py-2 rounded-xl flex-row items-center gap-2 ${mode === 'view' ? '' : ''}`}
-                style={mode === 'view' ? { backgroundColor: colors.greenMuted } : {}}
+                className="px-3 py-2 rounded-xl flex-row items-center gap-2"
+                style={{ backgroundColor: colors.greenMuted }}
                 onPress={() => setMode('view')}
               >
-                <Eye size={16} color={colors.text} />
-                <Text className="font-inter-bold" style={{ color: colors.text }}>View</Text>
+                <CheckCircle size={16} color={colors.green} />
+                <Text className="font-inter-bold" style={{ color: colors.green }}>Done</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                className={`px-3 py-2 rounded-xl flex-row items-center gap-2 ${mode === 'edit' ? '' : ''}`}
-                style={mode === 'edit' ? { backgroundColor: colors.greenMuted } : {}}
-                onPress={() => setMode('edit')}
-              >
-                <Pencil size={16} color={colors.text} />
-                <Text className="font-inter-bold" style={{ color: colors.text }}>Edit</Text>
-              </TouchableOpacity>
-            </View>
+            )}
           </View>
         </View>
       </LinearGradient>
@@ -897,7 +907,10 @@ export default function ItineraryScreen() {
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View className="flex-row gap-3">
               {(history.length ? history : (itineraries as any)).slice(0, 20).map((it: any) => {
-                const isActive = it.id === currentItinerary.id;
+                const isActive = it.id === currentItinerary?.id;
+                const coverUri = isActive && currentItinerary?.days?.[0]?.activities?.[0]?.image_url
+                  ? currentItinerary.days[0].activities[0].image_url
+                  : `https://picsum.photos/seed/${encodeURIComponent(it.id)}/800/600`;
                 return (
                   <View key={it.id} className="mr-4">
                     <TouchableOpacity
@@ -907,8 +920,9 @@ export default function ItineraryScreen() {
                       disabled={loadingHistory}
                     >
                       <Image
-                        source={{ uri: `https://source.unsplash.com/800x600/?${encodeURIComponent(it.destination)}` }}
-                        className="absolute inset-0 w-full h-full"
+                        source={{ uri: coverUri }}
+                        style={{ position: 'absolute', width: 256, height: 160 }}
+                        resizeMode="cover"
                       />
                       <LinearGradient
                         colors={['transparent', 'rgba(0,0,0,0.8)']}
@@ -962,6 +976,45 @@ export default function ItineraryScreen() {
           </View>
         </View>
 
+        {(currentItinerary as any).preferences?.costBreakdown && (
+          <View className="rounded-2xl p-5 shadow-md mb-6" style={{ backgroundColor: colors.card }}>
+            <Text className="font-inter-semibold text-xs uppercase tracking-wide mb-2" style={{ color: colors.textMuted }}>
+              Estimated total cost
+            </Text>
+            <View className="flex-row items-baseline justify-between mb-4">
+              <Text className="font-inter-bold text-2xl" style={{ color: colors.text }}>
+                ₹{((currentItinerary as any).preferences.costBreakdown.total || 0).toLocaleString()}
+                <Text className="font-inter-medium text-base ml-1" style={{ color: colors.textMuted }}>
+                  / {(currentItinerary as any).preferences.costBreakdown.daysCount || currentItinerary.days.length} days
+                </Text>
+              </Text>
+              <View className="w-10 h-10 rounded-full items-center justify-center" style={{ backgroundColor: colors.greenMuted }}>
+                <Wallet size={20} color={colors.green} />
+              </View>
+            </View>
+            <View className="h-px mb-4" style={{ backgroundColor: colors.divider }} />
+            <View className="flex-row justify-between">
+              <View>
+                <Text className="font-inter text-sm mb-0.5" style={{ color: colors.textMuted }}>Flights & Trains</Text>
+                <Text className="font-inter-bold text-lg" style={{ color: colors.text }}>
+                  ₹{((currentItinerary as any).preferences.costBreakdown.flightsTrains || 0).toLocaleString()}
+                </Text>
+                {(currentItinerary as any).preferences.costBreakdown.trainClass && (
+                  <Text className="font-inter text-xs mt-0.5" style={{ color: colors.textMuted }}>
+                    ({(currentItinerary as any).preferences.costBreakdown.trainClass} estimated)
+                  </Text>
+                )}
+              </View>
+              <View className="items-end">
+                <Text className="font-inter text-sm mb-0.5" style={{ color: colors.textMuted }}>Stay & Food</Text>
+                <Text className="font-inter-bold text-lg" style={{ color: colors.text }}>
+                  ₹{((currentItinerary as any).preferences.costBreakdown.stayFood || 0).toLocaleString()}
+                </Text>
+              </View>
+            </View>
+          </View>
+        )}
+
         <View className="flex-row gap-3 mb-6">
           <TouchableOpacity
             className="flex-1 rounded-xl py-3 flex-row items-center justify-center gap-2"
@@ -987,9 +1040,19 @@ export default function ItineraryScreen() {
               <View key={day.id} className="mb-6">
                 <View className="rounded-t-2xl p-4 border-l-4" style={{ backgroundColor: colors.card, borderLeftColor: colors.green }}>
                   <View className="flex-row items-center justify-between mb-1">
-                    <Text className="font-inter-bold text-lg" style={{ color: colors.text }}>
-                      {(currentItinerary as any).title?.toLowerCase().includes('top 10') ? 'Top Recommended Spots' : `Day ${day.day_number}`}
-                    </Text>
+                    <View className="flex-row items-center gap-2 flex-1">
+                      <Text className="font-inter-bold text-lg" style={{ color: colors.text }}>
+                        {(currentItinerary as any).title?.toLowerCase().includes('top 10') ? 'Top Recommended Spots' : `Day ${day.day_number}`}
+                      </Text>
+                      <TouchableOpacity
+                        className="flex-row items-center gap-1 px-2 py-1 rounded-lg"
+                        style={{ backgroundColor: colors.greenMuted }}
+                        onPress={() => setMode('edit')}
+                      >
+                        <Pencil size={12} color={colors.green} />
+                        <Text className="font-inter-bold text-xs" style={{ color: colors.green }}>Edit</Text>
+                      </TouchableOpacity>
+                    </View>
                     <Text className="text-sm" style={{ color: colors.textMuted }}>
                       {new Date(day.date).toLocaleDateString('en-IN', {
                         month: 'short',
@@ -1003,97 +1066,86 @@ export default function ItineraryScreen() {
                 <View className="rounded-b-2xl px-4 pb-4 shadow-lg" style={{ backgroundColor: colors.card }}>
                   {day.activities.map((activity, actIndex) => (
                     <View key={activity.id || `activity-${day.id}-${actIndex}`}>
-                      <TouchableOpacity 
-                        className="flex-row gap-3 py-4"
+                      <TouchableOpacity
+                        className="flex-row gap-3 py-3 items-center"
                         onPress={() => {
                           setSelectedActivity(activity);
                           setShowDetailModal(true);
                         }}
+                        activeOpacity={0.7}
                       >
-                        <View className="items-center">
-                          <View
-                            className={`w-12 h-12 rounded-full ${
-                              categoryColors[activity.category]
-                            } items-center justify-center`}
-                          >
-                            <Text className="text-2xl">
-                              {categoryIcons[activity.category]}
-                            </Text>
-                          </View>
-                          {actIndex < day.activities.length - 1 && (
-                            <View className="w-0.5 flex-1 bg-gray-200 mt-2" />
-                          )}
-                        </View>
-
-                        <View className="flex-1">
-                          <View className="flex-row items-start justify-between mb-2">
-                            <View className="flex-1">
-                              <Text className="text-base font-bold mb-1" style={{ color: colors.text }}>
-                                {activity.title}
-                              </Text>
-                              <View className="flex-row items-center gap-1 mb-1">
-                                <Clock size={12} color={colors.textMuted} />
-                                <Text className="text-xs" style={{ color: colors.textMuted }}>
-                                  {activity.time_start} - {activity.time_end}
-                                </Text>
-                              </View>
-                              <View className="flex-row items-center gap-1">
-                                <MapPin size={12} color={colors.textMuted} />
-                                <Text className="text-xs" numberOfLines={1} style={{ color: colors.textMuted }}>
-                                  {activity.location}
-                                </Text>
-                              </View>
-                            </View>
-                            <View className="px-3 py-1 rounded-full flex-row items-center gap-1" style={{ backgroundColor: colors.orangeMuted }}>
-                              <Clock size={11} color={colors.orange} />
-                              <Text className="font-bold text-xs" style={{ color: colors.orange }}>
-                                {activity.time_start}–{activity.time_end}
-                              </Text>
-                            </View>
-                            <View className="ml-2 self-center">
-                              <ChevronRight size={18} color={colors.textMuted} />
-                            </View>
-                          </View>
-
-                          {activity.image_url && (
+                        {/* Small image thumbnail or category icon */}
+                        <TouchableOpacity
+                          className="rounded-lg overflow-hidden"
+                          style={{ width: 56, height: 56 }}
+                          onPress={(e) => {
+                            e.stopPropagation();
+                            if (activity.image_url) setFullImageUri(activity.image_url);
+                          }}
+                        >
+                          {activity.image_url ? (
                             <Image
                               source={{ uri: activity.image_url }}
-                              className="w-full h-40 rounded-xl mb-2"
+                              className="w-full h-full"
                               resizeMode="cover"
                             />
+                          ) : (
+                            <View
+                              className={`w-full h-full items-center justify-center ${categoryColors[activity.category]}`}
+                            >
+                              <Text className="text-xl">{categoryIcons[activity.category]}</Text>
+                            </View>
                           )}
+                        </TouchableOpacity>
 
-                          <Text className="text-sm leading-5" numberOfLines={2} style={{ color: colors.textSecondary }}>
+                        <View className="flex-1 min-w-0">
+                          <Text className="text-sm font-bold mb-0.5" style={{ color: colors.text }} numberOfLines={1}>
+                            {activity.title}
+                          </Text>
+                          <View className="flex-row items-center gap-1 mb-0.5">
+                            <Clock size={11} color={colors.textMuted} />
+                            <Text className="text-xs" style={{ color: colors.textMuted }}>
+                              {activity.time_start}{activity.time_end ? ` – ${activity.time_end}` : ''}
+                            </Text>
+                          </View>
+                          {activity.location ? (
+                            <View className="flex-row items-center gap-1" style={{ marginBottom: 2 }}>
+                              <MapPin size={11} color={colors.textMuted} />
+                              <Text className="text-xs" numberOfLines={1} style={{ color: colors.textMuted }}>
+                                {activity.location}
+                              </Text>
+                            </View>
+                          ) : null}
+                          <Text className="text-xs leading-4" numberOfLines={1} style={{ color: colors.textSecondary }}>
                             {activity.description}
                           </Text>
-
-                          {/* 👍👎 Vote buttons */}
-                          <View className="flex-row gap-3 mt-3">
+                          <View className="flex-row gap-2 mt-1.5">
                             <TouchableOpacity
-                              className="flex-row items-center gap-1 px-3 py-1.5 rounded-full"
+                              className="flex-row items-center gap-1 px-2 py-1 rounded-full"
                               style={{ backgroundColor: votes[activity.id]?.myVote === 1 ? colors.greenMuted : colors.textMuted + '0F' }}
-                              onPress={() => handleVote(activity.id, 1)}
+                              onPress={(e) => { e.stopPropagation(); handleVote(activity.id, 1); }}
                             >
-                              <ThumbsUp size={13} color={votes[activity.id]?.myVote === 1 ? colors.green : colors.textMuted} />
+                              <ThumbsUp size={12} color={votes[activity.id]?.myVote === 1 ? colors.green : colors.textMuted} />
                               <Text className="text-xs font-bold" style={{ color: votes[activity.id]?.myVote === 1 ? colors.green : colors.textMuted }}>
                                 {votes[activity.id]?.up || 0}
                               </Text>
                             </TouchableOpacity>
                             <TouchableOpacity
-                              className="flex-row items-center gap-1 px-3 py-1.5 rounded-full"
+                              className="flex-row items-center gap-1 px-2 py-1 rounded-full"
                               style={{ backgroundColor: votes[activity.id]?.myVote === -1 ? colors.errorMuted : colors.textMuted + '0F' }}
-                              onPress={() => handleVote(activity.id, -1)}
+                              onPress={(e) => { e.stopPropagation(); handleVote(activity.id, -1); }}
                             >
-                              <ThumbsDown size={13} color={votes[activity.id]?.myVote === -1 ? colors.error : colors.textMuted} />
+                              <ThumbsDown size={12} color={votes[activity.id]?.myVote === -1 ? colors.error : colors.textMuted} />
                               <Text className="text-xs font-bold" style={{ color: votes[activity.id]?.myVote === -1 ? colors.error : colors.textMuted }}>
                                 {votes[activity.id]?.down || 0}
                               </Text>
                             </TouchableOpacity>
                           </View>
                         </View>
+                        <ChevronRight size={18} color={colors.textMuted} />
                       </TouchableOpacity>
                       {actIndex < day.activities.length - 1 && (
-                        <View className="h-px" style={{ backgroundColor: colors.background }} />
+                        <View className="h-px ml-[56px]" style={{ backgroundColor: colors.divider }} />
                       )}
                     </View>
                   ))}
@@ -1181,6 +1233,35 @@ export default function ItineraryScreen() {
                   </ScrollView>
                 </View>
               </View>
+            </Modal>
+
+            {/* Full-screen image modal (tap thumbnail to open) */}
+            <Modal
+              visible={!!fullImageUri}
+              transparent
+              animationType="fade"
+              onRequestClose={() => setFullImageUri(null)}
+            >
+              <TouchableOpacity
+                className="flex-1 bg-black items-center justify-center"
+                activeOpacity={1}
+                onPress={() => setFullImageUri(null)}
+              >
+                {fullImageUri ? (
+                  <Image
+                    source={{ uri: fullImageUri }}
+                    className="w-full h-full"
+                    resizeMode="contain"
+                  />
+                ) : null}
+                <TouchableOpacity
+                  className="absolute top-12 right-6 w-10 h-10 rounded-full items-center justify-center"
+                  style={{ backgroundColor: 'rgba(255,255,255,0.3)' }}
+                  onPress={() => setFullImageUri(null)}
+                >
+                  <X size={24} color="#fff" />
+                </TouchableOpacity>
+              </TouchableOpacity>
             </Modal>
 
             {/* Activity Detail Modal */}
@@ -1295,162 +1376,157 @@ export default function ItineraryScreen() {
                   </Text>
                 </View>
 
-                <View className="rounded-b-2xl shadow-lg" style={{ backgroundColor: colors.card }}>
-                  {day.activities.map((activity, actIndex) => (
-                    <View
-                      key={activity.id || `activity-${day.id}-${actIndex}`}
-                      className="border-b last:border-b-0"
-                      style={{ borderColor: colors.divider }}
-                    >
-                      {editingActivity?.id === activity.id ? (
-                        <View className="p-4" style={{ backgroundColor: colors.background }}>
-                          <TextInput
-                            className="rounded-lg px-3 py-2 mb-2"
-                            style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, color: colors.text }}
-                            placeholder="Title"
-                            placeholderTextColor={colors.textMuted}
-                            value={editingActivity.title}
-                            onChangeText={(text) =>
-                              setEditingActivity({ ...editingActivity, title: text })
-                            }
-                          />
-                          <TextInput
-                            className="rounded-lg px-3 py-2 mb-2"
-                            style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, color: colors.text }}
-                            placeholder="Description"
-                            placeholderTextColor={colors.textMuted}
-                            value={editingActivity.description}
-                            onChangeText={(text) =>
-                              setEditingActivity({
-                                ...editingActivity,
-                                description: text,
-                              })
-                            }
-                            multiline
-                          />
-                          <View className="flex-row gap-2 mb-2">
+                <View className="rounded-b-2xl shadow-lg overflow-hidden" style={{ backgroundColor: colors.card }}>
+                  <DraggableFlatList
+                    data={[...day.activities].sort((a, b) => (a.order_index ?? 0) - (b.order_index ?? 0))}
+                    keyExtractor={(item) => item.id}
+                    onDragEnd={({ data }) => handleDragEnd(day.id, data)}
+                    renderItem={({ item: activity, drag, isActive }) => (
+                      <View
+                        className="border-b last:border-b-0"
+                        style={{ borderColor: colors.divider, backgroundColor: isActive ? colors.greenMuted : undefined }}
+                      >
+                        {editingActivity?.id === activity.id ? (
+                          <View className="p-5" style={{ backgroundColor: colors.background }}>
                             <TextInput
-                              className="flex-1 rounded-lg px-3 py-2"
+                              className="rounded-lg px-3 py-2 mb-2"
                               style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, color: colors.text }}
-                              placeholder="Start (HH:MM)"
+                              placeholder="Title"
                               placeholderTextColor={colors.textMuted}
-                              value={editingActivity.time_start}
+                              value={editingActivity.title}
                               onChangeText={(text) =>
-                                setEditingActivity({
-                                  ...editingActivity,
-                                  time_start: text,
-                                })
+                                setEditingActivity({ ...editingActivity, title: text })
                               }
                             />
                             <TextInput
-                              className="flex-1 rounded-lg px-3 py-2"
+                              className="rounded-lg px-3 py-2 mb-2"
                               style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, color: colors.text }}
-                              placeholder="End (HH:MM)"
+                              placeholder="Description"
                               placeholderTextColor={colors.textMuted}
-                              value={editingActivity.time_end}
+                              value={editingActivity.description}
                               onChangeText={(text) =>
                                 setEditingActivity({
                                   ...editingActivity,
-                                  time_end: text,
+                                  description: text,
                                 })
                               }
+                              multiline
                             />
-                          </View>
-                          <TextInput
-                            className="rounded-lg px-3 py-2 mb-2"
-                            style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, color: colors.text }}
-                            placeholder="Location"
-                            placeholderTextColor={colors.textMuted}
-                            value={editingActivity.location}
-                            onChangeText={(text) =>
-                              setEditingActivity({ ...editingActivity, location: text })
-                            }
-                          />
-                          <TextInput
-                            className="rounded-lg px-3 py-2 mb-3"
-                            style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, color: colors.text }}
-                            placeholder="Cost (₹)"
-                            placeholderTextColor={colors.textMuted}
-                            value={String(editingActivity.cost ?? '')}
-                            onChangeText={(text) =>
-                              setEditingActivity({
-                                ...editingActivity,
-                                cost: parseFloat(text) || 0,
-                              })
-                            }
-                            keyboardType="number-pad"
-                          />
-                          <View className="flex-row gap-2">
-                            <TouchableOpacity
-                              className="flex-1 rounded-lg py-2"
-                              style={{ backgroundColor: colors.green }}
-                              onPress={() =>
-                                handleUpdateActivity(activity.id, editingActivity)
+                            <View className="flex-row gap-2 mb-2">
+                              <TextInput
+                                className="flex-1 rounded-lg px-3 py-2"
+                                style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, color: colors.text }}
+                                placeholder="Start (HH:MM)"
+                                placeholderTextColor={colors.textMuted}
+                                value={editingActivity.time_start}
+                                onChangeText={(text) =>
+                                  setEditingActivity({
+                                    ...editingActivity,
+                                    time_start: text,
+                                  })
+                                }
+                              />
+                              <TextInput
+                                className="flex-1 rounded-lg px-3 py-2"
+                                style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, color: colors.text }}
+                                placeholder="End (HH:MM)"
+                                placeholderTextColor={colors.textMuted}
+                                value={editingActivity.time_end}
+                                onChangeText={(text) =>
+                                  setEditingActivity({
+                                    ...editingActivity,
+                                    time_end: text,
+                                  })
+                                }
+                              />
+                            </View>
+                            <TextInput
+                              className="rounded-lg px-3 py-2 mb-2"
+                              style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, color: colors.text }}
+                              placeholder="Location"
+                              placeholderTextColor={colors.textMuted}
+                              value={editingActivity.location}
+                              onChangeText={(text) =>
+                                setEditingActivity({ ...editingActivity, location: text })
                               }
-                            >
-                              <Text className="text-center font-bold" style={{ color: colors.onGreen }}>
-                                Save
-                              </Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                              className="flex-1 rounded-lg py-2"
-                              style={{ backgroundColor: colors.card }}
-                              onPress={() => setEditingActivity(null)}
-                            >
-                              <Text className="text-center font-bold" style={{ color: colors.text }}>
-                                Cancel
-                              </Text>
-                            </TouchableOpacity>
-                          </View>
-                        </View>
-                      ) : (
-                        <TouchableOpacity
-                          className="p-4 flex-row items-center gap-3"
-                          onPress={() => setEditingActivity(activity)}
-                        >
-                          <GripVertical size={20} color={colors.textMuted} />
-                          <View className="flex-1">
-                            <Text className="font-bold mb-1" style={{ color: colors.text }}>
-                              {activity.title}
-                            </Text>
-                            <View className="flex-row items-center gap-3">
-                              <Text className="text-xs" style={{ color: colors.textMuted }}>
-                                {activity.time_start}–{activity.time_end}
-                              </Text>
-                              <Text className="text-xs" style={{ color: colors.textMuted }} numberOfLines={1}>
-                                {activity.location}
-                              </Text>
-                              <Text className="text-xs font-bold" style={{ color: colors.green }}>
-                                ₹{activity.cost}
-                              </Text>
+                            />
+                            <TextInput
+                              className="rounded-lg px-3 py-2 mb-3"
+                              style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, color: colors.text }}
+                              placeholder="Cost (₹)"
+                              placeholderTextColor={colors.textMuted}
+                              value={String(editingActivity.cost ?? '')}
+                              onChangeText={(text) =>
+                                setEditingActivity({
+                                  ...editingActivity,
+                                  cost: parseFloat(text) || 0,
+                                })
+                              }
+                              keyboardType="number-pad"
+                            />
+                            <View className="flex-row gap-2">
+                              <TouchableOpacity
+                                className="flex-1 rounded-lg py-2"
+                                style={{ backgroundColor: colors.green }}
+                                onPress={() =>
+                                  handleUpdateActivity(activity.id, editingActivity)
+                                }
+                              >
+                                <Text className="text-center font-bold" style={{ color: colors.onGreen }}>
+                                  Save
+                                </Text>
+                              </TouchableOpacity>
+                              <TouchableOpacity
+                                className="flex-1 rounded-lg py-2"
+                                style={{ backgroundColor: colors.card }}
+                                onPress={() => setEditingActivity(null)}
+                              >
+                                <Text className="text-center font-bold" style={{ color: colors.text }}>
+                                  Cancel
+                                </Text>
+                              </TouchableOpacity>
                             </View>
                           </View>
-                          <View className="flex-row items-center">
+                        ) : (
+                          <TouchableOpacity
+                            className="px-5 py-4 flex-row items-center gap-3"
+                            onPress={() => setEditingActivity(activity)}
+                            style={{ minHeight: 64 }}
+                          >
                             <TouchableOpacity
-                              onPress={() => handleMoveActivity(day.id, activity.id, 'up')}
-                              className="p-2 mr-1"
-                              disabled={actIndex === 0}
+                              onLongPress={drag}
+                              className="p-2 -m-2"
+                              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
                             >
-                              <ChevronUp size={18} color={actIndex === 0 ? colors.divider : colors.textMuted} />
+                              <GripVertical size={22} color={colors.textMuted} />
                             </TouchableOpacity>
-                            <TouchableOpacity
-                              onPress={() => handleMoveActivity(day.id, activity.id, 'down')}
-                              className="p-2 mr-2"
-                              disabled={actIndex === day.activities.length - 1}
-                            >
-                              <ChevronDown size={18} color={actIndex === day.activities.length - 1 ? colors.divider : colors.textMuted} />
-                            </TouchableOpacity>
+                            <View className="flex-1 min-w-0">
+                              <Text className="font-bold mb-1" style={{ color: colors.text }}>
+                                {activity.title}
+                              </Text>
+                              <View className="flex-row items-center gap-3 flex-wrap">
+                                <Text className="text-xs" style={{ color: colors.textMuted }}>
+                                  {activity.time_start}–{activity.time_end}
+                                </Text>
+                                <Text className="text-xs" style={{ color: colors.textMuted }} numberOfLines={1}>
+                                  {activity.location}
+                                </Text>
+                                <Text className="text-xs font-bold" style={{ color: colors.green }}>
+                                  ₹{activity.cost}
+                                </Text>
+                              </View>
+                            </View>
                             <TouchableOpacity
                               onPress={() => handleDeleteActivity(activity.id, day.id)}
                               className="p-2"
                             >
                               <Trash2 size={18} color={colors.error} />
                             </TouchableOpacity>
-                          </View>
-                        </TouchableOpacity>
-                      )}
-                    </View>
-                  ))}
+                          </TouchableOpacity>
+                        )}
+                      </View>
+                    )}
+                  />
 
                   {showAddActivity && editingDay?.id === day.id ? (
                     <View className="p-4 border-t-2" style={{ backgroundColor: colors.greenMuted, borderColor: colors.greenBorder }}>

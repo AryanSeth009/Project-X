@@ -2,7 +2,7 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import {View,Text,TextInput,TouchableOpacity,ScrollView,Alert,Modal} from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Sparkles, MapPin, Calendar, Users, Wallet, Heart, Info, MessageCircle, Home, X, ChevronLeft, ChevronRight, ChevronDown, TreePalm, Mountain, Landmark, Ship, Sun } from 'lucide-react-native';
+import { Sparkles, MapPin, Calendar, Users, Wallet, Heart, Info, MessageCircle, Home, X, ChevronLeft, ChevronRight, ChevronDown, TreePalm, Mountain, Landmark, Ship, Sun, Train, Plane, Search, Ticket, CheckCircle, ArrowLeft } from 'lucide-react-native';
 import { useStore } from '@/store/useStore';
 import { useTheme } from '@/context/ThemeContext';
 
@@ -167,7 +167,7 @@ function filterDestinations(query: string): string[] {
 export default function HomeScreen() {
   const router = useRouter();
   const { colors } = useTheme();
-  const [step, setStep] = useState<1 | 2>(1);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
   const [selectedState, setSelectedState] = useState('');
   const [destination, setDestination] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -179,6 +179,13 @@ export default function HomeScreen() {
   const [stayLocation, setStayLocation] = useState('');
   const [itineraryStyle, setItineraryStyle] = useState<'day-wise' | 'top-10'>('day-wise');
   const [areaOptions, setAreaOptions] = useState<{ name: string; type: string }[]>([]);
+  // Step 3: Tickets & transport
+  const [checkTickets, setCheckTickets] = useState<boolean | null>(null);
+  const [departurePlace, setDeparturePlace] = useState('');
+  const [transportOption, setTransportOption] = useState<'train' | 'flight' | ''>('');
+  const [transportSchedule, setTransportSchedule] = useState<Array<{ type: string; name: string; departure: string; arrival: string; price: number; class?: string }>>([]);
+  const [transportLoading, setTransportLoading] = useState(false);
+  const [highDemandNotice, setHighDemandNotice] = useState(false);
   
   const [showStateDropdown, setShowStateDropdown] = useState(false);
   const [showDestinationDropdown, setShowDestinationDropdown] = useState(false);
@@ -257,6 +264,40 @@ export default function HomeScreen() {
     setInterests((prev) => prev.filter((i) => allowed.includes(i)));
   }, [destination, step]);
 
+  const handleNextFromStep2 = () => {
+    setStep(3);
+    setCheckTickets(null);
+    setDeparturePlace('');
+    setTransportOption('');
+    setTransportSchedule([]);
+    setHighDemandNotice(Math.random() > 0.5); // Simulate high demand for demo
+  };
+
+  const fetchTransportSchedule = async () => {
+    if (!departurePlace.trim() || !transportOption || !destination) {
+      Alert.alert('Missing info', 'Please enter departure city and select train or flight.');
+      return;
+    }
+    setTransportLoading(true);
+    try {
+      const { API_BASE_URL } = await import('@/lib/api');
+      const res = await fetch(
+        `${API_BASE_URL}/api/transport/schedule?departure=${encodeURIComponent(departurePlace.trim())}&destination=${encodeURIComponent(destination)}&startDate=${startDate}&endDate=${endDate}&transport=${transportOption}&budget=${budget || 'midrange'}`
+      );
+      const json = await res.json();
+      if (json.success && json.options?.length) {
+        setTransportSchedule(json.options);
+      } else {
+        setTransportSchedule([]);
+      }
+    } catch (e) {
+      Alert.alert('Error', 'Could not fetch schedule. You can still generate the itinerary.');
+      setTransportSchedule([]);
+    } finally {
+      setTransportLoading(false);
+    }
+  };
+
   const toggleInterest = (interest: string) => {
     if (interests.includes(interest)) {
       setInterests(interests.filter((i) => i !== interest));
@@ -312,6 +353,9 @@ export default function HomeScreen() {
       personalPrompt,
       stayLocation: stayLocation || undefined,
       itineraryStyle,
+      checkTickets: checkTickets === true,
+      departurePlace: checkTickets ? departurePlace.trim() || undefined : undefined,
+      transportOption: checkTickets && transportOption ? transportOption : undefined,
     };
 
     router.push({
@@ -353,16 +397,27 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
             Plan Your Dream Trip
           </Text>
           <Text className="font-inter" style={{ color: colors.textSecondary }}>
-            Step {step} of 2 — quick details, then personalize.
+            Step {step} of 3 — {step === 1 ? 'route & dates' : step === 2 ? 'personalize' : 'tickets & transport'}.
           </Text>
         </View>
       </LinearGradient>
 
       <View className="px-6 py-6" style={{ backgroundColor: colors.background }}>
         <View className="rounded-3xl p-6 shadow-lg mb-6" style={{ backgroundColor: colors.card }}>
-          <Text className="font-inter-bold text-2xl mb-6" style={{ color: colors.text }}>
-            Trip Details
-          </Text>
+          <View className="flex-row items-center gap-3 mb-6">
+            {step > 1 && (
+              <TouchableOpacity
+                onPress={() => setStep((step - 1) as 1 | 2 | 3)}
+                className="w-10 h-10 rounded-full items-center justify-center"
+                style={{ backgroundColor: colors.inputBg }}
+              >
+                <ArrowLeft size={22} color={colors.text} />
+              </TouchableOpacity>
+            )}
+            <Text className="font-inter-bold text-2xl flex-1" style={{ color: colors.text }}>
+              Trip Details
+            </Text>
+          </View>
 
           <View className="gap-5">
             {step === 1 ? (
@@ -827,7 +882,7 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
                   </View>
                 </TouchableOpacity>
               </>
-            ) : (
+            ) : step === 2 ? (
               <>
                 {areaOptions.length > 0 && (
                   <View>
@@ -911,19 +966,38 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
                       Budget (optional)
                     </Text>
                   </View>
-                  <TextInput
-                    className="font-inter rounded-xl px-4 py-3"
-                    style={{ backgroundColor: colors.inputBg, borderWidth: 1, borderColor: colors.border, color: colors.text }}
-                    placeholder="e.g., 50000"
-                    placeholderTextColor={colors.textMuted}
-                    value={budget}
-                    onChangeText={setBudget}
-                    keyboardType="number-pad"
-                  />
+                  <View className="flex-row gap-3">
+                    {[
+                      { id: 'budget', label: '₹', sub: 'Budget' },
+                      { id: 'midrange', label: '₹₹', sub: 'Midrange' },
+                      { id: 'luxury', label: '₹₹₹', sub: 'Luxury' },
+                    ].map((tier) => {
+                      const isActive = budget === tier.id;
+                      return (
+                        <TouchableOpacity
+                          key={tier.id}
+                          onPress={() => setBudget(isActive ? '' : tier.id)}
+                          className="flex-1 rounded-2xl border-2 py-4 items-center justify-center"
+                          style={{
+                            backgroundColor: isActive ? colors.orange : colors.inputBg,
+                            borderColor: isActive ? colors.orange : colors.border,
+                          }}
+                          activeOpacity={0.85}
+                        >
+                          <Text className="font-inter-bold text-xl mb-0.5" style={{ color: isActive ? colors.onGreen : colors.text }}>
+                            {tier.label}
+                          </Text>
+                          <Text className="font-inter text-xs" style={{ color: isActive ? colors.onGreen : colors.textMuted }}>
+                            {tier.sub}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
                   <View className="flex-row items-center gap-2 mt-2">
                     <Info size={14} color={colors.textMuted} />
                     <Text className="font-inter text-xs flex-1" style={{ color: colors.textMuted }}>
-                      Leave blank if you want a balanced plan.
+                      Tap to select; tap again to clear. Leave unselected for a balanced plan.
                     </Text>
                   </View>
                 </View>
@@ -946,29 +1020,174 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
                   />
                 </View>
 
-                <View className="flex-row gap-3 mt-2">
-                  <TouchableOpacity
-                    className="flex-1 border-2 rounded-xl py-4"
-                    style={{ backgroundColor: colors.inputBg, borderColor: colors.border }}
-                    onPress={() => setStep(1)}
-                  >
-                    <Text className="font-inter-bold text-center text-lg" style={{ color: colors.text }}>
-                      Back
+                <TouchableOpacity
+                  className="rounded-xl py-4 mt-2 shadow-md"
+                  style={{ backgroundColor: colors.green }}
+                  onPress={handleNextFromStep2}
+                >
+                  <View className="flex-row items-center justify-center gap-2">
+                    <Text className="font-inter-bold text-center text-lg" style={{ color: colors.onGreen }}>
+                      Next
                     </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    className="flex-1 rounded-xl py-4 shadow-md"
-                    style={{ backgroundColor: colors.green }}
-                    onPress={handleGenerate}
-                  >
-                    <View className="flex-row items-center justify-center gap-2">
-                      <Sparkles size={20} color={colors.onGreen} />
-                      <Text className="font-inter-bold text-center text-lg" style={{ color: colors.onGreen }}>
-                        Generate Itinerary
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
+                    <ChevronRight size={20} color={colors.onGreen} />
+                  </View>
+                </TouchableOpacity>
+              </>
+            ) : (
+              /* Step 3: Tickets & transport */
+              <>
+                <View>
+                  <Text className="font-inter-bold text-xl mb-1" style={{ color: colors.text }}>
+                    Would you like to check tickets?
+                  </Text>
+                  <Text className="font-inter text-sm mb-4" style={{ color: colors.textSecondary }}>
+                    We can pull real-time availability and pricing from IRCTC and Flight APIs for your specific dates.
+                  </Text>
+                  <View className="gap-3">
+                    <TouchableOpacity
+                      onPress={() => { setCheckTickets(true); setTransportSchedule([]); }}
+                      className="rounded-2xl p-4 border-2 flex-row items-center gap-3"
+                      style={{
+                        backgroundColor: checkTickets === true ? colors.greenMuted : colors.inputBg,
+                        borderColor: checkTickets === true ? colors.green : colors.border,
+                      }}
+                      activeOpacity={0.85}
+                    >
+                      <View className="w-12 h-12 rounded-xl items-center justify-center" style={{ backgroundColor: checkTickets === true ? colors.greenMuted : colors.card }}>
+                        <Search size={24} color={checkTickets === true ? colors.green : colors.textMuted} />
+                      </View>
+                      <View className="flex-1">
+                        <Text className="font-inter-bold" style={{ color: colors.text }}>Yes, find me tickets</Text>
+                        <Text className="font-inter text-xs mt-0.5" style={{ color: colors.textSecondary }}>
+                          Check flights and trains from your current location to destination.
+                        </Text>
+                      </View>
+                      {checkTickets === true ? <CheckCircle size={20} color={colors.green} /> : <ChevronRight size={20} color={colors.textMuted} />}
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => { setCheckTickets(false); setTransportSchedule([]); setTransportOption(''); setDeparturePlace(''); }}
+                      className="rounded-2xl p-4 border-2 flex-row items-center gap-3"
+                      style={{
+                        backgroundColor: checkTickets === false ? colors.greenMuted : colors.inputBg,
+                        borderColor: checkTickets === false ? colors.green : colors.border,
+                      }}
+                      activeOpacity={0.85}
+                    >
+                      <View className="w-12 h-12 rounded-xl items-center justify-center" style={{ backgroundColor: colors.card }}>
+                        <Ticket size={24} color={checkTickets === false ? colors.green : colors.textMuted} />
+                      </View>
+                      <View className="flex-1">
+                        <Text className="font-inter-bold" style={{ color: colors.text }}>No, I've already booked</Text>
+                        <Text className="font-inter text-xs mt-0.5" style={{ color: colors.textSecondary }}>
+                          Skip transport and go straight to planning your activities.
+                        </Text>
+                      </View>
+                      {checkTickets === false ? <CheckCircle size={20} color={colors.green} /> : <ChevronRight size={20} color={colors.textMuted} />}
+                    </TouchableOpacity>
+                  </View>
                 </View>
+
+                {checkTickets === true && (
+                  <>
+                    <View>
+                      <Text className="font-inter-semibold mb-2" style={{ color: colors.text }}>Departure city</Text>
+                      <TextInput
+                        className="font-inter rounded-xl px-4 py-3"
+                        style={{ backgroundColor: colors.inputBg, borderWidth: 1, borderColor: colors.border, color: colors.text }}
+                        placeholder="e.g. Mumbai, Delhi, Bangalore"
+                        placeholderTextColor={colors.textMuted}
+                        value={departurePlace}
+                        onChangeText={setDeparturePlace}
+                      />
+                    </View>
+                    <View>
+                      <Text className="font-inter-semibold mb-2" style={{ color: colors.text }}>Train or flight?</Text>
+                      <View className="flex-row gap-3">
+                        <TouchableOpacity
+                          onPress={() => setTransportOption('train')}
+                          className="flex-1 rounded-2xl p-4 border-2 flex-row items-center justify-center gap-2"
+                          style={{
+                            backgroundColor: transportOption === 'train' ? colors.orangeMuted : colors.inputBg,
+                            borderColor: transportOption === 'train' ? colors.orange : colors.border,
+                          }}
+                        >
+                          <Train size={22} color={transportOption === 'train' ? colors.orange : colors.textMuted} />
+                          <Text className="font-inter-bold" style={{ color: transportOption === 'train' ? colors.orange : colors.textMuted }}>Train</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() => setTransportOption('flight')}
+                          className="flex-1 rounded-2xl p-4 border-2 flex-row items-center justify-center gap-2"
+                          style={{
+                            backgroundColor: transportOption === 'flight' ? colors.orangeMuted : colors.inputBg,
+                            borderColor: transportOption === 'flight' ? colors.orange : colors.border,
+                          }}
+                        >
+                          <Plane size={22} color={transportOption === 'flight' ? colors.orange : colors.textMuted} />
+                          <Text className="font-inter-bold" style={{ color: transportOption === 'flight' ? colors.orange : colors.textMuted }}>Flight</Text>
+                        </TouchableOpacity>
+                      </View>
+                      {budget && transportOption === 'train' && (
+                        <Text className="font-inter text-xs mt-2" style={{ color: colors.textMuted }}>
+                          {budget === 'budget' && 'Estimated for 3AC (3 Tier AC). '}
+                          {budget === 'midrange' && 'Estimated for 2AC (2 Tier AC). '}
+                          {budget === 'luxury' && 'Estimated for 1AC (1 Tier AC). '}
+                          Prices are indicative.
+                        </Text>
+                      )}
+                    </View>
+                    <TouchableOpacity
+                      onPress={fetchTransportSchedule}
+                      disabled={transportLoading || !departurePlace.trim() || !transportOption}
+                      className="rounded-xl py-3 flex-row items-center justify-center gap-2 border-2"
+                      style={{ backgroundColor: colors.card, borderColor: colors.orange }}
+                    >
+                      {transportLoading ? (
+                        <Text className="font-inter-semibold" style={{ color: colors.orange }}>Checking...</Text>
+                      ) : (
+                        <>
+                          <Search size={18} color={colors.orange} />
+                          <Text className="font-inter-semibold" style={{ color: colors.orange }}>Check availability & prices</Text>
+                        </>
+                      )}
+                    </TouchableOpacity>
+                    {transportSchedule.length > 0 && (
+                      <View className="rounded-2xl p-4 border" style={{ backgroundColor: colors.inputBg, borderColor: colors.border }}>
+                        <Text className="font-inter-bold mb-2" style={{ color: colors.text }}>Available options</Text>
+                        {transportSchedule.slice(0, 5).map((opt, i) => (
+                          <View key={i} className="flex-row justify-between items-center py-2 border-b" style={{ borderColor: colors.divider }}>
+                            <View>
+                              <Text className="font-inter-semibold" style={{ color: colors.text }}>{opt.name}</Text>
+                              <Text className="font-inter text-xs" style={{ color: colors.textMuted }}>{opt.departure} → {opt.arrival}{opt.class ? ` • ${opt.class}` : ''}</Text>
+                            </View>
+                            <Text className="font-inter-bold" style={{ color: colors.green }}>₹{opt.price.toLocaleString()}</Text>
+                          </View>
+                        ))}
+                      </View>
+                    )}
+                  </>
+                )}
+
+                {highDemandNotice && checkTickets === true && (
+                  <View className="rounded-xl p-4 flex-row gap-3 border" style={{ backgroundColor: colors.orangeMuted, borderColor: colors.orangeBorder }}>
+                    <Text className="text-xl">⚠️</Text>
+                    <Text className="font-inter text-sm flex-1" style={{ color: colors.text }}>
+                      Based on your dates, we've noticed high demand for this route. Checking now is recommended.
+                    </Text>
+                  </View>
+                )}
+
+                <TouchableOpacity
+                  className="rounded-xl py-4 mt-2 shadow-md"
+                  style={{ backgroundColor: colors.green }}
+                  onPress={handleGenerate}
+                >
+                  <View className="flex-row items-center justify-center gap-2">
+                    <Sparkles size={20} color={colors.onGreen} />
+                    <Text className="font-inter-bold text-center text-lg" style={{ color: colors.onGreen }}>
+                      Generate Itinerary
+                    </Text>
+                  </View>
+                </TouchableOpacity>
               </>
             )}
           </View>

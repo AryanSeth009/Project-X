@@ -9,6 +9,10 @@ export interface ItineraryFormData {
   /** Optional: where user is staying (e.g. Baga, Anjuna) - used to tailor Day 1 */
   stayLocation?: string;
   itineraryStyle?: 'day-wise' | 'top-10';
+  /** Step 3: user wants to check tickets from departure to destination */
+  checkTickets?: boolean;
+  departurePlace?: string;
+  transportOption?: 'train' | 'flight';
 }
 
 export interface GeneratedActivity {
