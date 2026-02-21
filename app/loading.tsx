@@ -271,7 +271,7 @@ export default function LoadingScreen() {
 
   return (
     <LinearGradient
-      colors={['#0f172a', '#1e1b4b', '#312e81']}
+      colors={['#1A1C19', '#242922', '#1A1C19']}
       className="flex-1 items-center justify-center px-6"
     >
       <View className="items-center justify-center">
@@ -280,33 +280,39 @@ export default function LoadingScreen() {
           style={{
             transform: [{ rotate: spin }],
             position: 'absolute',
+            borderWidth: 2,
+            borderColor: 'rgba(76, 175, 80, 0.2)',
+            width: 256,
+            height: 256,
+            borderRadius: 128,
+            borderStyle: 'dashed',
           }}
-          className="w-64 h-64 border-2 border-indigo-500/20 rounded-full border-dashed"
         />
 
         {/* Outer Glow */}
-        <View className="w-48 h-48 bg-indigo-500/10 rounded-full absolute shadow-2xl shadow-indigo-500/50" />
+        <View className="w-48 h-48 rounded-full absolute" style={{ backgroundColor: 'rgba(76, 175, 80, 0.1)' }} />
 
         {/* Central Icon Container */}
         <Animated.View
           style={{
             transform: [{ scale: pulseAnim }],
           }}
-          className="w-36 h-36 bg-white/10 backdrop-blur-md rounded-full items-center justify-center border border-white/20 shadow-xl"
+          className="w-36 h-36 rounded-full items-center justify-center border shadow-xl"
+          style={{ backgroundColor: 'rgba(245, 245, 220, 0.1)', borderColor: 'rgba(245, 245, 220, 0.2)' }}
         >
           <Text className="text-6xl">✨</Text>
         </Animated.View>
 
         <View className="mt-12 items-center">
-          <Text className="font-inter-bold text-3xl text-white mb-2 tracking-tight">
+          <Text className="font-inter-bold text-3xl text-[#F5F5DC] mb-2 tracking-tight">
             Magical Planning
           </Text>
-          <Text className="font-inter-medium text-indigo-200/60 text-sm uppercase tracking-[4px] mb-8">
+          <Text className="font-inter-medium text-sm uppercase tracking-[4px] mb-8" style={{ color: 'rgba(76, 175, 80, 0.8)' }}>
             AI Assistant
           </Text>
 
           <Animated.View style={{ opacity: fadeAnim }} className="h-12 justify-center">
-            <Text className="font-inter-medium text-lg text-white/90 text-center px-4">
+            <Text className="font-inter-medium text-lg text-center px-4" style={{ color: 'rgba(245, 245, 220, 0.9)' }}>
               {loadingMessages[messageIndex]}
             </Text>
           </Animated.View>
@@ -316,8 +322,9 @@ export default function LoadingScreen() {
             {[0, 1, 2, 3].map((i) => (
               <Animated.View
                 key={i}
-                className="w-2 h-2 rounded-full bg-indigo-400"
+                className="w-2 h-2 rounded-full"
                 style={{
+                  backgroundColor: '#4CAF50',
                   opacity: messageIndex % 4 === i ? 1 : 0.2,
                   transform: [{ scale: messageIndex % 4 === i ? 1.2 : 1 }],
                 }}

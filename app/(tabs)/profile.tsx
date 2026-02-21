@@ -26,22 +26,22 @@ export default function ProfileScreen() {
 
   if (!user) {
     return (
-      <View className="flex-1 items-center justify-center bg-gray-50">
-        <Text className="font-inter text-gray-500">Loading profile...</Text>
+      <View className="flex-1 items-center justify-center" style={{ backgroundColor: '#1A1C19' }}>
+        <Text className="font-inter" style={{ color: '#F5F5DC' }}>Loading profile...</Text>
       </View>
     );
   }
 
   return (
-    <ScrollView className="flex-1 bg-gray-50" showsVerticalScrollIndicator={false}>
-      <LinearGradient colors={['#FF9933', '#FFA500']} className="pt-16 pb-10 px-6">
+    <ScrollView className="flex-1" style={{ backgroundColor: '#1A1C19' }} showsVerticalScrollIndicator={false}>
+      <LinearGradient colors={['#242922', '#1A1C19']} className="pt-16 pb-10 px-6">
         <View className="flex-row items-center gap-3">
-          <View className="w-14 h-14 bg-white/25 rounded-2xl items-center justify-center">
-            <UserIcon size={26} color="#FFFFFF" />
+          <View className="w-14 h-14 rounded-2xl items-center justify-center" style={{ backgroundColor: 'rgba(76, 175, 80, 0.25)' }}>
+            <UserIcon size={26} color="#4CAF50" />
           </View>
           <View className="flex-1">
-            <Text className="font-inter-bold text-white text-2xl">Profile</Text>
-            <Text className="font-inter text-white/90" numberOfLines={1}>
+            <Text className="font-inter-bold text-2xl" style={{ color: '#F5F5DC' }}>Profile</Text>
+            <Text className="font-inter" numberOfLines={1} style={{ color: 'rgba(245, 245, 220, 0.9)' }}>
               {user.email}
             </Text>
           </View>
@@ -49,33 +49,35 @@ export default function ProfileScreen() {
       </LinearGradient>
 
       <View className="px-6 -mt-6 mb-6">
-        <View className="bg-white rounded-3xl p-6 shadow-xl">
-          <Text className="font-inter-semibold text-gray-500 text-xs mb-2 uppercase tracking-wide">
+        <View className="rounded-3xl p-6 shadow-xl" style={{ backgroundColor: '#242922' }}>
+          <Text className="font-inter-semibold text-xs mb-2 uppercase tracking-wide" style={{ color: '#9CA3AF' }}>
             Trips saved
           </Text>
-          <Text className="font-inter-bold text-4xl text-gray-800">
+          <Text className="font-inter-bold text-4xl" style={{ color: '#F5F5DC' }}>
             {itineraries.length}
           </Text>
 
           <TouchableOpacity
-            className="mt-5 bg-saffron-500 rounded-2xl py-4 flex-row items-center justify-center gap-2"
+            className="mt-5 rounded-2xl py-4 flex-row items-center justify-center gap-2"
+            style={{ backgroundColor: '#4CAF50' }}
             onPress={() => router.push('/(tabs)/itinerary')}
             activeOpacity={0.85}
           >
-            <History size={20} color="#FFFFFF" />
-            <Text className="font-inter-bold text-white text-base">Open Itineraries</Text>
+            <History size={20} color="#1A1C19" />
+            <Text className="font-inter-bold text-base" style={{ color: '#1A1C19' }}>Open Itineraries</Text>
           </TouchableOpacity>
         </View>
       </View>
 
       <View className="px-6 mb-10">
         <TouchableOpacity
-          className="bg-red-50 border-2 border-red-200 rounded-2xl p-4 flex-row items-center justify-center gap-3"
+          className="border-2 rounded-2xl p-4 flex-row items-center justify-center gap-3"
+          style={{ backgroundColor: 'rgba(239, 68, 68, 0.15)', borderColor: 'rgba(239, 68, 68, 0.4)' }}
           onPress={handleSignOut}
           activeOpacity={0.85}
         >
           <LogOut size={20} color="#EF4444" />
-          <Text className="font-inter-bold text-red-600 text-base">Sign Out</Text>
+          <Text className="font-inter-bold text-base" style={{ color: '#EF4444' }}>Sign Out</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

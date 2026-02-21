@@ -11,7 +11,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#1A7A73',
+        tabBarActiveTintColor: '#4CAF50',
         tabBarInactiveTintColor: '#9CA3AF',
 
         // Floating, rounded container
@@ -42,15 +42,15 @@ export default function TabLayout() {
           <View style={styles.glassContainer}>
             <BlurView
               intensity={70}
-              tint="light"
+              tint="dark"
               style={StyleSheet.absoluteFillObject}
             >
-              {/* white glass wash */}
+              {/* dark glass wash */}
               <View
                 style={[
                   StyleSheet.absoluteFillObject,
                   {
-                    backgroundColor: 'rgba(255, 255, 255, 0.55)',
+                    backgroundColor: 'rgba(36, 41, 34, 0.85)',
                   },
                 ]}
               />
@@ -62,7 +62,7 @@ export default function TabLayout() {
                   left: 0,
                   right: 0,
                   height: '55%',
-                  backgroundColor: 'rgba(255, 255, 255, 0.25)',
+                  backgroundColor: 'rgba(76, 175, 80, 0.08)',
                 }}
               />
               {/* 1 px glass-edge highlight */}
@@ -73,7 +73,7 @@ export default function TabLayout() {
                   left: 0,
                   right: 0,
                   height: StyleSheet.hairlineWidth * 2,
-                  backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                  backgroundColor: 'rgba(245, 245, 220, 0.3)',
                 }}
               />
             </BlurView>
