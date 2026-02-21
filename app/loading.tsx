@@ -294,11 +294,11 @@ export default function LoadingScreen() {
 
         {/* Central Icon Container */}
         <Animated.View
-          style={{
-            transform: [{ scale: pulseAnim }],
-          }}
+          style={[
+            { transform: [{ scale: pulseAnim }] },
+            { backgroundColor: 'rgba(245, 245, 220, 0.1)', borderColor: 'rgba(245, 245, 220, 0.2)' }
+          ]}
           className="w-36 h-36 rounded-full items-center justify-center border shadow-xl"
-          style={{ backgroundColor: 'rgba(245, 245, 220, 0.1)', borderColor: 'rgba(245, 245, 220, 0.2)' }}
         >
           <Text className="text-6xl">✨</Text>
         </Animated.View>
