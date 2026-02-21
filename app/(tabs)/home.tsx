@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import {View,Text,TextInput,TouchableOpacity,ScrollView,Alert,Modal} from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -24,6 +24,57 @@ const DESTINATION_ICONS: Record<string, typeof TreePalm> = {
   Jaipur: Landmark,
   Kerala: Ship,
   Rajasthan: Sun,
+};
+
+// Interests that are actually available at each destination (aligned with geo-service tags & attractions)
+const DESTINATION_INTERESTS: Record<string, string[]> = {
+  Goa: [
+    'Beach',
+    'Nightlife',
+    'Relaxation',
+    'Food',
+    'Nature',
+    'Shopping',
+    'Culture',
+    'History',
+  ],
+  Manali: [
+    'Mountain',
+    'Adventure',
+    'Nature',
+    'Food',
+    'Shopping',
+    'Relaxation',
+    'History',
+    'Culture',
+  ],
+  Jaipur: [
+    'History',
+    'Culture',
+    'Shopping',
+    'Food',
+    'City',
+    'Temple',
+  ],
+  Kerala: [
+    'Nature',
+    'River',
+    'Lake',
+    'Forest',
+    'Relaxation',
+    'Culture',
+    'Food',
+  ],
+  Rajasthan: [
+    'Desert',
+    'History',
+    'Culture',
+    'Adventure',
+    'Shopping',
+    'Food',
+    'City',
+    'Temple',
+  ],
 };
 
 // Levenshtein distance for fuzzy typo matching (e.g. "Gooa" -> "Goa")
@@ -94,6 +145,14 @@ export default function HomeScreen() {
     [destination]
   );
 
+  // Only show interests that exist at the selected destination (step 2)
+  const interestOptionsForDestination = useMemo(() => {
+    if (!destination.trim()) return [];
+    const key = DESTINATIONS.find((d) => d.toLowerCase() === destination.trim().toLowerCase());
+    if (!key || !DESTINATION_INTERESTS[key]) return [];
+    return DESTINATION_INTERESTS[key];
+  }, [destination]);
+
   const interestOptions = [
     'Culture',
     'Adventure',
@@ -113,6 +172,15 @@ export default function HomeScreen() {
     'Village',
     'Temple',
   ];
+
+  // When destination or step changes in step 2, keep only interests valid for that destination
+  useEffect(() => {
+    if (step !== 2) return;
+    const key = DESTINATIONS.find((d) => d.toLowerCase() === destination.trim().toLowerCase());
+    const allowed = key ? (DESTINATION_INTERESTS[key] ?? []) : [];
+    if (allowed.length === 0) return;
+    setInterests((prev) => prev.filter((i) => allowed.includes(i)));
+  }, [destination, step]);
 
   const toggleInterest = (interest: string) => {
     if (interests.includes(interest)) {
@@ -623,14 +691,17 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
                 )}
 
                 <View>
-                  <View className="flex-row items-center gap-2 mb-3">
+                  <View className="flex-row items-center gap-2 mb-2">
                     <Heart size={18} color="#F39C12" />
                     <Text className="font-inter-semibold" style={{ color: '#F5F5DC' }}>
                       What are you interested in?
                     </Text>
                   </View>
+                  <Text className="font-inter text-xs mb-3" style={{ color: '#9CA3AF' }}>
+                    Only interests available in {destination}
+                  </Text>
                   <View className="flex-row flex-wrap gap-2">
-                    {interestOptions.map((interest) => (
+                    {interestOptionsForDestination.map((interest) => (
                       <TouchableOpacity
                         key={interest}
                         onPress={() => toggleInterest(interest)}
