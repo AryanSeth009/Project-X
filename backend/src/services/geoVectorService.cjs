@@ -5,9 +5,13 @@ const fs = require('fs');
 const path = require('path');
 const OpenAI = require('openai');
 const { Pinecone } = require('@pinecone-database/pinecone');
+const { resolveDestinationSlug } = require('./contextBuilder.cjs');
 
 function loadStructuredData(destination) {
-  const slug = String(destination || '').toLowerCase();
+  const slug = resolveDestinationSlug(destination);
+  if (!slug) {
+    throw new Error(`No geo dataset format found for destination: ${destination}`);
+  }
   const filePath = path.join(
     __dirname,
     '..',
@@ -15,7 +19,7 @@ function loadStructuredData(destination) {
     `${slug}.json`,
   );
   if (!fs.existsSync(filePath)) {
-    throw new Error(`No geo dataset JSON found for destination: ${destination}`);
+    throw new Error(`No geo dataset JSON found for destination: ${slug}`);
   }
   return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
 }

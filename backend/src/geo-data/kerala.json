@@ -1,0 +1,992 @@
+{
+    "destination": "Kerala",
+    "completeTravelerGuide": {
+        "overview": {
+            "nickname": "God's Own Country 🌿",
+            "perfectFor": [
+                "Nature lovers",
+                "Backpackers",
+                "Honeymooners",
+                "Ayurveda seekers",
+                "Families",
+                "Solo travelers"
+            ],
+            "bestSeason": "September-March (20-32°C perfect weather)",
+            "shoulderSeason": "July-August (post-monsoon lush green)",
+            "avoid": "April-June (summer heat 35°C+)",
+            "airports": {
+                "COK": "Kochi (central gateway)",
+                "TRV": "Trivandrum (south gateway)",
+                "CCJ": "Kozhikode (north gateway)"
+            },
+            "travelTimes": {
+                "MumbaiFlight": "2hr",
+                "BangaloreFlight": "1hr",
+                "ChennaiFlight": "1.5hr",
+                "DelhiFlight": "3hr",
+                "MumbaiTrain": "24hr"
+            },
+            "mustDo": [
+                "Houseboat",
+                "Tea estates",
+                "Ayurveda",
+                "Kathakali",
+                "Spice plantations",
+                "Snake boat race",
+                "Theyyam"
+            ],
+            "avgDailyBudget": {
+                "budget": "₹2000-3500/person",
+                "midrange": "₹4000-7000/person",
+                "luxury": "₹12000+"
+            }
+        },
+        "areas": [
+            {
+                "name": "Alleppey (Alappuzha)",
+                "type": "Backwater Paradise 🚤",
+                "vibe": "Serene canals, houseboats, village life",
+                "whoShouldStay": [
+                    "Honeymooners",
+                    "Nature lovers",
+                    "Relaxation seekers",
+                    "Photographers"
+                ],
+                "whoShouldSkip": [
+                    "Party animals",
+                    "Nightlife seekers"
+                ],
+                "budgetRange": {
+                    "hostel": 400,
+                    "homestay": 800,
+                    "houseboat": 6000,
+                    "resort": 4000
+                },
+                "distanceFromAirport": "90min from COK",
+                "crowdLevel": "High (houseboat peak)",
+                "waterQuality": "Clean, safe for boating",
+                "sunsetRating": "⭐⭐⭐⭐⭐",
+                "bestFor": [
+                    "Houseboats",
+                    "Backwaters",
+                    "Village tours",
+                    "Birdwatching",
+                    "Canoeing"
+                ],
+                "travelerTips": [
+                    "Houseboat: Book 1 month early, choose AC sunset category",
+                    "Best time: 3PM-7PM sunset cruise",
+                    "Homestays cheaper than resorts",
+                    "Kayak tours ₹1500/day"
+                ],
+                "specificPlaces": {
+                    "restaurants": [
+                        {
+                            "name": "Cassia Restaurant",
+                            "type": "Lakeside fine dining",
+                            "cost": 1200,
+                            "mustTry": [
+                                "Kerala fish curry",
+                                "Appam stew"
+                            ],
+                            "bestFor": "Romantic dinner",
+                            "view": "Vembanad Lake sunset"
+                        },
+                        {
+                            "name": "Thaff Delicacy",
+                            "type": "Traditional Kerala thali",
+                            "cost": 350,
+                            "mustTry": [
+                                "Sadya (banana leaf meal)"
+                            ],
+                            "servingStyle": "On banana leaf"
+                        },
+                        {
+                            "name": "Artisan Farmers Cafe",
+                            "type": "Organic farm-to-table",
+                            "cost": 500,
+                            "mustTry": [
+                                "Jackfruit dishes",
+                                "Tapioca fries"
+                            ]
+                        },
+                        {
+                            "name": "Halais Restaurant",
+                            "type": "Arabian-Kerala",
+                            "cost": 450,
+                            "mustTry": [
+                                "Beef fry",
+                                "Porotta"
+                            ],
+                            "ambiance": "Local favorite"
+                        }
+                    ],
+                    "hostels": [
+                        {
+                            "name": "Zostel Alleppey",
+                            "cost": 400,
+                            "amenities": [
+                                "Backwater view",
+                                "Kayak tours",
+                                "Cooking classes",
+                                "Rooftop cafe"
+                            ],
+                            "rating": 4.4,
+                            "proTip": "Book rooftop dorms"
+                        },
+                        {
+                            "name": "Backwater Breeze Hostel",
+                            "cost": 380,
+                            "amenities": [
+                                "Houseboat pickup",
+                                "Village walks",
+                                "Bonfire"
+                            ],
+                            "rating": 4.2
+                        },
+                        {
+                            "name": "The Hosteller Alleppey",
+                            "cost": 450,
+                            "amenities": [
+                                "Cafe",
+                                "Common room",
+                                "Bike rental"
+                            ],
+                            "rating": 4.3
+                        }
+                    ],
+                    "houseboats": [
+                        {
+                            "name": "Xandari Pearl Houseboat",
+                            "category": "Luxury",
+                            "2hr": 4000,
+                            "overnight": 12000,
+                            "includes": [
+                                "AC",
+                                "Chef",
+                                "Crew",
+                                "Sun deck"
+                            ],
+                            "maxGuests": 4
+                        },
+                        {
+                            "name": "Budget Houseboat",
+                            "category": "Economy",
+                            "2hr": 2000,
+                            "overnight": 6000,
+                            "proTip": "Sunset departure best"
+                        },
+                        {
+                            "name": "Green Palm Houseboat",
+                            "category": "Mid-range",
+                            "2hr": 3000,
+                            "overnight": 8500,
+                            "includes": [
+                                "AC bedrooms",
+                                "Traditional food"
+                            ]
+                        }
+                    ],
+                    "activities": [
+                        {
+                            "name": "Houseboat Cruise 🚤",
+                            "cost": "2000-12000",
+                            "duration": "2hr/24hr",
+                            "bestTime": "3PM sunset",
+                            "proTip": "Private > shared"
+                        },
+                        {
+                            "name": "Kayaking Backwaters",
+                            "cost": 1500,
+                            "duration": "3hr",
+                            "groupSize": "2-4",
+                            "proTip": "Morning birdwatching"
+                        },
+                        {
+                            "name": "Village Bicycle Tour",
+                            "cost": 800,
+                            "duration": "4hr",
+                            "visit": "Coir making, Toddy tapping"
+                        },
+                        {
+                            "name": "Snake Boat Race",
+                            "cost": 500,
+                            "season": "August",
+                            "location": "Punnamada Lake"
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "Munnar Hill Station",
+                "type": "Tea Plantation Paradise ☕",
+                "vibe": "Misty hills, endless tea gardens, cool climate",
+                "whoShouldStay": [
+                    "Nature lovers",
+                    "Honeymooners",
+                    "Photography enthusiasts",
+                    "Trekkers"
+                ],
+                "whoShouldSkip": [
+                    "Beach lovers",
+                    "Nightlife seekers"
+                ],
+                "budgetRange": {
+                    "hostel": 500,
+                    "homestay": 1200,
+                    "resort": 3500
+                },
+                "distanceFromAirport": "4hr from COK",
+                "altitude": "1600m",
+                "temperature": "15-25°C year-round",
+                "bestFor": [
+                    "Tea estates",
+                    "Trekking",
+                    "Waterfalls",
+                    "Wildlife",
+                    "Sunrise views"
+                ],
+                "travelerTips": [
+                    "Carry warm clothes for evenings",
+                    "Book tea estate tours early",
+                    "Try fresh tea at plantations",
+                    "Avoid weekends for less crowd"
+                ],
+                "specificPlaces": {
+                    "restaurants": [
+                        {
+                            "name": "Rapsy Restaurant",
+                            "type": "Budget legend",
+                            "cost": 300,
+                            "mustTry": [
+                                "Mutton stew",
+                                "Appam",
+                                "Beef fry"
+                            ],
+                            "since": "1960s"
+                        },
+                        {
+                            "name": "Saravana Bhavan",
+                            "type": "South Indian",
+                            "cost": 250,
+                            "mustTry": "Banana leaf meals"
+                        },
+                        {
+                            "name": "Tea Valley Restaurant",
+                            "type": "Multi-cuisine",
+                            "cost": 600,
+                            "view": "Tea garden view",
+                            "mustTry": "Grilled fish"
+                        }
+                    ],
+                    "hostels": [
+                        {
+                            "name": "Zostel Munnar",
+                            "cost": 500,
+                            "amenities": [
+                                "Tea estate view",
+                                "Bonfire nights",
+                                "Cafe"
+                            ],
+                            "rating": 4.5
+                        },
+                        {
+                            "name": "Munnar Hostel",
+                            "cost": 450,
+                            "amenities": [
+                                "Dorms",
+                                "Kitchen",
+                                "Trekking guides"
+                            ],
+                            "rating": 4.1
+                        }
+                    ],
+                    "activities": [
+                        {
+                            "name": "Tea Museum Visit",
+                            "cost": 200,
+                            "duration": "1hr",
+                            "learn": "Tea processing history"
+                        },
+                        {
+                            "name": "Mattupetty Dam Boating",
+                            "cost": 300,
+                            "duration": "30min",
+                            "bestTime": "Morning"
+                        },
+                        {
+                            "name": "Eravikulam National Park",
+                            "cost": 120,
+                            "see": "Nilgiri Tahr (mountain goat)",
+                            "timing": "7AM-6PM"
+                        },
+                        {
+                            "name": "Top Station Viewpoint",
+                            "cost": 50,
+                            "bestTime": "Sunrise",
+                            "altitude": "1700m"
+                        },
+                        {
+                            "name": "Tea Plantation Trek",
+                            "cost": 800,
+                            "duration": "4hr",
+                            "guide": "Included"
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "Kochi (Fort Kochi)",
+                "type": "Cultural Melting Pot 🏰",
+                "vibe": "Portuguese-Dutch-Jewish heritage, colonial charm",
+                "whoShouldStay": [
+                    "History buffs",
+                    "Art lovers",
+                    "Foodies",
+                    "Backpackers"
+                ],
+                "budgetRange": {
+                    "hostel": 450,
+                    "heritageStay": 1500,
+                    "boutiqueHotel": 3000
+                },
+                "distanceFromAirport": "90min from COK",
+                "bestFor": [
+                    "History",
+                    "Street art",
+                    "Chinese fishing nets",
+                    "Kathakali",
+                    "Colonial architecture"
+                ],
+                "travelerTips": [
+                    "Walk the Fort Kochi area",
+                    "Kathakali shows at 6PM daily",
+                    "Try seafood at waterfront",
+                    "Bargain at spice markets"
+                ],
+                "specificPlaces": {
+                    "restaurants": [
+                        {
+                            "name": "Kashi Art Cafe",
+                            "type": "Rooftop heritage",
+                            "cost": 800,
+                            "view": "Chinese fishing nets",
+                            "mustTry": "Cold coffee"
+                        },
+                        {
+                            "name": "Fort House Restaurant",
+                            "type": "Waterfront",
+                            "cost": 700,
+                            "mustTry": "Fort Kochi fish curry"
+                        },
+                        {
+                            "name": "Dal Roti",
+                            "type": "North Indian",
+                            "cost": 350,
+                            "bestFor": "Quick meals"
+                        },
+                        {
+                            "name": "Oceanos Restaurant",
+                            "type": "Fine dining",
+                            "cost": 1200,
+                            "cuisine": "Seafood speciality"
+                        }
+                    ],
+                    "hostels": [
+                        {
+                            "name": "Zostel Fort Kochi",
+                            "cost": 450,
+                            "amenities": [
+                                "Heritage building",
+                                "Rooftop",
+                                "Art walks",
+                                "Cafe"
+                            ],
+                            "rating": 4.6
+                        },
+                        {
+                            "name": "Marine Drive Hostel",
+                            "cost": 400,
+                            "amenities": [
+                                "Sea view",
+                                "Common kitchen"
+                            ],
+                            "rating": 4.3
+                        }
+                    ],
+                    "activities": [
+                        {
+                            "name": "Chinese Fishing Nets",
+                            "cost": "20/tip",
+                            "bestTime": "5PM sunset",
+                            "history": "14th century Chinese traders"
+                        },
+                        {
+                            "name": "Kathakali Show",
+                            "cost": 400,
+                            "duration": "2hr",
+                            "makeupDemo": "6PM daily",
+                            "venue": "Kerala Kathakali Centre"
+                        },
+                        {
+                            "name": "Jewish Synagogue",
+                            "cost": 10,
+                            "openingHours": "10AM-5PM",
+                            "closed": "Friday-Saturday"
+                        },
+                        {
+                            "name": "Mattancherry Palace",
+                            "cost": 100,
+                            "timing": "10AM-5PM",
+                            "highlights": "Mural paintings"
+                        },
+                        {
+                            "name": "Spice Market Walk",
+                            "cost": 0,
+                            "duration": "2hr",
+                            "bestTime": "Morning"
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "Varkala Beach",
+                "type": "Cliffside Beach Paradise 🪨",
+                "vibe": "Golden cliffs + Arabian sea, yoga retreats",
+                "whoShouldStay": [
+                    "Yoga enthusiasts",
+                    "Beach lovers",
+                    "Solo travelers",
+                    "Budget travelers"
+                ],
+                "budgetRange": {
+                    "hostel": 400,
+                    "beachShack": 1000,
+                    "resort": 2500
+                },
+                "distanceFromAirport": "90min from TRV",
+                "bestFor": [
+                    "Cliff walks",
+                    "Ayurveda",
+                    "Surfing",
+                    "Sunset yoga",
+                    "Cafe hopping"
+                ],
+                "travelerTips": [
+                    "North Cliff has best views",
+                    "Sunset at 6PM sharp",
+                    "Try fresh seafood shacks",
+                    "Yoga classes ₹500/session"
+                ],
+                "specificPlaces": {
+                    "restaurants": [
+                        {
+                            "name": "Cafe del Mar",
+                            "type": "Cliff top",
+                            "cost": 600,
+                            "view": "360° ocean panorama",
+                            "mustTry": "Smoothie bowls"
+                        },
+                        {
+                            "name": "Wild Honey",
+                            "type": "Organic",
+                            "cost": 500,
+                            "mustTry": "Raw food bowls"
+                        },
+                        {
+                            "name": "Cliff Story Cafe",
+                            "type": "Rooftop",
+                            "cost": 450,
+                            "bestFor": "Breakfast"
+                        }
+                    ],
+                    "hostels": [
+                        {
+                            "name": "Zostel Varkala",
+                            "cost": 400,
+                            "amenities": [
+                                "Cliff view",
+                                "Yoga deck",
+                                "Cafe"
+                            ],
+                            "rating": 4.5
+                        },
+                        {
+                            "name": "Hostel by the Sea",
+                            "cost": 380,
+                            "amenities": [
+                                "Beach access",
+                                "Surf boards"
+                            ],
+                            "rating": 4.2
+                        }
+                    ],
+                    "activities": [
+                        {
+                            "name": "Cliff Walk",
+                            "cost": 0,
+                            "duration": "2km North Cliff",
+                            "bestTime": "Sunset"
+                        },
+                        {
+                            "name": "Surf Lessons",
+                            "cost": 1500,
+                            "duration": "2hr",
+                            "school": "Varkala Surf Club"
+                        },
+                        {
+                            "name": "Yoga Session",
+                            "cost": 500,
+                            "duration": "1hr",
+                            "type": "Hatha/Vinyasa"
+                        },
+                        {
+                            "name": "Ayurvedic Massage",
+                            "cost": 2000,
+                            "duration": "90min",
+                            "type": "Full body"
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "Thekkady (Periyar)",
+                "type": "Wildlife & Spice 🐘",
+                "vibe": "Tiger reserve, spice plantations, tribal culture",
+                "whoShouldStay": [
+                    "Wildlife enthusiasts",
+                    "Nature lovers",
+                    "Adventure seekers"
+                ],
+                "budgetRange": {
+                    "hostel": 500,
+                    "treehouse": 2000,
+                    "resort": 4000
+                },
+                "distanceFromAirport": "4hr from COK",
+                "bestFor": [
+                    "Wildlife safari",
+                    "Spice tours",
+                    "Trekking",
+                    "Bamboo rafting"
+                ],
+                "travelerTips": [
+                    "Morning safaris best for wildlife",
+                    "Book jungle stays early",
+                    "Carry binoculars",
+                    "Try bamboo chicken curry"
+                ],
+                "specificPlaces": {
+                    "restaurants": [
+                        {
+                            "name": "Spice Garden Restaurant",
+                            "type": "Traditional",
+                            "cost": 400,
+                            "mustTry": "Bamboo chicken"
+                        },
+                        {
+                            "name": "Periyar Cafe",
+                            "type": "Eco-friendly",
+                            "cost": 300,
+                            "view": "Lake view"
+                        }
+                    ],
+                    "hostels": [
+                        {
+                            "name": "Green View Hostel",
+                            "cost": 500,
+                            "amenities": [
+                                "Jungle view",
+                                "Bonfire"
+                            ],
+                            "rating": 4.3
+                        }
+                    ],
+                    "activities": [
+                        {
+                            "name": "Periyar Lake Boat Safari",
+                            "cost": 450,
+                            "duration": "1.5hr",
+                            "see": "Elephants, bison, birds",
+                            "timing": "7AM & 1PM"
+                        },
+                        {
+                            "name": "Spice Plantation Tour",
+                            "cost": 500,
+                            "duration": "2hr",
+                            "touch": "Cardamom, pepper, vanilla"
+                        },
+                        {
+                            "name": "Bamboo Rafting",
+                            "cost": 750,
+                            "duration": "3hr",
+                            "includes": "Trek + rafting"
+                        },
+                        {
+                            "name": "Jungle Trek",
+                            "cost": 1000,
+                            "duration": "4hr",
+                            "guide": "Forest department"
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "Wayanad",
+                "type": "Misty Hills & Caves 🌄",
+                "vibe": "Ancient caves, waterfalls, lush forests",
+                "whoShouldStay": [
+                    "Trekkers",
+                    "History buffs",
+                    "Nature lovers"
+                ],
+                "budgetRange": {
+                    "hostel": 450,
+                    "resort": 3000,
+                    "homestay": 1200
+                },
+                "distanceFromAirport": "3hr from CCJ",
+                "bestFor": [
+                    "Edakkal Caves",
+                    "Chembra Peak",
+                    "Waterfalls",
+                    "Wildlife"
+                ],
+                "specificPlaces": {
+                    "activities": [
+                        {
+                            "name": "Edakkal Caves Trek",
+                            "cost": 150,
+                            "duration": "2hr",
+                            "see": "Neolithic carvings"
+                        },
+                        {
+                            "name": "Chembra Peak Trek",
+                            "cost": 1000,
+                            "duration": "6hr",
+                            "feature": "Heart-shaped lake"
+                        },
+                        {
+                            "name": "Soochipara Falls",
+                            "cost": 100,
+                            "bestTime": "Post-monsoon"
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "Kovalam Beach",
+                "type": "Lighthouse Beach Paradise 🏖️",
+                "vibe": "Touristy beaches, lighthouse views, water sports",
+                "whoShouldStay": [
+                    "Beach lovers",
+                    "Families",
+                    "Water sports enthusiasts"
+                ],
+                "budgetRange": {
+                    "hostel": 500,
+                    "resort": 3500,
+                    "homestay": 1500
+                },
+                "distanceFromAirport": "45min from TRV",
+                "bestFor": [
+                    "Swimming",
+                    "Surfing",
+                    "Sunset",
+                    "Lighthouse views"
+                ],
+                "specificPlaces": {
+                    "activities": [
+                        {
+                            "name": "Lighthouse Visit",
+                            "cost": 20,
+                            "timing": "3PM-5PM"
+                        },
+                        {
+                            "name": "Surfing Lessons",
+                            "cost": 1200,
+                            "duration": "2hr"
+                        }
+                    ]
+                }
+            }
+        ],
+        "transport": {
+            "scooter": {
+                "costPerDay": 500,
+                "recommended": false,
+                "reason": "Heavy rain common",
+                "bestFor": "Fort Kochi, Varkala, Kovalam"
+            },
+            "taxi": {
+                "avgCostPerTrip": 1200,
+                "kochiAlleppey": "₹3500 (2hr)",
+                "kochiMunnar": "₹5000 (4hr)",
+                "airportKochi": "₹1200",
+                "trivandrumVarkala": "₹2500 (1.5hr)"
+            },
+            "houseboat": {
+                "alleppey": "₹2000-15000",
+                "kumarakom": "₹3000-20000",
+                "kochi": "₹4000-25000"
+            },
+            "ktcBus": {
+                "alleppeyMunnar": "₹400 (7hr)",
+                "kochiThekkady": "₹350 (5hr)",
+                "trivandrumKovalam": "₹30 (1hr)",
+                "reliable": true
+            },
+            "ferry": {
+                "kochiFortKochi": "₹10 (30min)",
+                "alleppeyKumarakom": "₹50 (1hr)",
+                "frequency": "Every 30min"
+            }
+        },
+        "attractions": [
+            {
+                "name": "Alleppey Houseboat",
+                "type": "Backwater",
+                "openingHours": "24hr",
+                "cost": "₹2000-15000",
+                "bestTime": "Sunset departure"
+            },
+            {
+                "name": "Munnar Tea Gardens",
+                "type": "Plantation",
+                "openingHours": "Sunrise-sunset",
+                "bestView": "Pothamedu viewpoint"
+            },
+            {
+                "name": "Periyar Tiger Reserve",
+                "type": "Wildlife",
+                "openingHours": "6AM-6PM",
+                "boatSafari": "₹450"
+            },
+            {
+                "name": "Chinese Fishing Nets",
+                "type": "Heritage",
+                "location": "Fort Kochi",
+                "cost": "₹20/tip"
+            },
+            {
+                "name": "Varkala Cliff",
+                "type": "Beach",
+                "openingHours": "24hr",
+                "walk": "2km North Cliff"
+            },
+            {
+                "name": "Athirappilly Waterfalls",
+                "type": "Waterfall",
+                "distance": "55km Kochi",
+                "bestSeason": "Monsoon",
+                "entryFee": "₹50"
+            },
+            {
+                "name": "Padmanabhaswamy Temple",
+                "type": "Temple",
+                "location": "Trivandrum",
+                "dressCode": "Traditional attire"
+            },
+            {
+                "name": "Bekal Fort",
+                "type": "Heritage",
+                "location": "Kasaragod",
+                "bestTime": "Sunset"
+            }
+        ],
+        "travelClusters": [
+            {
+                "clusterName": "Golden Triangle Kerala",
+                "places": [
+                    "Kochi",
+                    "Alleppey",
+                    "Munnar",
+                    "Thekkady"
+                ],
+                "duration": "6D/5N",
+                "distance": "500km loop",
+                "vibe": "Complete Kerala experience",
+                "dayPlan": "D1 Kochi, D2-3 Alleppey houseboat, D4 Munnar, D5-6 Thekkady"
+            },
+            {
+                "clusterName": "South Kerala Beach Trail",
+                "places": [
+                    "Varkala",
+                    "Kovalam",
+                    "Kanyakumari"
+                ],
+                "duration": "4D/3N",
+                "vibe": "Cliff beaches + sunsets",
+                "dayPlan": "D1 Varkala, D2 Kovalam, D3 Kanyakumari, D4 Trivandrum"
+            },
+            {
+                "clusterName": "Northern Heritage Trail",
+                "places": [
+                    "Kozhikode",
+                    "Wayanad",
+                    "Bekal"
+                ],
+                "duration": "5D/4N",
+                "vibe": "History + hills",
+                "bestSeason": "Oct-Feb"
+            }
+        ],
+        "budgetTips": [
+            "Houseboat: 2hr sunset ₹2500 < overnight ₹12000",
+            "Homestays 60% cheaper than resorts",
+            "KSRTC buses ₹400 Alleppey-Munnar vs taxi ₹5000",
+            "Zostel network ₹400-500/night everywhere",
+            "Eat thali ₹150 vs tourist restaurants ₹600",
+            "Share autorickshaw Fort Kochi ₹30/person",
+            "Munnar tea museum ₹200 combo ticket",
+            "Periyar boat safari morning slot (more animals)",
+            "Varkala cliff walk free vs paid viewpoints",
+            "Kochi-Kumarakom houseboat ₹8000 (bargain)",
+            "Buy spices from local markets not tourist shops",
+            "Use ferry in Kochi instead of taxi"
+        ],
+        "hiddenGems": [
+            {
+                "name": "Gavi Forest",
+                "access": "4hr Thekkady",
+                "cost": 0,
+                "why": "Tiger reserve, camping, pristine"
+            },
+            {
+                "name": "Thenmala Dam",
+                "access": "1hr Kollam",
+                "cost": 30,
+                "why": "Rainforest, boating, butterflies"
+            },
+            {
+                "name": "Malampuzha Gardens",
+                "access": "Palakkad",
+                "cost": 20,
+                "why": "Fantasy park, ropeway"
+            },
+            {
+                "name": "Ponmudi Hills",
+                "access": "2hr Trivandrum",
+                "cost": 0,
+                "why": "Golden valley, trekking"
+            },
+            {
+                "name": "Munroe Island",
+                "access": "3hr Kollam",
+                "cost": 1000,
+                "why": "Backwater village, canoe tours"
+            },
+            {
+                "name": "Thattekad Bird Sanctuary",
+                "access": "2hr Kochi",
+                "cost": 100,
+                "why": "300+ bird species"
+            }
+        ],
+        "ayurvedaTips": {
+            "bestPlaces": [
+                "Kovalam",
+                "Varkala",
+                "Marari Beach",
+                "Alleppey"
+            ],
+            "massageCost": "₹2000-4000 (90min)",
+            "package": "₹25000/7days all inclusive",
+            "bestSeason": "Post-monsoon Oct-Mar",
+            "topCenters": [
+                "Kairali",
+                "Somatheeram",
+                "Ayurveda Mana"
+            ],
+            "treatments": [
+                "Abhyanga",
+                "Shirodhara",
+                "Panchakarma"
+            ]
+        },
+        "foodGuide": {
+            "mustTry": [
+                "Kappa (tapioca) + meen curry",
+                "Appam + vegetable stew",
+                "Malabar paratha",
+                "Prawns roast",
+                "Fish moilee",
+                "Payasam (dessert)",
+                "Beef fry + porotta",
+                "Kerala sadya",
+                "Karimeen pollichathu",
+                "Banana fritters"
+            ],
+            "streetFood": [
+                "Banana chips",
+                "Ada pradhaman",
+                "Jackfruit halwa",
+                "Sulaimani chai",
+                "Unniyappam"
+            ],
+            "restaurantTypes": [
+                "Thattukada (street stalls)",
+                "Military hotels",
+                "Traditional homes",
+                "Backwater cafes"
+            ]
+        },
+        "packingList": [
+            "Light cotton clothes",
+            "Raincoat/poncho",
+            "Mosquito repellent",
+            "Power bank (weak signals)",
+            "Comfortable walking shoes",
+            "Swimwear",
+            "Sunscreen SPF50+",
+            "Hat/cap",
+            "First aid kit",
+            "Universal adapter",
+            "Water bottle",
+            "Flip flops",
+            "Warm layer (for hills)"
+        ],
+        "emergencyContacts": {
+            "police": "100",
+            "ambulance": "108",
+            "touristHelpline": "1800-425-4747",
+            "keralaTourism": "0471-2321132"
+        },
+        "festivals": [
+            {
+                "name": "Onam",
+                "month": "Aug-Sep",
+                "highlights": "Sadya feast, Pookalam flowers, Snake boat race"
+            },
+            {
+                "name": "Theyyam",
+                "month": "Dec-Apr",
+                "location": "North Kerala",
+                "type": "Ritual art form"
+            },
+            {
+                "name": "Nehru Trophy",
+                "month": "August",
+                "location": "Alleppey",
+                "event": "Snake boat race"
+            }
+        ],
+        "languageGuide": {
+            "hello": "Namaskaram",
+            "thankYou": "Nanni",
+            "howMuch": "Vila ethra?",
+            "delicious": "Ruchi",
+            "yes": "Athe",
+            "no": "Alla"
+        },
+        "connectivity": {
+            "mobileNetworks": [
+                "Jio",
+                "Airtel",
+                "VI"
+            ],
+            "wifiAvailability": "Good in cities, limited in remote areas",
+            "simCard": "Available at airports with ID proof"
+        }
+    }
+}

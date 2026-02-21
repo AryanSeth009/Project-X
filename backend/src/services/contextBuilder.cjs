@@ -6,9 +6,15 @@ const path = require('path');
 
 // Map destination variations to dataset slugs (e.g. "North Goa" -> "goa")
 const DESTINATION_ALIASES = {
-  goa: ['goa', 'north goa', 'south goa', 'baga', 'anjuna', 'palolem', 'calangute'],
+  goa: ['goa', 'north goa', 'south goa', 'baga', 'anjuna', 'palolem', 'calangute', 'panjim', 'arambol'],
   manali: ['manali', 'old manali', 'solang', 'rohtang'],
   jaipur: ['jaipur', 'pink city', 'amer', 'rajasthan'],
+  jodhpur: ['jodhpur', 'blue city'],
+  udaipur: ['udaipur', 'city of lakes'],
+  jaisalmer: ['jaisalmer', 'golden city'],
+  shimla: ['shimla', 'kufri'],
+  kashmir: ['kashmir', 'srinagar', 'gulmarg', 'pahalgam'],
+  kerala: ['kerala', 'alleppey', 'munnar', 'kochi', 'fort kochi', 'varkala', 'thekkady', 'wayanad', 'kovalam', 'kovalam beach', 'alappuzha']
 };
 
 function resolveDestinationSlug(destination) {
@@ -35,11 +41,12 @@ function loadGeoDataset(destination) {
 function buildRichContext(destination, structuredData, vectorInsights = []) {
   if (!structuredData) return null;
 
-  const areas = structuredData.areas || [];
-  const attractions = structuredData.attractions || [];
-  const travelClusters = structuredData.travelClusters || [];
-  const budgetTips = structuredData.budgetTips || [];
-  const hiddenGems = structuredData.hiddenGems || [];
+  const dataRoot = structuredData.completeTravelerGuide || structuredData;
+  const areas = dataRoot.areas || [];
+  const attractions = dataRoot.attractions || [];
+  const travelClusters = dataRoot.travelClusters || [];
+  const budgetTips = dataRoot.budgetTips || [];
+  const hiddenGems = dataRoot.hiddenGems || [];
 
   // Extract specific places (restaurants, hostels, activities) from areas
   const specificRestaurants = [];
@@ -81,6 +88,7 @@ function buildRichContext(destination, structuredData, vectorInsights = []) {
   });
 
   // Build rich context object
+  const transportData = structuredData.completeTravelerGuide?.transport || structuredData.transport;
   return {
     destination: structuredData.destination || destination,
     recommendedAreas: areas.map((a) => ({
@@ -91,12 +99,12 @@ function buildRichContext(destination, structuredData, vectorInsights = []) {
     })),
     avgHotelCost: areas.length > 0
       ? Math.round(
-          areas.reduce((sum, a) => sum + (a.budgetRange?.hotel || 0), 0) /
+          areas.reduce((sum, a) => sum + (a.budgetRange?.hotel || a.budgetRange?.resort || 0), 0) /
             areas.length,
         )
       : null,
-    scooterCost: structuredData.transport?.scooter?.costPerDay || null,
-    taxiCost: structuredData.transport?.taxi?.avgCostPerTrip || null,
+    scooterCost: transportData?.scooter?.costPerDay || null,
+    taxiCost: transportData?.taxi?.avgCostPerTrip || null,
     travelClusters: travelClusters.map((c) => ({
       clusterName: c.clusterName,
       places: c.places || [],
@@ -148,4 +156,5 @@ module.exports = {
   getGeoContext,
   buildRichContext,
   loadGeoDataset,
+  resolveDestinationSlug,
 };

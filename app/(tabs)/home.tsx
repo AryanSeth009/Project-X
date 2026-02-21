@@ -5,75 +5,120 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Sparkles, MapPin, Calendar, Users, Wallet, Heart, Info, MessageCircle, Home, X, ChevronLeft, ChevronRight, ChevronDown, TreePalm, Mountain, Landmark, Ship, Sun } from 'lucide-react-native';
 import { useStore } from '@/store/useStore';
 
-// Destinations supported by the app (matches geo-service / itinerary data)
-const DESTINATIONS = ['Goa', 'Manali', 'Jaipur', 'Kerala', 'Rajasthan'];
+// States and Cities supported by the app (matches geo-service / itinerary data)
+const STATES = ['Goa', 'Himachal Pradesh', 'Jammu & Kashmir', 'Kerala', 'Rajasthan'];
+
+const STATE_CITIES: Record<string, string[]> = {
+  'Goa': ['Baga', 'Anjuna', 'Palolem', 'Calangute', 'Goa'],
+  'Himachal Pradesh': ['Manali', 'Shimla'],
+  'Jammu & Kashmir': ['Srinagar', 'Gulmarg', 'Pahalgam', 'Kashmir'],
+  'Kerala': ['Alleppey', 'Munnar', 'Kochi', 'Varkala', 'Thekkady', 'Wayanad', 'Kovalam Beach', 'Kerala'],
+  'Rajasthan': ['Jaipur', 'Jodhpur', 'Udaipur', 'Jaisalmer'],
+};
+
+// All available destinations to support existing logic if needed
+const DESTINATIONS = Object.values(STATE_CITIES).flat();
 
 const DESTINATION_DESCRIPTIONS: Record<string, string> = {
   Goa: 'Beaches, chill, clubs',
+  Baga: 'Vibrant nightlife, water sports',
+  Anjuna: 'Flea markets, trance, backpackers',
+  Palolem: 'Peaceful beaches, yoga, nature',
+  Calangute: 'Shopping, commercial beach, food',
   Manali: 'Mountains, adventure, snow',
+  Shimla: 'Colonial charm, hills, snow',
+  Kashmir: 'Paradise on earth, valleys, lakes',
+  Srinagar: 'Houseboats, Dal Lake, gardens',
+  Gulmarg: 'Skiing, gondola, snow',
+  Pahalgam: 'Valleys, rivers, trekking',
   Jaipur: 'Heritage, palaces, bazaars',
+  Jodhpur: 'Blue city, forts, culture',
+  Udaipur: 'City of lakes, romance, palaces',
+  Jaisalmer: 'Golden city, desert, camel safari',
   Kerala: 'Backwaters, nature, houseboats',
-  Rajasthan: 'Desert, forts, culture',
+  Alleppey: 'Houseboats, backwaters, serene',
+  Munnar: 'Tea estates, misty hills, nature',
+  Kochi: 'Heritage, history, Chinese fishing nets',
+  Varkala: 'Cliffs, beaches, yoga retreats',
+  Thekkady: 'Wildlife, spice plantations, nature',
+  Wayanad: 'Hills, caves, waterfalls',
+  'Kovalam Beach': 'Lighthouse, surfing, beaches',
+  Rajasthan: 'Desert, forts, culture', // Fallback
 };
 
 const ICON_COLOR = '#4CAF50';
 
 const DESTINATION_ICONS: Record<string, typeof TreePalm> = {
   Goa: TreePalm,
+  Baga: TreePalm,
+  Anjuna: TreePalm,
+  Palolem: TreePalm,
+  Calangute: TreePalm,
   Manali: Mountain,
+  Shimla: Mountain,
+  Kashmir: Mountain,
+  Srinagar: Ship,
+  Gulmarg: Mountain,
+  Pahalgam: Mountain,
   Jaipur: Landmark,
+  Jodhpur: Landmark,
+  Udaipur: Landmark,
+  Jaisalmer: Sun,
   Kerala: Ship,
+  Alleppey: Ship,
+  Munnar: Mountain,
+  Kochi: Landmark,
+  Varkala: TreePalm,
+  Thekkady: TreePalm,
+  Wayanad: Mountain,
+  'Kovalam Beach': TreePalm,
   Rajasthan: Sun,
 };
 
+// Common interets array for parent propagation
+const goaInterests = ['Beach', 'Nightlife', 'Relaxation', 'Food', 'Nature', 'Shopping', 'Culture', 'History'];
+const keralaInterests = ['Nature', 'River', 'Lake', 'Forest', 'Relaxation', 'Culture', 'Food'];
+const kashmirInterests = ['Mountain', 'Lake', 'Nature', 'Culture', 'Food', 'Shopping', 'Relaxation'];
+
 // Interests that are actually available at each destination (aligned with geo-service tags & attractions)
 const DESTINATION_INTERESTS: Record<string, string[]> = {
-  Goa: [
-    'Beach',
-    'Nightlife',
-    'Relaxation',
-    'Food',
-    'Nature',
-    'Shopping',
-    'Culture',
-    'History',
-  ],
+  Goa: goaInterests,
+  Baga: goaInterests,
+  Anjuna: goaInterests,
+  Palolem: goaInterests,
+  Calangute: goaInterests,
   Manali: [
-    'Mountain',
-    'Adventure',
-    'Nature',
-    'Food',
-    'Shopping',
-    'Relaxation',
-    'History',
-    'Culture',
+    'Mountain', 'Adventure', 'Nature', 'Food', 'Shopping', 'Relaxation', 'History', 'Culture',
   ],
+  Shimla: [
+    'Mountain', 'History', 'Culture', 'Nature', 'Shopping', 'Relaxation',
+  ],
+  Kashmir: kashmirInterests,
+  Srinagar: kashmirInterests,
+  Gulmarg: kashmirInterests,
+  Pahalgam: kashmirInterests,
   Jaipur: [
-    'History',
-    'Culture',
-    'Shopping',
-    'Food',
-    'City',
-    'Temple',
+    'History', 'Culture', 'Shopping', 'Food', 'City', 'Temple',
   ],
-  Kerala: [
-    'Nature',
-    'River',
-    'Lake',
-    'Forest',
-    'Relaxation',
-    'Culture',
-    'Food',
+  Jodhpur: [
+    'History', 'Culture', 'Shopping', 'Food', 'Adventure', 'City',
   ],
+  Udaipur: [
+    'Lake', 'History', 'Culture', 'Food', 'Relaxation', 'Shopping', 'City',
+  ],
+  Jaisalmer: [
+    'Desert', 'Adventure', 'History', 'Culture', 'Shopping',
+  ],
+  Kerala: keralaInterests,
+  Alleppey: keralaInterests,
+  Munnar: keralaInterests,
+  Kochi: keralaInterests,
+  Varkala: keralaInterests,
+  Thekkady: keralaInterests,
+  Wayanad: keralaInterests,
+  'Kovalam Beach': keralaInterests,
   Rajasthan: [
-    'Desert',
-    'History',
-    'Culture',
-    'Adventure',
-    'Shopping',
-    'Food',
-    'City',
-    'Temple',
+    'Desert', 'History', 'Culture', 'Adventure', 'Shopping', 'Food', 'City', 'Temple',
   ],
 };
 
@@ -122,6 +167,7 @@ function filterDestinations(query: string): string[] {
 export default function HomeScreen() {
   const router = useRouter();
   const [step, setStep] = useState<1 | 2>(1);
+  const [selectedState, setSelectedState] = useState('');
   const [destination, setDestination] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -132,17 +178,45 @@ export default function HomeScreen() {
   const [stayLocation, setStayLocation] = useState('');
   const [itineraryStyle, setItineraryStyle] = useState<'day-wise' | 'top-10'>('day-wise');
   const [areaOptions, setAreaOptions] = useState<{ name: string; type: string }[]>([]);
+  
+  const [showStateDropdown, setShowStateDropdown] = useState(false);
   const [showDestinationDropdown, setShowDestinationDropdown] = useState(false);
+  
+  const stateInputRef = useRef<TextInput>(null);
+  const stateBlurRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  
   const destinationInputRef = useRef<TextInput>(null);
   const destinationBlurRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const filteredDestinations = useMemo(
-    () => filterDestinations(destination),
-    [destination]
+  const filteredStates = useMemo(() => {
+    const q = selectedState.trim().toLowerCase();
+    if (!q) return STATES;
+    return STATES.filter(s => s.toLowerCase().includes(q));
+  }, [selectedState]);
+
+  const isValidState = useMemo(
+    () => STATES.some((s) => s.toLowerCase() === selectedState.trim().toLowerCase()),
+    [selectedState]
   );
+
+  const activeCityList = useMemo(() => {
+    if (isValidState) {
+      const stateKey = STATES.find(s => s.toLowerCase() === selectedState.trim().toLowerCase());
+      return stateKey ? STATE_CITIES[stateKey] : [];
+    }
+    return [];
+  }, [isValidState, selectedState]);
+
+  const filteredDestinations = useMemo(() => {
+    const q = destination.trim().toLowerCase();
+    if (!q) return activeCityList;
+    return activeCityList.filter(c => c.toLowerCase().includes(q));
+  }, [destination, activeCityList]);
+
   const isValidDestination = useMemo(
-    () => DESTINATIONS.some((d) => d.toLowerCase() === destination.trim().toLowerCase()),
-    [destination]
+    () => DESTINATIONS.some((d) => d.toLowerCase() === destination.trim().toLowerCase()) && 
+          activeCityList.some(c => c.toLowerCase() === destination.trim().toLowerCase()),
+    [destination, activeCityList]
   );
 
   // Only show interests that exist at the selected destination (step 2)
@@ -191,12 +265,12 @@ export default function HomeScreen() {
   };
 
   const handleNext = async () => {
-    if (!destination || !startDate || !endDate) {
-      Alert.alert('Missing Information', 'Please fill destination and dates.');
+    if (!selectedState || !destination || !startDate || !endDate) {
+      Alert.alert('Missing Information', 'Please fill state, city, and dates.');
       return;
     }
-    if (!isValidDestination) {
-      Alert.alert('Select a destination', 'Please choose a destination from the dropdown (e.g. Goa, Kerala, Rajasthan).');
+    if (!isValidState || !isValidDestination) {
+      Alert.alert('Invalid Selection', 'Please select a valid State and City from the dropdown.');
       return;
     }
     setStep(2);
@@ -293,125 +367,232 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
             {step === 1 ? (
               <>
                 <View>
-                  <View className="flex-row items-center gap-2 mb-2">
-                    <MapPin size={18} color="#F39C12" />
-                    <Text className="font-inter-semibold" style={{ color: '#F5F5DC' }}>
-                      Where do you wanna go?
-                    </Text>
-                  </View>
-                  <View className="relative" style={{ zIndex: showDestinationDropdown ? 1000 : 0 }} collapsable={false}>
-                    <TextInput
-                      ref={destinationInputRef}
-                      className="font-inter rounded-t-xl px-4 py-3 pr-10"
-                      style={{
-                        backgroundColor: '#1A1C19',
-                        borderWidth: 1,
-                        borderColor: showDestinationDropdown ? '#4CAF50' : '#242922',
-                        color: '#F5F5DC',
-                        borderBottomWidth: showDestinationDropdown && filteredDestinations.length > 0 ? 0 : 1,
-                      }}
-                      placeholder="Type or select: Goa, Kerala, Rajasthan..."
-                      placeholderTextColor="#9CA3AF"
-                      value={destination}
-                      onChangeText={(text) => {
-                        setDestination(text);
-                        setShowDestinationDropdown(true);
-                      }}
-                      onFocus={() => {
-                        if (destinationBlurRef.current) {
-                          clearTimeout(destinationBlurRef.current);
-                          destinationBlurRef.current = null;
-                        }
-                        setShowDestinationDropdown(true);
-                      }}
-                      onBlur={() => {
-                        destinationBlurRef.current = setTimeout(() => {
-                          setShowDestinationDropdown(false);
-                          destinationBlurRef.current = null;
-                        }, 500);
-                      }}
-                    />
-                    <View className="absolute right-3 top-0 bottom-0 justify-center pointer-events-none">
-                      <ChevronDown size={20} color="#9CA3AF" />
+                  <View className="mb-4">
+                    <View className="flex-row items-center gap-2 mb-2">
+                      <MapPin size={18} color="#F39C12" />
+                      <Text className="font-inter-semibold" style={{ color: '#F5F5DC' }}>
+                        State
+                      </Text>
                     </View>
-                    {showDestinationDropdown && (
-                      <View
-                        className="rounded-b-xl border-x border-b overflow-hidden"
+                    <View className="relative" style={{ zIndex: showStateDropdown ? 1000 : 0 }} collapsable={false}>
+                      <TextInput
+                        ref={stateInputRef}
+                        className="font-inter rounded-xl px-4 py-3 pr-10"
                         style={{
                           backgroundColor: '#1A1C19',
-                          borderColor: '#242922',
                           borderWidth: 1,
-                          maxHeight: 260,
-                          zIndex: 1001,
-                          elevation: 8,
+                          borderColor: showStateDropdown ? '#4CAF50' : '#242922',
+                          color: '#F5F5DC',
+                          borderBottomWidth: showStateDropdown && filteredStates.length > 0 ? 0 : 1,
+                          borderBottomLeftRadius: showStateDropdown && filteredStates.length > 0 ? 0 : 12,
+                          borderBottomRightRadius: showStateDropdown && filteredStates.length > 0 ? 0 : 12,
                         }}
-                        pointerEvents="auto"
-                      >
-                        <ScrollView
-                          keyboardShouldPersistTaps="always"
-                          nestedScrollEnabled
-                          scrollEnabled={true}
-                          style={{ maxHeight: 260 }}
-                          showsVerticalScrollIndicator={true}
-                        >
-                          {filteredDestinations.length === 0 ? (
-                            <View className="px-4 py-3">
-                              <Text className="font-inter text-sm" style={{ color: '#9CA3AF' }}>
-                                No matches. Try: Goa, Kerala, Rajasthan, Manali, Jaipur
-                              </Text>
-                            </View>
-                          ) : (
-                            filteredDestinations.map((name) => {
-                              const IconComponent = DESTINATION_ICONS[name];
-                              return (
-                                <TouchableOpacity
-                                  key={name}
-                                  activeOpacity={0.7}
-                                  className="px-4 py-3.5 flex-row items-center gap-3"
-                                  style={{
-                                    backgroundColor: name === destination ? 'rgba(76, 175, 80, 0.2)' : 'transparent',
-                                    borderBottomWidth: 1,
-                                    borderBottomColor: '#242922',
-                                    minHeight: 56,
-                                  }}
-                                  onPress={() => {
-                                    if (destinationBlurRef.current) {
-                                      clearTimeout(destinationBlurRef.current);
-                                      destinationBlurRef.current = null;
-                                    }
-                                    setDestination(name);
-                                    setShowDestinationDropdown(false);
-                                    destinationInputRef.current?.blur();
-                                  }}
-                                >
-                                  {IconComponent ? (
-                                    <View style={{ width: 28, alignItems: 'center' }}>
-                                      <IconComponent size={22} color={ICON_COLOR} />
-                                    </View>
-                                  ) : null}
-                                  <View className="flex-1">
-                                    <Text className="font-inter" style={{ color: '#F5F5DC' }}>
-                                      {name}
-                                    </Text>
-                                    <Text className="font-inter text-xs mt-0.5" style={{ color: '#9CA3AF' }} numberOfLines={1}>
-                                      {DESTINATION_DESCRIPTIONS[name] ?? ''}
-                                    </Text>
-                                  </View>
-                                  {name === destination ? (
-                                    <Text className="font-inter-semibold text-xs" style={{ color: '#4CAF50' }}>Selected</Text>
-                                  ) : null}
-                                </TouchableOpacity>
-                              );
-                            })
-                          )}
-                        </ScrollView>
+                        placeholder="Type or select a state..."
+                        placeholderTextColor="#9CA3AF"
+                        value={selectedState}
+                        onChangeText={(text) => {
+                          setSelectedState(text);
+                          setShowStateDropdown(true);
+                          setDestination('');
+                        }}
+                        onFocus={() => {
+                          if (stateBlurRef.current) {
+                            clearTimeout(stateBlurRef.current);
+                            stateBlurRef.current = null;
+                          }
+                          setShowStateDropdown(true);
+                        }}
+                        onBlur={() => {
+                          stateBlurRef.current = setTimeout(() => {
+                            setShowStateDropdown(false);
+                            stateBlurRef.current = null;
+                          }, 200);
+                        }}
+                      />
+                      <View className="absolute right-3 top-0 bottom-0 justify-center pointer-events-none">
+                        <ChevronDown size={20} color="#9CA3AF" />
                       </View>
-                    )}
+                      {showStateDropdown && (
+                        <View
+                          className="rounded-b-xl border-x border-b overflow-hidden absolute top-full left-0 right-0"
+                          style={{
+                            backgroundColor: '#1A1C19',
+                            borderColor: '#242922',
+                            borderWidth: 1,
+                            maxHeight: 200,
+                            zIndex: 1001,
+                            elevation: 8,
+                          }}
+                          pointerEvents="auto"
+                        >
+                          <ScrollView
+                            keyboardShouldPersistTaps="always"
+                            nestedScrollEnabled
+                            style={{ maxHeight: 200 }}
+                          >
+                            {filteredStates.map((name) => (
+                              <TouchableOpacity
+                                key={name}
+                                activeOpacity={0.7}
+                                className="px-4 py-3 flex-row items-center gap-3"
+                                style={{
+                                  backgroundColor: name === selectedState ? 'rgba(76, 175, 80, 0.2)' : 'transparent',
+                                  borderBottomWidth: 1,
+                                  borderBottomColor: '#242922',
+                                }}
+                                onPress={() => {
+                                  if (stateBlurRef.current) {
+                                    clearTimeout(stateBlurRef.current);
+                                    stateBlurRef.current = null;
+                                  }
+                                  setSelectedState(name);
+                                  setShowStateDropdown(false);
+                                  stateInputRef.current?.blur();
+                                  
+                                  const cities = STATE_CITIES[name];
+                                  if (cities && cities.length === 1) {
+                                    setDestination(cities[0]);
+                                  } else {
+                                    setDestination('');
+                                  }
+                                }}
+                              >
+                                <Text className="font-inter flex-1" style={{ color: '#F5F5DC' }}>
+                                  {name}
+                                </Text>
+                                {name === selectedState ? (
+                                  <Text className="font-inter-semibold text-xs" style={{ color: '#4CAF50' }}>Selected</Text>
+                                ) : null}
+                              </TouchableOpacity>
+                            ))}
+                          </ScrollView>
+                        </View>
+                      )}
+                    </View>
                   </View>
-                  {destination.length > 0 && !isValidDestination && (
-                    <Text className="font-inter text-xs mt-1.5" style={{ color: '#F39C12' }}>
-                      Select a destination from the dropdown to continue
-                    </Text>
+
+                  {isValidState && activeCityList.length > 0 && (
+                    <View className="mb-4">
+                      <View className="flex-row items-center gap-2 mb-2">
+                        <MapPin size={18} color="#4CAF50" />
+                        <Text className="font-inter-semibold" style={{ color: '#F5F5DC' }}>
+                          City / Region
+                        </Text>
+                      </View>
+                      <View className="relative" style={{ zIndex: showDestinationDropdown ? 999 : 0 }} collapsable={false}>
+                        <TextInput
+                          ref={destinationInputRef}
+                          className="font-inter rounded-xl px-4 py-3 pr-10"
+                          style={{
+                            backgroundColor: '#1A1C19',
+                            borderWidth: 1,
+                            borderColor: showDestinationDropdown ? '#4CAF50' : '#242922',
+                            color: '#F5F5DC',
+                            borderBottomWidth: showDestinationDropdown && filteredDestinations.length > 0 ? 0 : 1,
+                            borderBottomLeftRadius: showDestinationDropdown && filteredDestinations.length > 0 ? 0 : 12,
+                            borderBottomRightRadius: showDestinationDropdown && filteredDestinations.length > 0 ? 0 : 12,
+                          }}
+                          placeholder={`Select city in ${selectedState}...`}
+                          placeholderTextColor="#9CA3AF"
+                          value={destination}
+                          onChangeText={(text) => {
+                            setDestination(text);
+                            setShowDestinationDropdown(true);
+                          }}
+                          onFocus={() => {
+                            if (destinationBlurRef.current) {
+                              clearTimeout(destinationBlurRef.current);
+                              destinationBlurRef.current = null;
+                            }
+                            setShowDestinationDropdown(true);
+                          }}
+                          onBlur={() => {
+                            destinationBlurRef.current = setTimeout(() => {
+                              setShowDestinationDropdown(false);
+                              destinationBlurRef.current = null;
+                            }, 200);
+                          }}
+                        />
+                        <View className="absolute right-3 top-0 bottom-0 justify-center pointer-events-none">
+                          <ChevronDown size={20} color="#9CA3AF" />
+                        </View>
+                        {showDestinationDropdown && (
+                          <View
+                            className="rounded-b-xl border-x border-b overflow-hidden absolute top-full left-0 right-0"
+                            style={{
+                              backgroundColor: '#1A1C19',
+                              borderColor: '#242922',
+                              borderWidth: 1,
+                              maxHeight: 260,
+                              zIndex: 1000,
+                              elevation: 8,
+                            }}
+                            pointerEvents="auto"
+                          >
+                            <ScrollView
+                              keyboardShouldPersistTaps="always"
+                              nestedScrollEnabled
+                              style={{ maxHeight: 260 }}
+                            >
+                              {filteredDestinations.length === 0 ? (
+                                <View className="px-4 py-3">
+                                  <Text className="font-inter text-sm" style={{ color: '#9CA3AF' }}>
+                                    No matches found.
+                                  </Text>
+                                </View>
+                              ) : (
+                                filteredDestinations.map((name) => {
+                                  const IconComponent = DESTINATION_ICONS[name];
+                                  return (
+                                    <TouchableOpacity
+                                      key={name}
+                                      activeOpacity={0.7}
+                                      className="px-4 py-3.5 flex-row items-center gap-3"
+                                      style={{
+                                        backgroundColor: name === destination ? 'rgba(76, 175, 80, 0.2)' : 'transparent',
+                                        borderBottomWidth: 1,
+                                        borderBottomColor: '#242922',
+                                      }}
+                                      onPress={() => {
+                                        if (destinationBlurRef.current) {
+                                          clearTimeout(destinationBlurRef.current);
+                                          destinationBlurRef.current = null;
+                                        }
+                                        setDestination(name);
+                                        setShowDestinationDropdown(false);
+                                        destinationInputRef.current?.blur();
+                                      }}
+                                    >
+                                      {IconComponent ? (
+                                        <View style={{ width: 28, alignItems: 'center' }}>
+                                          <IconComponent size={22} color={ICON_COLOR} />
+                                        </View>
+                                      ) : null}
+                                      <View className="flex-1">
+                                        <Text className="font-inter" style={{ color: '#F5F5DC' }}>
+                                          {name}
+                                        </Text>
+                                        <Text className="font-inter text-xs mt-0.5" style={{ color: '#9CA3AF' }} numberOfLines={1}>
+                                          {DESTINATION_DESCRIPTIONS[name] ?? ''}
+                                        </Text>
+                                      </View>
+                                      {name === destination ? (
+                                        <Text className="font-inter-semibold text-xs" style={{ color: '#4CAF50' }}>Selected</Text>
+                                      ) : null}
+                                    </TouchableOpacity>
+                                  );
+                                })
+                              )}
+                            </ScrollView>
+                          </View>
+                        )}
+                      </View>
+                      {destination.length > 0 && !isValidDestination && (
+                        <Text className="font-inter text-xs mt-1.5" style={{ color: '#F39C12' }}>
+                          Select a city from the dropdown to continue
+                        </Text>
+                      )}
+                    </View>
                   )}
                 </View>
 
