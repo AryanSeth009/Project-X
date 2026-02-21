@@ -8,6 +8,7 @@ export interface ItineraryFormData {
   personalPrompt?: string;
   /** Optional: where user is staying (e.g. Baga, Anjuna) - used to tailor Day 1 */
   stayLocation?: string;
+  itineraryStyle?: 'day-wise' | 'top-10';
 }
 
 export interface GeneratedActivity {
@@ -646,7 +647,7 @@ class ItineraryGenerator {
         cost: activity.cost,
         category: activity.category,
         order_index: index,
-        image_url: this.getRandomImage(activity.category),
+        image_url: this.getRandomImage(activity),
       });
 
       // 30-minute break between activities
@@ -656,19 +657,27 @@ class ItineraryGenerator {
     return result;
   }
 
-  private getRandomImage(category: string): string {
-    const imageMap: Record<string, string> = {
-      attraction:
-        'https://images.pexels.com/photos/2166553/pexels-photo-2166553.jpeg',
-      food: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
-      activity:
-        'https://images.pexels.com/photos/1659438/pexels-photo-1659438.jpeg',
-      transport:
-        'https://images.pexels.com/photos/1550372/pexels-photo-1550372.jpeg',
-      accommodation:
-        'https://images.pexels.com/photos/271643/pexels-photo-271643.jpeg',
-    };
-    return imageMap[category] || imageMap.attraction;
+  private getRandomImage(activity: any): string {
+    const title = activity.name || activity.title || '';
+    const category = activity.category || 'travel';
+    const keywords = ['aerial', 'landscape', 'landmark', 'scenic', '4k', 'travel'];
+    
+    // Use hash for stable but "random" keywords
+    const hash = this.getHash(title);
+    const k1 = keywords[hash % keywords.length];
+    const k2 = keywords[(hash + 1) % keywords.length];
+    
+    const query = `${encodeURIComponent(title || category)} ${k1} ${k2}`;
+    return `https://source.unsplash.com/800x600/?${query}`;
+  }
+
+  private getHash(str: string): number {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = ((hash << 5) - hash) + str.charCodeAt(i);
+      hash |= 0;
+    }
+    return Math.abs(hash);
   }
 
   private getDayTitle(dayNumber: number, destination: string): string {
@@ -827,6 +836,33 @@ class ItineraryGenerator {
 
     const generatedDays: GeneratedDay[] = [];
     const usedActivityNames = new Set<string>();
+
+    if (formData.itineraryStyle === 'top-10') {
+      // Pick top 10 activities
+      const top10Activities = [...filteredByBudget]
+        .sort((a, b) => (b.score || 1) - (a.score || 1))
+        .slice(0, 10);
+      
+      const timeSlots = this.generateTimeSlots(top10Activities);
+      
+      generatedDays.push({
+        day_number: 1,
+        date: startDate.toISOString().split('T')[0],
+        title: `Top 10 Places to Visit in ${formData.destination}`,
+        activities: timeSlots,
+      });
+      
+      return {
+        title: `Top 10 Spots in ${formData.destination}`,
+        destination: formData.destination,
+        start_date: formData.startDate,
+        end_date: formData.endDate,
+        budget: budget,
+        travelers: travelers,
+        preferences: formData.interests,
+        days: generatedDays,
+      };
+    }
 
     for (let day = 1; day <= days; day++) {
       const currentDate = new Date(startDate);

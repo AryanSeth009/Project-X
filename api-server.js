@@ -271,6 +271,7 @@ app.post('/itinerary/generate', async (req, res) => {
       interests,
       personalPrompt,
       stayLocation,
+      itineraryStyle,
     } = req.body || {};
 
     // Step 1: Validate input
@@ -328,6 +329,7 @@ app.post('/itinerary/generate', async (req, res) => {
       interests: interests || [],
       personalPrompt: personalPrompt || '',
       stayLocation: stayLocation ? String(stayLocation).trim() : '',
+      itineraryStyle: itineraryStyle || 'day-wise',
     };
 
     // Step 2: Call Geo Service (uses Supabase destination_contexts if configured, else static datasets)

@@ -8,7 +8,11 @@ import {
   Share,
   TextInput,
   Alert,
+  Modal,
+  Linking,
+  Platform,
 } from 'react-native';
+import { BlurView } from 'expo-blur';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
@@ -23,6 +27,11 @@ import {
   Plus,
   Trash2,
   GripVertical,
+  ChevronRight,
+  ChevronUp,
+  ChevronDown,
+  Navigation,
+  ExternalLink,
 } from 'lucide-react-native';
 import { useStore } from '@/store/useStore';
 import { supabase } from '@/lib/supabase';
@@ -55,7 +64,7 @@ type ItineraryListItem = {
 export default function ItineraryScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { currentItinerary, user, itineraries, setCurrentItinerary } = useStore();
+  const { currentItinerary, user, itineraries, setCurrentItinerary, deleteItinerary } = useStore();
   const [loading, setLoading] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [history, setHistory] = useState<ItineraryListItem[]>([]);
@@ -64,6 +73,8 @@ export default function ItineraryScreen() {
   const [editingDay, setEditingDay] = useState<any>(null);
   const [editingActivity, setEditingActivity] = useState<any>(null);
   const [showAddActivity, setShowAddActivity] = useState(false);
+  const [selectedActivity, setSelectedActivity] = useState<any>(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
   const [newActivity, setNewActivity] = useState({
     title: '',
     description: '',
@@ -337,6 +348,96 @@ export default function ItineraryScreen() {
     }
   };
 
+  const handleDeleteItinerary = async (itineraryId: string) => {
+    Alert.alert(
+      'Delete Itinerary',
+      'Are you sure you want to delete this itinerary? This action cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const { error } = await supabase
+                .from('itineraries')
+                .delete()
+                .eq('id', itineraryId);
+
+              if (error) throw error;
+
+              // Update local state
+              setHistory((prev) => prev.filter((it) => it.id !== itineraryId));
+              deleteItinerary(itineraryId);
+
+              // If the deleted one was current, reset current
+              if (currentItinerary?.id === itineraryId) {
+                setCurrentItinerary(null);
+              }
+              
+              Alert.alert('Deleted', 'Itinerary has been removed.');
+            } catch (e) {
+              console.error('Error deleting itinerary:', e);
+              Alert.alert('Error', 'Failed to delete itinerary.');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleMoveActivity = async (dayId: string, activityId: string, direction: 'up' | 'down') => {
+    if (!currentItinerary) return;
+
+    const day = currentItinerary.days.find(d => d.id === dayId);
+    if (!day) return;
+
+    const activities = [...day.activities].sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
+    const currentIndex = activities.findIndex(a => a.id === activityId);
+    
+    if (direction === 'up' && currentIndex === 0) return;
+    if (direction === 'down' && currentIndex === activities.length - 1) return;
+
+    const swapIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+    const currentActivity = activities[currentIndex];
+    const targetActivity = activities[swapIndex];
+
+    // Swap order_index
+    const newCurrentOrder = targetActivity.order_index || 0;
+    const newTargetOrder = currentActivity.order_index || 0;
+
+    try {
+      // Update both in Supabase
+      const { error: error1 } = await supabase
+        .from('activities')
+        .update({ order_index: newCurrentOrder })
+        .eq('id', currentActivity.id);
+
+      const { error: error2 } = await supabase
+        .from('activities')
+        .update({ order_index: newTargetOrder })
+        .eq('id', targetActivity.id);
+
+      if (error1 || error2) throw error1 || error2;
+
+      // Update local state
+      const updatedActivities = activities.map(a => {
+        if (a.id === currentActivity.id) return { ...a, order_index: newCurrentOrder };
+        if (a.id === targetActivity.id) return { ...a, order_index: newTargetOrder };
+        return a;
+      }).sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
+
+      const updatedDays = currentItinerary.days.map(d => 
+        d.id === dayId ? { ...d, activities: updatedActivities } : d
+      );
+
+      setCurrentItinerary({ ...currentItinerary, days: updatedDays });
+    } catch (e) {
+      console.error('Error reordering activities:', e);
+      Alert.alert('Error', 'Failed to reorder activities.');
+    }
+  };
+
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-gray-50">
@@ -375,6 +476,24 @@ export default function ItineraryScreen() {
     if (p === 'local') return 'Generated locally';
     return null;
   })();
+
+  const openInMaps = (location: string) => {
+    const scheme = Platform.select({ ios: 'maps:0,0?q=', android: 'geo:0,0?q=' });
+    const latLng = `${0},${0}`;
+    const label = location;
+    const url = Platform.select({
+      ios: `${scheme}${label}@${latLng}`,
+      android: `${scheme}${latLng}(${label})`,
+    });
+
+    if (url) {
+      Linking.openURL(url);
+    } else {
+      // Fallback for web or other platforms
+      const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
+      Linking.openURL(googleMapsUrl);
+    }
+  };
 
   return (
     <ScrollView className="flex-1 bg-gray-50" showsVerticalScrollIndicator={false}>
@@ -432,21 +551,42 @@ export default function ItineraryScreen() {
               {(history.length ? history : (itineraries as any)).slice(0, 20).map((it: any) => {
                 const isActive = it.id === currentItinerary.id;
                 return (
-                  <TouchableOpacity
-                    key={it.id}
-                    className={`px-4 py-3 rounded-2xl border ${
-                      isActive ? 'bg-saffron-50 border-saffron-300' : 'bg-white border-gray-200'
-                    }`}
-                    onPress={() => loadItineraryById(it.id)}
-                    disabled={loadingHistory}
-                  >
-                    <Text className="font-inter-bold text-gray-800" numberOfLines={1}>
-                      {it.destination}
-                    </Text>
-                    <Text className="font-inter text-gray-500 text-xs mt-0.5" numberOfLines={1}>
-                      {it.start_date} → {it.end_date}
-                    </Text>
-                  </TouchableOpacity>
+                  <View key={it.id} className="mr-4">
+                    <TouchableOpacity
+                      className={`w-64 h-40 rounded-3xl overflow-hidden shadow-lg border-2 ${
+                        isActive ? 'border-saffron-500' : 'border-transparent'
+                      }`}
+                      onPress={() => loadItineraryById(it.id)}
+                      disabled={loadingHistory}
+                    >
+                      <Image
+                        source={{ uri: `https://source.unsplash.com/800x600/?${encodeURIComponent(it.destination)}` }}
+                        className="absolute inset-0 w-full h-full"
+                      />
+                      <LinearGradient
+                        colors={['transparent', 'rgba(0,0,0,0.8)']}
+                        className="absolute inset-0 p-4 justify-end"
+                      >
+                        <Text className="font-inter-bold text-white text-lg" numberOfLines={1}>
+                          {it.destination}
+                        </Text>
+                        <View className="flex-row items-center justify-between mt-1">
+                          <Text className="font-inter text-white/70 text-xs">
+                            {it.start_date}
+                          </Text>
+                          <TouchableOpacity 
+                            onPress={(e) => {
+                              e.stopPropagation();
+                              handleDeleteItinerary(it.id);
+                            }}
+                            className="bg-black/40 p-1.5 rounded-full"
+                          >
+                            <Trash2 size={14} color="#FF6B6B" />
+                          </TouchableOpacity>
+                        </View>
+                      </LinearGradient>
+                    </TouchableOpacity>
+                  </View>
                 );
               })}
             </View>
@@ -460,7 +600,7 @@ export default function ItineraryScreen() {
               <Text className="text-xs text-gray-500">Duration</Text>
             </View>
             <Text className="font-inter-bold text-lg text-gray-800">
-              {currentItinerary.days.length} Days
+              {(currentItinerary as any).title?.toLowerCase().includes('top 10') ? 'Top 10' : `${currentItinerary.days.length} Days`}
             </Text>
           </View>
           <View className="w-px bg-gray-200" />
@@ -510,7 +650,7 @@ export default function ItineraryScreen() {
                 <View className="bg-white rounded-t-2xl p-4 border-l-4 border-saffron-500">
                   <View className="flex-row items-center justify-between mb-1">
                     <Text className="font-inter-bold text-lg text-gray-800">
-                      Day {day.day_number}
+                      {(currentItinerary as any).title?.toLowerCase().includes('top 10') ? 'Top Recommended Spots' : `Day ${day.day_number}`}
                     </Text>
                     <Text className="text-sm text-gray-500">
                       {new Date(day.date).toLocaleDateString('en-IN', {
@@ -525,7 +665,13 @@ export default function ItineraryScreen() {
                 <View className="bg-white rounded-b-2xl px-4 pb-4 shadow-lg">
                   {day.activities.map((activity, actIndex) => (
                     <View key={activity.id || `activity-${day.id}-${actIndex}`}>
-                      <View className="flex-row gap-3 py-4">
+                      <TouchableOpacity 
+                        className="flex-row gap-3 py-4"
+                        onPress={() => {
+                          setSelectedActivity(activity);
+                          setShowDetailModal(true);
+                        }}
+                      >
                         <View className="items-center">
                           <View
                             className={`w-12 h-12 rounded-full ${
@@ -555,7 +701,7 @@ export default function ItineraryScreen() {
                               </View>
                               <View className="flex-row items-center gap-1">
                                 <MapPin size={12} color="#6B7280" />
-                                <Text className="text-xs text-gray-500">
+                                <Text className="text-xs text-gray-500" numberOfLines={1}>
                                   {activity.location}
                                 </Text>
                               </View>
@@ -564,6 +710,9 @@ export default function ItineraryScreen() {
                               <Text className="text-green-700 font-bold text-sm">
                                 ₹{activity.cost}
                               </Text>
+                            </View>
+                            <View className="ml-2 self-center">
+                              <ChevronRight size={18} color="#D1D5DB" />
                             </View>
                           </View>
 
@@ -575,11 +724,11 @@ export default function ItineraryScreen() {
                             />
                           )}
 
-                          <Text className="text-sm text-gray-600 leading-5">
+                          <Text className="text-sm text-gray-600 leading-5" numberOfLines={2}>
                             {activity.description}
                           </Text>
                         </View>
-                      </View>
+                      </TouchableOpacity>
                       {actIndex < day.activities.length - 1 && (
                         <View className="h-px bg-gray-100" />
                       )}
@@ -588,6 +737,96 @@ export default function ItineraryScreen() {
                 </View>
               </View>
             ))}
+
+            {/* Activity Detail Modal */}
+            <Modal
+              visible={showDetailModal}
+              transparent
+              animationType="slide"
+              onRequestClose={() => setShowDetailModal(false)}
+            >
+              <View className="flex-1 bg-black/60 justify-end">
+                <View className="bg-white h-[90%] rounded-t-[40px] overflow-hidden">
+                  <ScrollView showsVerticalScrollIndicator={false}>
+                    {/* Header Image */}
+                    <View className="h-80 w-full relative">
+                      <Image
+                        source={{ uri: selectedActivity?.image_url || `https://source.unsplash.com/800x600/?${encodeURIComponent(selectedActivity?.title || 'travel')}` }}
+                        className="w-full h-full"
+                        resizeMode="cover"
+                      />
+                      <BlurView intensity={30} className="absolute top-12 left-6 rounded-full overflow-hidden">
+                        <TouchableOpacity 
+                          onPress={() => setShowDetailModal(false)}
+                          className="w-12 h-12 items-center justify-center"
+                        >
+                          <ChevronRight size={24} color="white" style={{ transform: [{rotate: '180deg'}] }} />
+                        </TouchableOpacity>
+                      </BlurView>
+
+                      <LinearGradient
+                        colors={['transparent', 'white']}
+                        className="absolute bottom-0 left-0 right-0 h-24"
+                      />
+                    </View>
+
+                    {/* Content */}
+                    <View className="px-8 pb-12">
+                      <View className="flex-row justify-between items-start mb-6">
+                        <View className="flex-1 mr-4">
+                          <Text className="font-inter-bold text-3xl text-gray-900 mb-2">
+                            {selectedActivity?.title}
+                          </Text>
+                          <View className="flex-row items-center gap-2">
+                            <MapPin size={16} color="#FF9933" />
+                            <Text className="font-inter-medium text-gray-500">
+                              {selectedActivity?.location}
+                            </Text>
+                          </View>
+                        </View>
+                        <View className="bg-indigo-950 px-4 py-2 rounded-2xl">
+                          <Text className="font-inter-bold text-white">
+                            ₹{selectedActivity?.cost}
+                          </Text>
+                        </View>
+                      </View>
+
+                      {/* Stats */}
+                      <View className="flex-row gap-4 mb-8">
+                        <View className="bg-gray-100 px-4 py-3 rounded-2xl flex-row items-center gap-2">
+                          <Clock size={16} color="#6B7280" />
+                          <Text className="font-inter-medium text-gray-700">
+                            {selectedActivity?.time_start} - {selectedActivity?.time_end}
+                          </Text>
+                        </View>
+                        <View className="bg-gray-100 px-4 py-3 rounded-2xl flex-row items-center gap-2">
+                          <Text className="text-lg">{categoryIcons[selectedActivity?.category]}</Text>
+                          <Text className="font-inter-medium text-gray-700">
+                            {selectedActivity?.category?.charAt(0).toUpperCase() + selectedActivity?.category?.slice(1)}
+                          </Text>
+                        </View>
+                      </View>
+
+                      {/* Description */}
+                      <Text className="font-inter-bold text-xl text-gray-900 mb-3">About</Text>
+                      <Text className="font-inter text-gray-600 leading-7 text-lg mb-10">
+                        {selectedActivity?.description}
+                      </Text>
+
+                      {/* Map Button */}
+                      <TouchableOpacity
+                        onPress={() => openInMaps(selectedActivity?.location || selectedActivity?.title)}
+                        className="bg-saffron-500 h-16 rounded-2xl flex-row items-center justify-center gap-3 shadow-lg"
+                      >
+                        <Navigation size={22} color="white" />
+                        <Text className="text-white font-inter-bold text-lg">Open in Maps</Text>
+                        <ExternalLink size={18} color="white" />
+                      </TouchableOpacity>
+                    </View>
+                  </ScrollView>
+                </View>
+              </View>
+            </Modal>
           </>
         ) : (
           <>
@@ -725,12 +964,28 @@ export default function ItineraryScreen() {
                               </Text>
                             </View>
                           </View>
-                          <TouchableOpacity
-                            onPress={() => handleDeleteActivity(activity.id, day.id)}
-                            className="p-2"
-                          >
-                            <Trash2 size={18} color="#EF4444" />
-                          </TouchableOpacity>
+                          <View className="flex-row items-center">
+                            <TouchableOpacity
+                              onPress={() => handleMoveActivity(day.id, activity.id, 'up')}
+                              className="p-2 mr-1"
+                              disabled={actIndex === 0}
+                            >
+                              <ChevronUp size={18} color={actIndex === 0 ? '#E5E7EB' : '#9CA3AF'} />
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              onPress={() => handleMoveActivity(day.id, activity.id, 'down')}
+                              className="p-2 mr-2"
+                              disabled={actIndex === day.activities.length - 1}
+                            >
+                              <ChevronDown size={18} color={actIndex === day.activities.length - 1 ? '#E5E7EB' : '#9CA3AF'} />
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              onPress={() => handleDeleteActivity(activity.id, day.id)}
+                              className="p-2"
+                            >
+                              <Trash2 size={18} color="#EF4444" />
+                            </TouchableOpacity>
+                          </View>
                         </TouchableOpacity>
                       )}
                     </View>
