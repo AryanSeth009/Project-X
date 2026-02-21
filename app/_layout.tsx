@@ -9,11 +9,13 @@ import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { supabase } from '@/lib/supabase';
 import { useStore } from '@/store/useStore';
 import { FontFamily } from '@/lib/fonts';
+import { ThemeProvider, useTheme } from '@/context/ThemeContext';
 
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+function RootLayoutContent() {
   useFrameworkReady();
+  const { resolvedScheme } = useTheme();
   const { setUser, setProfile } = useStore();
 
   const [fontsLoaded] = useFonts({
@@ -87,7 +89,15 @@ export default function RootLayout() {
         <Stack.Screen name="auth" />
         <Stack.Screen name="+not-found" />
       </Stack>
-      <StatusBar style="light" />
+      <StatusBar style={resolvedScheme === 'dark' ? 'light' : 'dark'} />
     </>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <ThemeProvider>
+      <RootLayoutContent />
+    </ThemeProvider>
   );
 }

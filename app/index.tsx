@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MapPin, ArrowRight } from 'lucide-react-native';
 import { useStore } from '@/store/useStore';
+import { useTheme } from '@/context/ThemeContext';
 
 const { width } = Dimensions.get('window');
 
@@ -29,6 +30,7 @@ const PLACES = [
 export default function OnboardingScreen() {
   const router = useRouter();
   const { user } = useStore();
+  const { colors, resolvedScheme } = useTheme();
   const [currentIndex, setCurrentIndex] = useState(0);
   const fadeAnim = useRef(new Animated.Value(1)).current;
 
@@ -68,8 +70,8 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <View className="flex-1 bg-[#1A1C19]">
-      <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
+    <View className="flex-1" style={{ backgroundColor: colors.background }}>
+      <StatusBar barStyle={resolvedScheme === 'dark' ? 'light-content' : 'dark-content'} translucent backgroundColor="transparent" />
       <Animated.View style={[{ flex: 1, opacity: fadeAnim }]}>
         <ImageBackground
           source={{ uri: PLACES[currentIndex].image }}
@@ -77,25 +79,25 @@ export default function OnboardingScreen() {
           resizeMode="cover"
         >
           <LinearGradient
-            colors={['transparent', 'rgba(26,28,25,0.5)', '#1A1C19']}
+            colors={['transparent', `${colors.background}80`, colors.background]}
             locations={[0, 0.4, 0.95]}
             style={styles.overlay}
           >
             <View className="flex-1 px-8 pb-12 justify-end">
               {/* Header Content */}
               <View className="mb-10">
-                <Text className="font-inter-boldnt text-[44px] leading-[48px] text-[#F5F5DC] mb-4">
+                <Text className="font-inter-bold text-[44px] leading-[48px] mb-4" style={{ color: colors.text }}>
                   Explore the{"\n"}world with us!
                 </Text>
-                <Text className="font-inter-medium text-lg text-[#F5F5DC]/70 leading-6">
+                <Text className="font-inter-medium text-lg leading-6" style={{ color: colors.textSecondary }}>
                   With SafarYatraAI, you can find stays and travel spots in matter of seconds! Sounds cool right?
                 </Text>
               </View>
 
               {/* Location Badge */}
-              <View className="flex-row items-center bg-[#242922] self-start px-4 py-2 rounded-full border border-[#4CAF50]/30 mb-8">
-                <MapPin size={16} color="#4CAF50" />
-                <Text className="font-inter-medium text-[#F5F5DC] ml-2">
+              <View className="flex-row items-center self-start px-4 py-2 rounded-full border mb-8" style={{ backgroundColor: colors.card, borderColor: colors.greenBorder }}>
+                <MapPin size={16} color={colors.green} />
+                <Text className="font-inter-medium ml-2" style={{ color: colors.text }}>
                   {PLACES[currentIndex].location}
                 </Text>
               </View>
@@ -108,7 +110,7 @@ export default function OnboardingScreen() {
                     className="h-1.5 rounded-full"
                     style={{
                       width: index === currentIndex ? 40 : 24,
-                      backgroundColor: index === currentIndex ? '#4CAF50' : 'rgba(245, 245, 220, 0.3)'
+                      backgroundColor: index === currentIndex ? colors.green : colors.textMuted + '80'
                     }}
                   />
                 ))}
@@ -116,21 +118,21 @@ export default function OnboardingScreen() {
 
               {/* Bottom Section Card */}
               <View 
-                className="rounded-[40px] p-6 items-center border border-[#242922]"
-                style={{ backgroundColor: '#242922' }}
+                className="rounded-[40px] p-6 items-center border"
+                style={{ backgroundColor: colors.card, borderColor: colors.border }}
               >
                 <TouchableOpacity
                   onPress={handleStart}
                   className="w-full h-16 rounded-2xl flex-row items-center justify-center gap-3"
-                  style={{ backgroundColor: '#4CAF50' }}
+                  style={{ backgroundColor: colors.green }}
                 >
-                  <Text className="text-[#1A1C19] font-inter-bold text-lg">Let's start your journey</Text>
-                  <ArrowRight size={20} color="#1A1C19" />
+                  <Text className="font-inter-bold text-lg" style={{ color: colors.onGreen }}>Let's start your journey</Text>
+                  <ArrowRight size={20} color={colors.onGreen} />
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={handleLogin} className="mt-6 flex-row">
-                  <Text className="font-inter text-[#F5F5DC] text-base">Already have an account? </Text>
-                  <Text className="font-inter-bold text-[#4CAF50] text-base">Login here</Text>
+                  <Text className="font-inter text-base" style={{ color: colors.text }}>Already have an account? </Text>
+                  <Text className="font-inter-bold text-base" style={{ color: colors.green }}>Login here</Text>
                 </TouchableOpacity>
               </View>
             </View>

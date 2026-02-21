@@ -4,8 +4,10 @@ import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GoogleLogo } from '@/components/GoogleLogo';
 import { supabase } from '@/lib/supabase';
+import { useTheme } from '@/context/ThemeContext';
 
 export default function AuthScreen() {
+  const { colors } = useTheme();
   const router = useRouter();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
@@ -50,7 +52,7 @@ export default function AuthScreen() {
 
   return (
     <LinearGradient
-      colors={['#1A1C19', '#242922']}
+      colors={[colors.gradientStart, colors.gradientEnd]}
       start={{ x: 0, y: 0 }}
       end={{ x: 0, y: 1 }}
       className="flex-1"
@@ -64,10 +66,10 @@ export default function AuthScreen() {
           showsVerticalScrollIndicator={false}>
           {/* Simple Header - transparent to show gradient */}
           <View className="pt-16 pb-8 px-6">
-            <Text className="font-inter-bold text-3xl text-[#F5F5DC] mb-2">
+            <Text className="font-inter-bold text-3xl mb-2" style={{ color: colors.text }}>
               {isLogin ? 'Sign In' : 'Sign Up'}
             </Text>
-            <Text className="font-inter text-[#F5F5DC]/70 text-base">
+            <Text className="font-inter text-base" style={{ color: colors.textSecondary }}>
               {isLogin
                 ? 'Welcome back you\'ve been missed'
                 : 'Just a few quick things to get you started'}
@@ -77,37 +79,37 @@ export default function AuthScreen() {
           {/* Main Content */}
           <View className="flex-1 px-6">
             {error ? (
-              <View className="border-l-4 border-red-500 rounded-xl p-4 mb-6 flex-row items-center" style={{ backgroundColor: 'rgba(239, 68, 68, 0.15)' }}>
+              <View className="border-l-4 rounded-xl p-4 mb-6 flex-row items-center" style={{ backgroundColor: colors.errorMuted, borderColor: colors.error }}>
                 <Text className="text-2xl mr-3">⚠️</Text>
-                <Text className="font-inter-medium flex-1" style={{ color: '#FCA5A5' }}>{error}</Text>
+                <Text className="font-inter-medium flex-1" style={{ color: colors.error }}>{error}</Text>
               </View>
             ) : null}
 
             {/* Sign-up bonus banner */}
             {!isLogin && (
   <View className="mb-6 rounded-2xl overflow-hidden">
-    <View className="p-px rounded-2xl" style={{ backgroundColor: '#F39C12' }}>
+    <View className="p-px rounded-2xl" style={{ backgroundColor: colors.orange }}>
       <View className="rounded-2xl px-4 py-3 flex-row items-center gap-3"
-        style={{ backgroundColor: '#242922' }}>
+        style={{ backgroundColor: colors.card }}>
         
         <View className="relative">
           <View className="w-12 h-12 rounded-2xl items-center justify-center"
-            style={{ backgroundColor: '#F39C12' }}>
+            style={{ backgroundColor: colors.orange }}>
             <Text className="text-2xl">🎁</Text>
           </View>
         </View>
 
         <View className="flex-1">
-          <Text className="font-inter-bold text-xs text-[#F39C12] uppercase tracking-widest mb-0.5">
+          <Text className="font-inter-bold text-xs uppercase tracking-widest mb-0.5" style={{ color: colors.orange }}>
             New Account Offer
           </Text>
-          <Text className="font-inter-bold text-[#F5F5DC] text-base leading-tight">
+          <Text className="font-inter-bold text-base leading-tight" style={{ color: colors.text }}>
             Get 3 Free Credits
           </Text>
         </View>
 
-        <View className="rounded-full px-3 py-1.5" style={{ backgroundColor: '#4CAF50' }}>
-          <Text className="font-inter-bold text-[#1A1C19] text-xs">FREE</Text>
+        <View className="rounded-full px-3 py-1.5" style={{ backgroundColor: colors.green }}>
+          <Text className="font-inter-bold text-xs" style={{ color: colors.onGreen }}>FREE</Text>
         </View>
 
       </View>
@@ -118,15 +120,15 @@ export default function AuthScreen() {
             <View className="gap-4">
               {/* Email Input */}
               <View>
-                <Text className="font-inter-semibold text-[#F5F5DC] mb-2 text-sm">
+                <Text className="font-inter-semibold mb-2 text-sm" style={{ color: colors.text }}>
                   Email ID
                 </Text>
-                <View className="rounded-xl px-4 py-2 border border-[#242922]" style={{ backgroundColor: '#242922' }}>
+                <View className="rounded-xl px-4 py-2 border" style={{ backgroundColor: colors.card, borderColor: colors.border }}>
                   <TextInput
                     className="font-inter text-base"
-                    style={{ color: '#F5F5DC' }}
+                    style={{ color: colors.text }}
                     placeholder="Enter Email ID"
-                    placeholderTextColor="#9CA3AF"
+                    placeholderTextColor={colors.textMuted}
                     value={email}
                     onChangeText={setEmail}
                     autoCapitalize="none"
@@ -137,20 +139,20 @@ export default function AuthScreen() {
 
               {/* Password Input */}
               <View>
-                <Text className="font-inter-semibold text-[#F5F5DC] mb-2 text-sm">
+                <Text className="font-inter-semibold mb-2 text-sm" style={{ color: colors.text }}>
                   Password
                 </Text>
-                <View className="rounded-xl px-4 py-2 flex-row items-center border border-[#242922]" style={{ backgroundColor: '#242922' }}>
+                <View className="rounded-xl px-4 py-2 flex-row items-center border" style={{ backgroundColor: colors.card, borderColor: colors.border }}>
                   <TextInput
                     className="font-inter flex-1 text-base"
-                    style={{ color: '#F5F5DC' }}
+                    style={{ color: colors.text }}
                     placeholder="Enter Password"
-                    placeholderTextColor="#9CA3AF"
+                    placeholderTextColor={colors.textMuted}
                     value={password}
                     onChangeText={setPassword}
                     secureTextEntry
                   />
-                  <Text className="text-[#F5F5DC]/60 text-xl">👁</Text>
+                  <Text className="text-xl" style={{ color: colors.textMuted }}>👁</Text>
                 </View>
               </View>
 
@@ -161,16 +163,17 @@ export default function AuthScreen() {
                     className="flex-row items-center gap-2"
                     onPress={() => setRememberMe(!rememberMe)}
                   >
-                    <View className={`w-5 h-5 rounded border-2 items-center justify-center ${
-                      rememberMe ? 'border-[#4CAF50]' : 'border-[#242922]'
-                    }`} style={rememberMe ? { backgroundColor: '#4CAF50' } : { backgroundColor: '#242922' }}>
-                      {rememberMe && <Text className="text-[#1A1C19] text-xs">✓</Text>}
+                    <View className="w-5 h-5 rounded border-2 items-center justify-center" style={{
+                      borderColor: rememberMe ? colors.green : colors.border,
+                      backgroundColor: rememberMe ? colors.green : colors.card,
+                    }}>
+                      {rememberMe && <Text className="text-xs" style={{ color: colors.onGreen }}>✓</Text>}
                     </View>
-                    <Text className="font-inter text-[#F5F5DC] text-sm">Remember Me</Text>
+                    <Text className="font-inter text-sm" style={{ color: colors.text }}>Remember Me</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity>
-                    <Text className="font-inter-medium text-[#F5F5DC]/80 text-sm">
+                    <Text className="font-inter-medium text-sm" style={{ color: colors.textSecondary }}>
                       Forgot Password?
                     </Text>
                   </TouchableOpacity>
@@ -185,10 +188,10 @@ export default function AuthScreen() {
                 activeOpacity={0.8}
               >
                 <View 
-                  style={{ backgroundColor: '#4CAF50' }}
+                  style={{ backgroundColor: colors.green }}
                   className="rounded-xl py-4"
                 >
-                  <Text className="font-inter-bold text-[#1A1C19] text-center text-base">
+                  <Text className="font-inter-bold text-center text-base" style={{ color: colors.onGreen }}>
                     {loading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Create account')}
                   </Text>
                 </View>
@@ -196,17 +199,17 @@ export default function AuthScreen() {
 
               {/* Divider */}
               <View className="flex-row items-center my-4">
-                <View className="flex-1 h-px bg-[#242922]" />
-                <Text className="font-inter px-4 text-[#F5F5DC]/60 text-sm">Or with</Text>
-                <View className="flex-1 h-px bg-[#242922]" />
+                <View className="flex-1 h-px" style={{ backgroundColor: colors.border }} />
+                <Text className="font-inter px-4 text-sm" style={{ color: colors.textMuted }}>Or with</Text>
+                <View className="flex-1 h-px" style={{ backgroundColor: colors.border }} />
               </View>
 
               {/* Social Login Options */}
               <View className="flex-row gap-3">
 
-                <TouchableOpacity className="flex-1 rounded-xl py-3.5 items-center justify-center flex-row gap-2 border border-[#242922]" style={{ backgroundColor: '#242922' }}>
+                <TouchableOpacity className="flex-1 rounded-xl py-3.5 items-center justify-center flex-row gap-2 border" style={{ backgroundColor: colors.card, borderColor: colors.border }}>
                   <GoogleLogo size={22} />
-                  <Text className="font-inter-semibold text-[#F5F5DC] text-sm">Continue with Google</Text>
+                  <Text className="font-inter-semibold text-sm" style={{ color: colors.text }}>Continue with Google</Text>
                 </TouchableOpacity>
                 </View>
                 </View>
@@ -221,11 +224,11 @@ export default function AuthScreen() {
               setError('');
             }}
           >
-            <Text className="font-inter text-center text-[#F5F5DC]/80 text-sm">
+            <Text className="font-inter text-center text-sm" style={{ color: colors.textSecondary }}>
               {isLogin
                 ? "Don't have an account? "
                 : 'Already have an account? '}
-              <Text className="font-inter-bold text-[#4CAF50]">
+              <Text className="font-inter-bold" style={{ color: colors.green }}>
                 {isLogin ? 'Sign Up' : 'Sign In'}
               </Text>
             </Text>

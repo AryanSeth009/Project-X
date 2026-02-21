@@ -3,16 +3,19 @@ import { Home, Map, User, Crown } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
 import { View, StyleSheet, Platform } from 'react-native';
 import { FontFamily } from '@/lib/fonts';
+import { useTheme } from '@/context/ThemeContext';
 
 const TAB_RADIUS = 32;
 
 export default function TabLayout() {
+  const { colors, resolvedScheme } = useTheme();
+  const isDark = resolvedScheme === 'dark';
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#4CAF50',
-        tabBarInactiveTintColor: 'rgba(255,255,255,0.45)',
+        tabBarActiveTintColor: colors.green,
+        tabBarInactiveTintColor: isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)',
 
         tabBarStyle: {
           position: 'absolute',
@@ -41,15 +44,15 @@ export default function TabLayout() {
             {/* Core iOS-style blur */}
             <BlurView
               intensity={85}
-              tint="systemChromeMaterialDark"
+              tint={isDark ? 'systemChromeMaterialDark' : 'systemChromeMaterialLight'}
               style={StyleSheet.absoluteFillObject}
             />
 
-            {/* Subtle dark tint over the blur — keep opacity LOW so blur shows */}
+            {/* Subtle tint over the blur — keep opacity LOW so blur shows */}
             <View
               style={[
                 StyleSheet.absoluteFillObject,
-                { backgroundColor: 'rgba(18, 20, 18, 0.35)' },
+                { backgroundColor: isDark ? 'rgba(18, 20, 18, 0.35)' : 'rgba(255, 255, 255, 0.5)' },
               ]}
             />
 
@@ -57,7 +60,7 @@ export default function TabLayout() {
             <View
               style={[
                 StyleSheet.absoluteFillObject,
-                { backgroundColor: 'rgba(76, 175, 80, 0.04)' },
+                { backgroundColor: isDark ? 'rgba(76, 175, 80, 0.04)' : 'rgba(34, 139, 34, 0.04)' },
               ]}
             />
 

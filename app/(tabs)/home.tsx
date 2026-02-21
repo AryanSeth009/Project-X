@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Sparkles, MapPin, Calendar, Users, Wallet, Heart, Info, MessageCircle, Home, X, ChevronLeft, ChevronRight, ChevronDown, TreePalm, Mountain, Landmark, Ship, Sun } from 'lucide-react-native';
 import { useStore } from '@/store/useStore';
+import { useTheme } from '@/context/ThemeContext';
 
 // States and Cities supported by the app (matches geo-service / itinerary data)
 const STATES = ['Goa', 'Himachal Pradesh', 'Jammu & Kashmir', 'Kerala', 'Rajasthan'];
@@ -46,7 +47,6 @@ const DESTINATION_DESCRIPTIONS: Record<string, string> = {
   Rajasthan: 'Desert, forts, culture', // Fallback
 };
 
-const ICON_COLOR = '#4CAF50';
 
 const DESTINATION_ICONS: Record<string, typeof TreePalm> = {
   Goa: TreePalm,
@@ -166,6 +166,7 @@ function filterDestinations(query: string): string[] {
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
   const [step, setStep] = useState<1 | 2>(1);
   const [selectedState, setSelectedState] = useState('');
   const [destination, setDestination] = useState('');
@@ -328,38 +329,38 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
   return (
     <ScrollView
       className="flex-1"
-      style={{ backgroundColor: '#1A1C19' }}
+      style={{ backgroundColor: colors.background }}
       scrollEnabled={!showDestinationDropdown}
       keyboardShouldPersistTaps="handled"
     >
       <LinearGradient
-        colors={['#242922', '#1A1C19']}
+        colors={[colors.backgroundSecondary, colors.background]}
         className="pt-12 pb-8 px-6"
       >
         <View className="flex-row items-center justify-between mb-6">
           <View>
-            <Text className="font-inter-bold text-3xl" style={{ color: '#F5F5DC' }}>SafarYatraAI</Text>
-            <Text className="font-inter text-sm" style={{ color: 'rgba(245, 245, 220, 0.9)' }}>Your One Tap Itinerary Planner</Text>
+            <Text className="font-inter-bold text-3xl" style={{ color: colors.text }}>SafarYatraAI</Text>
+            <Text className="font-inter text-sm" style={{ color: colors.textSecondary }}>Your One Tap Itinerary Planner</Text>
           </View>
-          <View className="rounded-full px-4 py-2 flex-row items-center gap-2" style={{ backgroundColor: 'rgba(76, 175, 80, 0.25)' }}>
-            <Sparkles size={16} color="#4CAF50" />
-            <Text className="font-inter-semibold" style={{ color: '#F5F5DC' }}>AI Trip Planner</Text>
+          <View className="rounded-full px-4 py-2 flex-row items-center gap-2" style={{ backgroundColor: colors.greenMuted }}>
+            <Sparkles size={16} color={colors.green} />
+            <Text className="font-inter-semibold" style={{ color: colors.text }}>AI Trip Planner</Text>
           </View>
         </View>
 
-        <View className="rounded-2xl p-4" style={{ backgroundColor: 'rgba(36, 41, 34, 0.9)' }}>
-          <Text className="font-inter-semibold text-xl mb-2" style={{ color: '#F5F5DC' }}>
+        <View className="rounded-2xl p-4" style={{ backgroundColor: colors.card }}>
+          <Text className="font-inter-semibold text-xl mb-2" style={{ color: colors.text }}>
             Plan Your Dream Trip
           </Text>
-          <Text className="font-inter" style={{ color: 'rgba(245, 245, 220, 0.8)' }}>
+          <Text className="font-inter" style={{ color: colors.textSecondary }}>
             Step {step} of 2 — quick details, then personalize.
           </Text>
         </View>
       </LinearGradient>
 
-      <View className="px-6 py-6" style={{ backgroundColor: '#1A1C19' }}>
-        <View className="rounded-3xl p-6 shadow-lg mb-6" style={{ backgroundColor: '#242922' }}>
-          <Text className="font-inter-bold text-2xl mb-6" style={{ color: '#F5F5DC' }}>
+      <View className="px-6 py-6" style={{ backgroundColor: colors.background }}>
+        <View className="rounded-3xl p-6 shadow-lg mb-6" style={{ backgroundColor: colors.card }}>
+          <Text className="font-inter-bold text-2xl mb-6" style={{ color: colors.text }}>
             Trip Details
           </Text>
 
@@ -369,8 +370,8 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
                 <View>
                   <View className="mb-4">
                     <View className="flex-row items-center gap-2 mb-2">
-                      <MapPin size={18} color="#F39C12" />
-                      <Text className="font-inter-semibold" style={{ color: '#F5F5DC' }}>
+                      <MapPin size={18} color={colors.orange} />
+                      <Text className="font-inter-semibold" style={{ color: colors.text }}>
                         State
                       </Text>
                     </View>
@@ -379,16 +380,16 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
                         ref={stateInputRef}
                         className="font-inter rounded-xl px-4 py-3 pr-10"
                         style={{
-                          backgroundColor: '#1A1C19',
+                          backgroundColor: colors.inputBg,
                           borderWidth: 1,
-                          borderColor: showStateDropdown ? '#4CAF50' : '#242922',
-                          color: '#F5F5DC',
+                          borderColor: showStateDropdown ? colors.green : colors.inputBorder,
+                          color: colors.text,
                           borderBottomWidth: showStateDropdown && filteredStates.length > 0 ? 0 : 1,
                           borderBottomLeftRadius: showStateDropdown && filteredStates.length > 0 ? 0 : 12,
                           borderBottomRightRadius: showStateDropdown && filteredStates.length > 0 ? 0 : 12,
                         }}
                         placeholder="Type or select a state..."
-                        placeholderTextColor="#9CA3AF"
+                        placeholderTextColor={colors.textMuted}
                         value={selectedState}
                         onChangeText={(text) => {
                           setSelectedState(text);
@@ -410,14 +411,14 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
                         }}
                       />
                       <View className="absolute right-3 top-0 bottom-0 justify-center pointer-events-none">
-                        <ChevronDown size={20} color="#9CA3AF" />
+                        <ChevronDown size={20} color={colors.textMuted} />
                       </View>
                       {showStateDropdown && (
                         <View
                           className="rounded-b-xl border-x border-b overflow-hidden absolute top-full left-0 right-0"
                           style={{
-                            backgroundColor: '#1A1C19',
-                            borderColor: '#242922',
+                            backgroundColor: colors.inputBg,
+                            borderColor: colors.border,
                             borderWidth: 1,
                             maxHeight: 200,
                             zIndex: 1001,
@@ -436,9 +437,9 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
                                 activeOpacity={0.7}
                                 className="px-4 py-3 flex-row items-center gap-3"
                                 style={{
-                                  backgroundColor: name === selectedState ? 'rgba(76, 175, 80, 0.2)' : 'transparent',
+                                  backgroundColor: name === selectedState ? colors.greenMuted : 'transparent',
                                   borderBottomWidth: 1,
-                                  borderBottomColor: '#242922',
+                                  borderBottomColor: colors.border,
                                 }}
                                 onPress={() => {
                                   if (stateBlurRef.current) {
@@ -457,11 +458,11 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
                                   }
                                 }}
                               >
-                                <Text className="font-inter flex-1" style={{ color: '#F5F5DC' }}>
+                                <Text className="font-inter flex-1" style={{ color: colors.text }}>
                                   {name}
                                 </Text>
                                 {name === selectedState ? (
-                                  <Text className="font-inter-semibold text-xs" style={{ color: '#4CAF50' }}>Selected</Text>
+                                  <Text className="font-inter-semibold text-xs" style={{ color: colors.green }}>Selected</Text>
                                 ) : null}
                               </TouchableOpacity>
                             ))}
@@ -474,8 +475,8 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
                   {isValidState && activeCityList.length > 0 && (
                     <View className="mb-4">
                       <View className="flex-row items-center gap-2 mb-2">
-                        <MapPin size={18} color="#4CAF50" />
-                        <Text className="font-inter-semibold" style={{ color: '#F5F5DC' }}>
+                        <MapPin size={18} color={colors.green} />
+                        <Text className="font-inter-semibold" style={{ color: colors.text }}>
                           City / Region
                         </Text>
                       </View>
@@ -484,16 +485,16 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
                           ref={destinationInputRef}
                           className="font-inter rounded-xl px-4 py-3 pr-10"
                           style={{
-                            backgroundColor: '#1A1C19',
+                            backgroundColor: colors.inputBg,
                             borderWidth: 1,
-                            borderColor: showDestinationDropdown ? '#4CAF50' : '#242922',
-                            color: '#F5F5DC',
+                            borderColor: showDestinationDropdown ? colors.green : colors.inputBorder,
+                            color: colors.text,
                             borderBottomWidth: showDestinationDropdown && filteredDestinations.length > 0 ? 0 : 1,
                             borderBottomLeftRadius: showDestinationDropdown && filteredDestinations.length > 0 ? 0 : 12,
                             borderBottomRightRadius: showDestinationDropdown && filteredDestinations.length > 0 ? 0 : 12,
                           }}
                           placeholder={`Select city in ${selectedState}...`}
-                          placeholderTextColor="#9CA3AF"
+                          placeholderTextColor={colors.textMuted}
                           value={destination}
                           onChangeText={(text) => {
                             setDestination(text);
@@ -514,14 +515,14 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
                           }}
                         />
                         <View className="absolute right-3 top-0 bottom-0 justify-center pointer-events-none">
-                          <ChevronDown size={20} color="#9CA3AF" />
+                          <ChevronDown size={20} color={colors.textMuted} />
                         </View>
                         {showDestinationDropdown && (
                           <View
                             className="rounded-b-xl border-x border-b overflow-hidden absolute top-full left-0 right-0"
                             style={{
-                              backgroundColor: '#1A1C19',
-                              borderColor: '#242922',
+                              backgroundColor: colors.inputBg,
+                              borderColor: colors.border,
                               borderWidth: 1,
                               maxHeight: 260,
                               zIndex: 1000,
@@ -536,7 +537,7 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
                             >
                               {filteredDestinations.length === 0 ? (
                                 <View className="px-4 py-3">
-                                  <Text className="font-inter text-sm" style={{ color: '#9CA3AF' }}>
+                                  <Text className="font-inter text-sm" style={{ color: colors.textMuted }}>
                                     No matches found.
                                   </Text>
                                 </View>
@@ -549,9 +550,9 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
                                       activeOpacity={0.7}
                                       className="px-4 py-3.5 flex-row items-center gap-3"
                                       style={{
-                                        backgroundColor: name === destination ? 'rgba(76, 175, 80, 0.2)' : 'transparent',
+                                        backgroundColor: name === destination ? colors.greenMuted : 'transparent',
                                         borderBottomWidth: 1,
-                                        borderBottomColor: '#242922',
+                                        borderBottomColor: colors.border,
                                       }}
                                       onPress={() => {
                                         if (destinationBlurRef.current) {
@@ -565,19 +566,19 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
                                     >
                                       {IconComponent ? (
                                         <View style={{ width: 28, alignItems: 'center' }}>
-                                          <IconComponent size={22} color={ICON_COLOR} />
+                                          <IconComponent size={22} color={colors.green} />
                                         </View>
                                       ) : null}
                                       <View className="flex-1">
-                                        <Text className="font-inter" style={{ color: '#F5F5DC' }}>
+                                        <Text className="font-inter" style={{ color: colors.text }}>
                                           {name}
                                         </Text>
-                                        <Text className="font-inter text-xs mt-0.5" style={{ color: '#9CA3AF' }} numberOfLines={1}>
+                                        <Text className="font-inter text-xs mt-0.5" style={{ color: colors.textMuted }} numberOfLines={1}>
                                           {DESTINATION_DESCRIPTIONS[name] ?? ''}
                                         </Text>
                                       </View>
                                       {name === destination ? (
-                                        <Text className="font-inter-semibold text-xs" style={{ color: '#4CAF50' }}>Selected</Text>
+                                        <Text className="font-inter-semibold text-xs" style={{ color: colors.green }}>Selected</Text>
                                       ) : null}
                                     </TouchableOpacity>
                                   );
@@ -588,7 +589,7 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
                         )}
                       </View>
                       {destination.length > 0 && !isValidDestination && (
-                        <Text className="font-inter text-xs mt-1.5" style={{ color: '#F39C12' }}>
+                        <Text className="font-inter text-xs mt-1.5" style={{ color: colors.orange }}>
                           Select a city from the dropdown to continue
                         </Text>
                       )}
@@ -598,8 +599,8 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
 
                 <View>
                   <View className="flex-row items-center gap-2 mb-3">
-                    <Sparkles size={18} color="#F39C12" />
-                    <Text className="font-inter-semibold" style={{ color: '#F5F5DC' }}>
+                    <Sparkles size={18} color={colors.orange} />
+                    <Text className="font-inter-semibold" style={{ color: colors.text }}>
                       Itinerary Style
                     </Text>
                   </View>
@@ -608,17 +609,17 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
                       onPress={() => setItineraryStyle('day-wise')}
                       className="flex-1 p-4 rounded-2xl border-2"
                       style={{
-                        backgroundColor: itineraryStyle === 'day-wise' ? 'rgba(243, 156, 18, 0.2)' : '#1A1C19',
-                        borderColor: itineraryStyle === 'day-wise' ? '#F39C12' : '#242922'
+                        backgroundColor: itineraryStyle === 'day-wise' ? colors.orangeMuted : colors.inputBg,
+                        borderColor: itineraryStyle === 'day-wise' ? colors.orange : colors.border
                       }}
                     >
                       <View className="flex-row items-center gap-2 mb-1">
-                        <Calendar size={18} color={itineraryStyle === 'day-wise' ? '#F39C12' : '#9CA3AF'} />
-                        <Text className="font-inter-bold" style={{ color: itineraryStyle === 'day-wise' ? '#F5F5DC' : '#9CA3AF' }}>
+                        <Calendar size={18} color={itineraryStyle === 'day-wise' ? colors.orange : colors.textMuted} />
+                        <Text className="font-inter-bold" style={{ color: itineraryStyle === 'day-wise' ? colors.text : colors.textMuted }}>
                           Daily Plan
                         </Text>
                       </View>
-                      <Text className="font-inter text-xs leading-4" style={{ color: itineraryStyle === 'day-wise' ? 'rgba(245, 245, 220, 0.7)' : '#9CA3AF' }}>
+                      <Text className="font-inter text-xs leading-4" style={{ color: itineraryStyle === 'day-wise' ? colors.textSecondary : colors.textMuted }}>
                         Day-by-day complete schedule
                       </Text>
                     </TouchableOpacity>
@@ -627,17 +628,17 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
                       onPress={() => setItineraryStyle('top-10')}
                       className="flex-1 p-4 rounded-2xl border-2"
                       style={{
-                        backgroundColor: itineraryStyle === 'top-10' ? 'rgba(76, 175, 80, 0.2)' : '#1A1C19',
-                        borderColor: itineraryStyle === 'top-10' ? '#4CAF50' : '#242922'
+                        backgroundColor: itineraryStyle === 'top-10' ? colors.greenMuted : colors.inputBg,
+                        borderColor: itineraryStyle === 'top-10' ? colors.green : colors.border
                       }}
                     >
                       <View className="flex-row items-center gap-2 mb-1">
-                        <Sparkles size={18} color={itineraryStyle === 'top-10' ? '#4CAF50' : '#9CA3AF'} />
-                        <Text className="font-inter-bold" style={{ color: itineraryStyle === 'top-10' ? '#F5F5DC' : '#9CA3AF' }}>
+                        <Sparkles size={18} color={itineraryStyle === 'top-10' ? colors.green : colors.textMuted} />
+                        <Text className="font-inter-bold" style={{ color: itineraryStyle === 'top-10' ? colors.text : colors.textMuted }}>
                           Top 10 Spots
                         </Text>
                       </View>
-                      <Text className="font-inter text-xs leading-4" style={{ color: itineraryStyle === 'top-10' ? 'rgba(245, 245, 220, 0.7)' : '#9CA3AF' }}>
+                      <Text className="font-inter text-xs leading-4" style={{ color: itineraryStyle === 'top-10' ? colors.textSecondary : colors.textMuted }}>
                         Curated list of best places
                       </Text>
                     </TouchableOpacity>
@@ -646,22 +647,22 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
 
                 <View className="flex-1">
   <View className="flex-row items-center gap-2 mb-2">
-    <Calendar size={18} color="#F39C12" />
-    <Text className="font-inter-semibold" style={{ color: '#F5F5DC' }}>Date Range</Text>
+    <Calendar size={18} color={colors.orange} />
+    <Text className="font-inter-semibold" style={{ color: colors.text }}>Date Range</Text>
   </View>
   <TouchableOpacity
     className="rounded-xl px-4 py-3 flex-row items-center justify-between"
-    style={{ backgroundColor: '#1A1C19', borderWidth: 1, borderColor: '#242922' }}
+    style={{ backgroundColor: colors.inputBg, borderWidth: 1, borderColor: colors.border }}
     onPress={() => setShowCalendar(true)}
   >
-    <Text className="font-inter" style={{ color: startDate && endDate ? '#F5F5DC' : '#9CA3AF' }}>
+    <Text className="font-inter" style={{ color: startDate && endDate ? colors.text : colors.textMuted }}>
       {startDate && endDate
         ? `${startDate}  →  ${endDate}`
         : startDate
         ? `${startDate}  →  Select end`
         : 'Select dates'}
     </Text>
-    <Calendar size={16} color="#9CA3AF" />
+    <Calendar size={16} color={colors.textMuted} />
   </TouchableOpacity>
 
   {/* Calendar Modal */}
@@ -672,15 +673,15 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
     onRequestClose={() => setShowCalendar(false)}
   >
     <View className="flex-1 justify-end" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-      <View className="rounded-t-3xl px-5 pt-5 pb-8" style={{ backgroundColor: '#242922' }}>
+      <View className="rounded-t-3xl px-5 pt-5 pb-8" style={{ backgroundColor: colors.card }}>
         {/* Header */}
         <View className="flex-row justify-between items-center mb-1">
-          <Text className="font-inter-semibold text-lg" style={{ color: '#F5F5DC' }}>Select Dates</Text>
+          <Text className="font-inter-semibold text-lg" style={{ color: colors.text }}>Select Dates</Text>
           <TouchableOpacity onPress={() => setShowCalendar(false)}>
-            <X size={22} color="#9CA3AF" />
+            <X size={22} color={colors.textMuted} />
           </TouchableOpacity>
         </View>
-        <Text className="font-inter text-sm mb-4" style={{ color: '#9CA3AF' }}>
+        <Text className="font-inter text-sm mb-4" style={{ color: colors.textMuted }}>
           {!startDate ? 'Pick a start date' : !endDate ? 'Pick an end date' : `${startDate}  →  ${endDate}`}
         </Text>
 
@@ -694,9 +695,9 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
             }}
             className="p-2"
           >
-            <ChevronLeft size={20} color="#F5F5DC" />
+            <ChevronLeft size={20} color={colors.text} />
           </TouchableOpacity>
-          <Text className="font-inter-semibold text-base" style={{ color: '#F5F5DC' }}>
+          <Text className="font-inter-semibold text-base" style={{ color: colors.text }}>
             {new Date(calendarYear, calendarMonth).toLocaleString('default', { month: 'long', year: 'numeric' })}
           </Text>
           <TouchableOpacity
@@ -707,7 +708,7 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
             }}
             className="p-2"
           >
-            <ChevronRight size={20} color="#F5F5DC" />
+            <ChevronRight size={20} color={colors.text} />
           </TouchableOpacity>
         </View>
 
@@ -715,7 +716,7 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
         <View className="flex-row mb-2">
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
             <View key={day} className="flex-1 items-center">
-              <Text className="font-inter text-xs" style={{ color: '#9CA3AF' }}>{day}</Text>
+              <Text className="font-inter text-xs" style={{ color: colors.textMuted }}>{day}</Text>
             </View>
           ))}
         </View>
@@ -748,9 +749,9 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
                     className={`flex-1 items-center py-2 mx-0.5 rounded-full ${isPast ? 'opacity-30' : ''}`}
                     style={
                       isStart || isEnd
-                        ? { backgroundColor: '#4CAF50' }
+                        ? { backgroundColor: colors.green }
                         : isInRange
-                        ? { backgroundColor: 'rgba(76, 175, 80, 0.3)' }
+                        ? { backgroundColor: colors.greenMuted }
                         : {}
                     }
                     onPress={() => {
@@ -767,7 +768,7 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
                     }}
                     disabled={isPast}
                   >
-                    <Text className={`font-inter text-sm ${isStart || isEnd ? 'font-inter-semibold' : ''}`} style={{ color: isStart || isEnd ? '#1A1C19' : '#F5F5DC' }}>
+                    <Text className={`font-inter text-sm ${isStart || isEnd ? 'font-inter-semibold' : ''}`} style={{ color: isStart || isEnd ? colors.onGreen : colors.text }}>
                       {day}
                     </Text>
                   </TouchableOpacity>
@@ -780,13 +781,13 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
         {/* Done Button */}
         <TouchableOpacity
           className="mt-5 rounded-2xl py-3.5 items-center"
-          style={{ backgroundColor: startDate && endDate ? '#4CAF50' : '#1A1C19' }}
+          style={{ backgroundColor: startDate && endDate ? colors.green : colors.inputBg }}
           onPress={() => {
             if (startDate && endDate) setShowCalendar(false);
           }}
           disabled={!startDate || !endDate}
         >
-          <Text className="font-inter-semibold text-base" style={{ color: startDate && endDate ? '#1A1C19' : '#9CA3AF' }}>
+          <Text className="font-inter-semibold text-base" style={{ color: startDate && endDate ? colors.onGreen : colors.textMuted }}>
             {startDate && endDate ? 'Confirm Dates' : 'Select both dates'}
           </Text>
         </TouchableOpacity>
@@ -797,16 +798,16 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
 
                 <View>
                   <View className="flex-row items-center gap-2 mb-2">
-                    <Users size={18} color="#F39C12" />
-                    <Text className="font-inter-semibold" style={{ color: '#F5F5DC' }}>
+                    <Users size={18} color={colors.orange} />
+                    <Text className="font-inter-semibold" style={{ color: colors.text }}>
                       No. of travelers
                     </Text>
                   </View>
                   <TextInput
                     className="font-inter rounded-xl px-4 py-3"
-                    style={{ backgroundColor: '#1A1C19', borderWidth: 1, borderColor: '#242922', color: '#F5F5DC' }}
+                    style={{ backgroundColor: colors.inputBg, borderWidth: 1, borderColor: colors.border, color: colors.text }}
                     placeholder="1"
-                    placeholderTextColor="#9CA3AF"
+                    placeholderTextColor={colors.textMuted}
                     value={travelers}
                     onChangeText={setTravelers}
                     keyboardType="number-pad"
@@ -816,11 +817,11 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
 
                 <TouchableOpacity
                   className="rounded-xl py-4 mt-2 shadow-md"
-                  style={{ backgroundColor: '#4CAF50' }}
+                  style={{ backgroundColor: colors.green }}
                   onPress={handleNext}
                 >
                   <View className="flex-row items-center justify-center gap-2">
-                    <Text className="font-inter-bold text-center text-lg" style={{ color: '#1A1C19' }}>
+                    <Text className="font-inter-bold text-center text-lg" style={{ color: colors.onGreen }}>
                       Next
                     </Text>
                   </View>
@@ -831,12 +832,12 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
                 {areaOptions.length > 0 && (
                   <View>
                     <View className="flex-row items-center gap-2 mb-2">
-                      <Home size={18} color="#F39C12" />
-                      <Text className="font-inter-semibold" style={{ color: '#F5F5DC' }}>
+                      <Home size={18} color={colors.orange} />
+                      <Text className="font-inter-semibold" style={{ color: colors.text }}>
                         Where are you staying? (optional)
                       </Text>
                     </View>
-                    <Text className="font-inter text-xs mb-2" style={{ color: '#9CA3AF' }}>
+                    <Text className="font-inter text-xs mb-2" style={{ color: colors.textMuted }}>
                       We'll tailor Day 1 around your area
                     </Text>
                     <View className="flex-row flex-wrap gap-2">
@@ -844,11 +845,11 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
                         onPress={() => setStayLocation('')}
                         className="px-4 py-2 rounded-full border-2"
                         style={{
-                          backgroundColor: !stayLocation ? '#4CAF50' : '#1A1C19',
-                          borderColor: !stayLocation ? '#4CAF50' : '#242922',
+                          backgroundColor: !stayLocation ? colors.green : colors.inputBg,
+                          borderColor: !stayLocation ? colors.green : colors.border,
                         }}
                       >
-                        <Text className="font-inter-semibold" style={{ color: !stayLocation ? '#1A1C19' : '#F5F5DC' }}>
+                        <Text className="font-inter-semibold" style={{ color: !stayLocation ? colors.onGreen : colors.text }}>
                           Skip
                         </Text>
                       </TouchableOpacity>
@@ -858,11 +859,11 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
                           onPress={() => setStayLocation(opt.name)}
                           className="px-4 py-2 rounded-full border-2"
                           style={{
-                            backgroundColor: stayLocation === opt.name ? '#4CAF50' : '#1A1C19',
-                            borderColor: stayLocation === opt.name ? '#4CAF50' : '#242922',
+                            backgroundColor: stayLocation === opt.name ? colors.green : colors.inputBg,
+                            borderColor: stayLocation === opt.name ? colors.green : colors.border,
                           }}
                         >
-                          <Text className="font-inter-semibold" style={{ color: stayLocation === opt.name ? '#1A1C19' : '#F5F5DC' }}>
+                          <Text className="font-inter-semibold" style={{ color: stayLocation === opt.name ? colors.onGreen : colors.text }}>
                             {opt.name}
                           </Text>
                         </TouchableOpacity>
@@ -873,12 +874,12 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
 
                 <View>
                   <View className="flex-row items-center gap-2 mb-2">
-                    <Heart size={18} color="#F39C12" />
-                    <Text className="font-inter-semibold" style={{ color: '#F5F5DC' }}>
+                    <Heart size={18} color={colors.orange} />
+                    <Text className="font-inter-semibold" style={{ color: colors.text }}>
                       What are you interested in?
                     </Text>
                   </View>
-                  <Text className="font-inter text-xs mb-3" style={{ color: '#9CA3AF' }}>
+                  <Text className="font-inter text-xs mb-3" style={{ color: colors.textMuted }}>
                     Only interests available in {destination}
                   </Text>
                   <View className="flex-row flex-wrap gap-2">
@@ -888,13 +889,13 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
                         onPress={() => toggleInterest(interest)}
                         className="px-4 py-2 rounded-full border-2"
                         style={{
-                          backgroundColor: interests.includes(interest) ? '#4CAF50' : '#1A1C19',
-                          borderColor: interests.includes(interest) ? '#4CAF50' : '#242922',
+                          backgroundColor: interests.includes(interest) ? colors.green : colors.inputBg,
+                          borderColor: interests.includes(interest) ? colors.green : colors.border,
                         }}
                       >
                         <Text
                           className="font-inter-semibold"
-                          style={{ color: interests.includes(interest) ? '#1A1C19' : '#F5F5DC' }}
+                          style={{ color: interests.includes(interest) ? colors.onGreen : colors.text }}
                         >
                           {interest}
                         </Text>
@@ -905,23 +906,23 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
 
                 <View>
                   <View className="flex-row items-center gap-2 mb-2">
-                    <Wallet size={18} color="#F39C12" />
-                    <Text className="font-inter-semibold" style={{ color: '#F5F5DC' }}>
+                    <Wallet size={18} color={colors.orange} />
+                    <Text className="font-inter-semibold" style={{ color: colors.text }}>
                       Budget (optional)
                     </Text>
                   </View>
                   <TextInput
                     className="font-inter rounded-xl px-4 py-3"
-                    style={{ backgroundColor: '#1A1C19', borderWidth: 1, borderColor: '#242922', color: '#F5F5DC' }}
+                    style={{ backgroundColor: colors.inputBg, borderWidth: 1, borderColor: colors.border, color: colors.text }}
                     placeholder="e.g., 50000"
-                    placeholderTextColor="#9CA3AF"
+                    placeholderTextColor={colors.textMuted}
                     value={budget}
                     onChangeText={setBudget}
                     keyboardType="number-pad"
                   />
                   <View className="flex-row items-center gap-2 mt-2">
-                    <Info size={14} color="#9CA3AF" />
-                    <Text className="font-inter text-xs flex-1" style={{ color: '#9CA3AF' }}>
+                    <Info size={14} color={colors.textMuted} />
+                    <Text className="font-inter text-xs flex-1" style={{ color: colors.textMuted }}>
                       Leave blank if you want a balanced plan.
                     </Text>
                   </View>
@@ -929,16 +930,16 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
 
                 <View>
                   <View className="flex-row items-center gap-2 mb-2">
-                    <MessageCircle size={18} color="#F39C12" />
-                    <Text className="font-inter-semibold" style={{ color: '#F5F5DC' }}>
+                    <MessageCircle size={18} color={colors.orange} />
+                    <Text className="font-inter-semibold" style={{ color: colors.text }}>
                       Personalize (optional)
                     </Text>
                   </View>
                   <TextInput
                     className="font-inter rounded-xl px-4 py-3"
-                    style={{ backgroundColor: '#1A1C19', borderWidth: 1, borderColor: '#242922', color: '#F5F5DC' }}
+                    style={{ backgroundColor: colors.inputBg, borderWidth: 1, borderColor: colors.border, color: colors.text }}
                     placeholder="Chat-style prompt… e.g., 'I love hidden cafes, no temples, and I want a chill pace.'"
-                    placeholderTextColor="#9CA3AF"
+                    placeholderTextColor={colors.textMuted}
                     value={personalPrompt}
                     onChangeText={setPersonalPrompt}
                     multiline
@@ -948,21 +949,21 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
                 <View className="flex-row gap-3 mt-2">
                   <TouchableOpacity
                     className="flex-1 border-2 rounded-xl py-4"
-                    style={{ backgroundColor: '#1A1C19', borderColor: '#242922' }}
+                    style={{ backgroundColor: colors.inputBg, borderColor: colors.border }}
                     onPress={() => setStep(1)}
                   >
-                    <Text className="font-inter-bold text-center text-lg" style={{ color: '#F5F5DC' }}>
+                    <Text className="font-inter-bold text-center text-lg" style={{ color: colors.text }}>
                       Back
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     className="flex-1 rounded-xl py-4 shadow-md"
-                    style={{ backgroundColor: '#4CAF50' }}
+                    style={{ backgroundColor: colors.green }}
                     onPress={handleGenerate}
                   >
                     <View className="flex-row items-center justify-center gap-2">
-                      <Sparkles size={20} color="#1A1C19" />
-                      <Text className="font-inter-bold text-center text-lg" style={{ color: '#1A1C19' }}>
+                      <Sparkles size={20} color={colors.onGreen} />
+                      <Text className="font-inter-bold text-center text-lg" style={{ color: colors.onGreen }}>
                         Generate Itinerary
                       </Text>
                     </View>
@@ -973,19 +974,19 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
           </View>
         </View>
 
-        <View className="rounded-2xl p-6 mb-6" style={{ backgroundColor: 'rgba(76, 175, 80, 0.15)', borderWidth: 1, borderColor: 'rgba(76, 175, 80, 0.3)' }}>
-          <Text className="font-inter-bold text-lg mb-3" style={{ color: '#F5F5DC' }}>
+        <View className="rounded-2xl p-6 mb-6" style={{ backgroundColor: colors.greenMuted, borderWidth: 1, borderColor: colors.greenBorder }}>
+          <Text className="font-inter-bold text-lg mb-3" style={{ color: colors.text }}>
             🎉 Demo Itinerary
           </Text>
-          <Text className="font-inter mb-4" style={{ color: 'rgba(245, 245, 220, 0.8)' }}>
+          <Text className="font-inter mb-4" style={{ color: colors.textSecondary }}>
             See how YatraAI creates perfect travel plans. Check out our sample Goa itinerary!
           </Text>
           <TouchableOpacity
             className="border-2 rounded-xl py-3"
-            style={{ backgroundColor: '#242922', borderColor: '#4CAF50' }}
+            style={{ backgroundColor: colors.card, borderColor: colors.green }}
             onPress={() => router.push('/(tabs)/itinerary')}
           >
-            <Text className="font-inter-bold text-center" style={{ color: '#4CAF50' }}>
+            <Text className="font-inter-bold text-center" style={{ color: colors.green }}>
               View Demo
             </Text>
           </TouchableOpacity>

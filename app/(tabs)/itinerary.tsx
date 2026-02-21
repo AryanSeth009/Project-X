@@ -45,6 +45,7 @@ import {
 import * as Clipboard from 'expo-clipboard';
 import { useStore } from '@/store/useStore';
 import { supabase } from '@/lib/supabase';
+import { useTheme } from '@/context/ThemeContext';
 
 const categoryIcons: any = {
   attraction: '🏛️',
@@ -75,6 +76,7 @@ export default function ItineraryScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { currentItinerary, user, itineraries, setCurrentItinerary, deleteItinerary } = useStore();
+  const { colors } = useTheme();
   const [loading, setLoading] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [history, setHistory] = useState<ItineraryListItem[]>([]);
@@ -622,28 +624,28 @@ export default function ItineraryScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center" style={{ backgroundColor: '#1A1C19' }}>
-        <Text className="font-inter" style={{ color: '#F5F5DC' }}>Loading itinerary...</Text>
+      <View className="flex-1 items-center justify-center" style={{ backgroundColor: colors.background }}>
+        <Text className="font-inter" style={{ color: colors.text }}>Loading itinerary...</Text>
       </View>
     );
   }
 
   if (!currentItinerary) {
     return (
-      <View className="flex-1 items-center justify-center px-6" style={{ backgroundColor: '#1A1C19' }}>
+      <View className="flex-1 items-center justify-center px-6" style={{ backgroundColor: colors.background }}>
         <Text className="text-6xl mb-4">📋</Text>
-        <Text className="font-inter-bold text-2xl mb-2" style={{ color: '#F5F5DC' }}>
+        <Text className="font-inter-bold text-2xl mb-2" style={{ color: colors.text }}>
           No Itinerary Yet
         </Text>
-        <Text className="font-inter text-center" style={{ color: '#9CA3AF' }}>
+        <Text className="font-inter text-center" style={{ color: colors.textMuted }}>
           Create your first itinerary from the Home tab
         </Text>
         <TouchableOpacity
           className="mt-6 rounded-xl px-5 py-3"
-          style={{ backgroundColor: '#4CAF50' }}
+          style={{ backgroundColor: colors.green }}
           onPress={() => router.push('/(tabs)/home')}
         >
-          <Text className="font-inter-bold" style={{ color: '#1A1C19' }}>Go to Home</Text>
+          <Text className="font-inter-bold" style={{ color: colors.onGreen }}>Go to Home</Text>
         </TouchableOpacity>
       </View>
     );
@@ -679,25 +681,25 @@ export default function ItineraryScreen() {
   };
 
   return (
-    <ScrollView className="flex-1" style={{ backgroundColor: '#1A1C19' }} showsVerticalScrollIndicator={false}>
+    <ScrollView className="flex-1" style={{ backgroundColor: colors.background }} showsVerticalScrollIndicator={false}>
       <LinearGradient
-        colors={['#242922', '#1A1C19']}
+        colors={[colors.backgroundSecondary, colors.background]}
         className="pt-12 pb-6 px-6"
       >
         <View className="flex-row items-start justify-between gap-3">
           <View className="flex-1">
-            <Text className="font-inter-bold text-3xl mb-2" style={{ color: '#F5F5DC' }}>
+            <Text className="font-inter-bold text-3xl mb-2" style={{ color: colors.text }}>
               {currentItinerary.title}
             </Text>
             <View className="flex-row items-center gap-2">
-              <MapPin size={16} color="#4CAF50" />
-              <Text className="font-inter-medium text-lg" style={{ color: 'rgba(245, 245, 220, 0.9)' }}>
+              <MapPin size={16} color={colors.green} />
+              <Text className="font-inter-medium text-lg" style={{ color: colors.textSecondary }}>
                 {currentItinerary.destination}
               </Text>
             </View>
             {aiProviderLabel && (
-              <View className="mt-2 self-start rounded-full px-3 py-1" style={{ backgroundColor: 'rgba(76, 175, 80, 0.25)' }}>
-                <Text className="font-inter text-xs" style={{ color: '#F5F5DC' }}>{aiProviderLabel}</Text>
+              <View className="mt-2 self-start rounded-full px-3 py-1" style={{ backgroundColor: colors.greenMuted }}>
+                <Text className="font-inter text-xs" style={{ color: colors.text }}>{aiProviderLabel}</Text>
               </View>
             )}
           </View>
@@ -706,19 +708,19 @@ export default function ItineraryScreen() {
             {/* Collab icon with collaborator count badge */}
             <TouchableOpacity
               className="relative w-10 h-10 rounded-xl items-center justify-center"
-              style={{ backgroundColor: 'rgba(36, 41, 34, 0.8)' }}
+              style={{ backgroundColor: colors.card + 'CC' }}
               onPress={() => {
                 if (currentItinerary) loadCollaborators(currentItinerary.id);
                 setShowCollabModal(true);
               }}
             >
-              <Users2 size={20} color="#4CAF50" />
+              <Users2 size={20} color={colors.green} />
               {collaborators.filter(c => c.status === 'accepted').length > 0 && (
                 <View
                   className="absolute -top-1 -right-1 w-4 h-4 rounded-full items-center justify-center"
-                  style={{ backgroundColor: '#4CAF50' }}
+                  style={{ backgroundColor: colors.green }}
                 >
-                  <Text className="text-xs font-bold" style={{ color: '#1A1C19', fontSize: 9 }}>
+                  <Text className="text-xs font-bold" style={{ color: colors.onGreen, fontSize: 9 }}>
                     {collaborators.filter(c => c.status === 'accepted').length}
                   </Text>
                 </View>
@@ -728,36 +730,36 @@ export default function ItineraryScreen() {
             {/* 🔔 Notification bell with unread badge */}
             <TouchableOpacity
               className="relative w-10 h-10 rounded-xl items-center justify-center"
-              style={{ backgroundColor: 'rgba(36, 41, 34, 0.8)' }}
+              style={{ backgroundColor: colors.card + 'CC' }}
               onPress={() => { setShowNotifModal(true); loadNotifications(); }}
             >
-              <Bell size={20} color={unreadCount > 0 ? '#F39C12' : '#9CA3AF'} />
+              <Bell size={20} color={unreadCount > 0 ? colors.orange : colors.textMuted} />
               {unreadCount > 0 && (
                 <View
                   className="absolute -top-1 -right-1 w-4 h-4 rounded-full items-center justify-center"
-                  style={{ backgroundColor: '#EF4444' }}
+                  style={{ backgroundColor: colors.error }}
                 >
                   <Text style={{ color: '#fff', fontSize: 9, fontWeight: 'bold' }}>{unreadCount}</Text>
                 </View>
               )}
             </TouchableOpacity>
 
-            <View className="flex-row rounded-2xl p-1" style={{ backgroundColor: 'rgba(36, 41, 34, 0.8)' }}>
+            <View className="flex-row rounded-2xl p-1" style={{ backgroundColor: colors.card + 'CC' }}>
               <TouchableOpacity
                 className={`px-3 py-2 rounded-xl flex-row items-center gap-2 ${mode === 'view' ? '' : ''}`}
-                style={mode === 'view' ? { backgroundColor: 'rgba(76, 175, 80, 0.3)' } : {}}
+                style={mode === 'view' ? { backgroundColor: colors.greenMuted } : {}}
                 onPress={() => setMode('view')}
               >
-                <Eye size={16} color="#F5F5DC" />
-                <Text className="font-inter-bold" style={{ color: '#F5F5DC' }}>View</Text>
+                <Eye size={16} color={colors.text} />
+                <Text className="font-inter-bold" style={{ color: colors.text }}>View</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 className={`px-3 py-2 rounded-xl flex-row items-center gap-2 ${mode === 'edit' ? '' : ''}`}
-                style={mode === 'edit' ? { backgroundColor: 'rgba(76, 175, 80, 0.3)' } : {}}
+                style={mode === 'edit' ? { backgroundColor: colors.greenMuted } : {}}
                 onPress={() => setMode('edit')}
               >
-                <Pencil size={16} color="#F5F5DC" />
-                <Text className="font-inter-bold" style={{ color: '#F5F5DC' }}>Edit</Text>
+                <Pencil size={16} color={colors.text} />
+                <Text className="font-inter-bold" style={{ color: colors.text }}>Edit</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -772,22 +774,22 @@ export default function ItineraryScreen() {
         onRequestClose={() => setShowCollabModal(false)}
       >
         <View className="flex-1 justify-end" style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}>
-          <View className="rounded-t-3xl" style={{ backgroundColor: '#242922', maxHeight: '85%' }}>
+          <View className="rounded-t-3xl" style={{ backgroundColor: colors.card, maxHeight: '85%' }}>
             {/* Header */}
             <View className="flex-row items-center justify-between px-6 pt-6 pb-4">
               <View className="flex-row items-center gap-2">
-                <Users2 size={22} color="#4CAF50" />
-                <Text className="font-inter-bold text-xl" style={{ color: '#F5F5DC' }}>Collaborators</Text>
+                <Users2 size={22} color={colors.green} />
+                <Text className="font-inter-bold text-xl" style={{ color: colors.text }}>Collaborators</Text>
               </View>
               <TouchableOpacity onPress={() => setShowCollabModal(false)}>
-                <X size={22} color="#9CA3AF" />
+                <X size={22} color={colors.textMuted} />
               </TouchableOpacity>
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false} className="px-6">
               {/* Current collaborators */}
               {collaborators.length === 0 ? (
-                <Text className="text-center py-4 font-inter" style={{ color: '#9CA3AF' }}>
+                <Text className="text-center py-4 font-inter" style={{ color: colors.textMuted }}>
                   No collaborators yet. Invite someone below!
                 </Text>
               ) : (
@@ -795,27 +797,27 @@ export default function ItineraryScreen() {
                   <View
                     key={c.id}
                     className="flex-row items-center justify-between py-3 border-b"
-                    style={{ borderColor: '#1A1C19' }}
+                    style={{ borderColor: colors.divider }}
                   >
                     {/* Avatar + info */}
                     <View className="flex-row items-center gap-3">
                       <View
                         className="w-10 h-10 rounded-full items-center justify-center"
-                        style={{ backgroundColor: c.status === 'accepted' ? 'rgba(76,175,80,0.3)' : 'rgba(156,163,175,0.2)' }}
+                        style={{ backgroundColor: c.status === 'accepted' ? colors.greenMuted : colors.textMuted + '33' }}
                       >
-                        <Text className="font-inter-bold" style={{ color: c.status === 'accepted' ? '#4CAF50' : '#9CA3AF' }}>
+                        <Text className="font-inter-bold" style={{ color: c.status === 'accepted' ? colors.green : colors.textMuted }}>
                           {c.email?.[0]?.toUpperCase() || '?'}
                         </Text>
                       </View>
                       <View>
-                        <Text className="font-inter-medium" style={{ color: '#F5F5DC' }} numberOfLines={1}>
+                        <Text className="font-inter-medium" style={{ color: colors.text }} numberOfLines={1}>
                           {c.email}
                         </Text>
                         <View
                           className="self-start px-2 py-0.5 rounded-full mt-0.5"
-                          style={{ backgroundColor: c.status === 'pending' ? 'rgba(243,156,18,0.2)' : 'rgba(76,175,80,0.2)' }}
+                          style={{ backgroundColor: c.status === 'pending' ? colors.orangeMuted : colors.greenMuted }}
                         >
-                          <Text className="text-xs" style={{ color: c.status === 'pending' ? '#F39C12' : '#4CAF50' }}>
+                          <Text className="text-xs" style={{ color: c.status === 'pending' ? colors.orange : colors.green }}>
                             {c.status === 'pending' ? 'Pending' : c.role === 'editor' ? 'Editor' : 'Viewer'}
                           </Text>
                         </View>
@@ -827,15 +829,15 @@ export default function ItineraryScreen() {
                       <View className="flex-row items-center gap-2">
                         <TouchableOpacity
                           className="px-2 py-1 rounded-lg"
-                          style={{ backgroundColor: 'rgba(76,175,80,0.15)' }}
+                          style={{ backgroundColor: colors.greenMuted }}
                           onPress={() => handleChangeRole(c.id, c.role === 'editor' ? 'viewer' : 'editor')}
                         >
-                          <Text className="text-xs font-bold" style={{ color: '#4CAF50' }}>
+                          <Text className="text-xs font-bold" style={{ color: colors.green }}>
                             {c.role === 'editor' ? '→ Viewer' : '→ Editor'}
                           </Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => handleRemoveCollaborator(c.id)}>
-                          <X size={16} color="#EF4444" />
+                          <X size={16} color={colors.error} />
                         </TouchableOpacity>
                       </View>
                     )}
@@ -845,13 +847,13 @@ export default function ItineraryScreen() {
 
               {/* Invite section */}
               <View className="mt-6 mb-4">
-                <Text className="font-inter-bold mb-3" style={{ color: '#F5F5DC' }}>Invite by email</Text>
+                <Text className="font-inter-bold mb-3" style={{ color: colors.text }}>Invite by email</Text>
                 <View className="flex-row gap-2">
                   <TextInput
                     className="flex-1 rounded-xl px-4 py-3 font-inter"
-                    style={{ backgroundColor: '#1A1C19', color: '#F5F5DC', borderWidth: 1, borderColor: '#333' }}
+                    style={{ backgroundColor: colors.background, color: colors.text, borderWidth: 1, borderColor: colors.border }}
                     placeholder="friend@example.com"
-                    placeholderTextColor="#9CA3AF"
+                    placeholderTextColor={colors.textMuted}
                     value={inviteEmail}
                     onChangeText={setInviteEmail}
                     keyboardType="email-address"
@@ -859,11 +861,11 @@ export default function ItineraryScreen() {
                   />
                   <TouchableOpacity
                     className="rounded-xl px-4 items-center justify-center"
-                    style={{ backgroundColor: inviteSending ? '#333' : '#4CAF50' }}
+                    style={{ backgroundColor: inviteSending ? colors.border : colors.green }}
                     onPress={sendInvite}
                     disabled={inviteSending}
                   >
-                    <Send size={18} color="#1A1C19" />
+                    <Send size={18} color={colors.onGreen} />
                   </TouchableOpacity>
                 </View>
 
@@ -871,14 +873,14 @@ export default function ItineraryScreen() {
                 {inviteLink ? (
                   <TouchableOpacity
                     className="flex-row items-center justify-center gap-2 mt-3 py-3 rounded-xl border"
-                    style={{ borderColor: '#4CAF50' }}
+                    style={{ borderColor: colors.green }}
                     onPress={() => { Clipboard.setStringAsync(inviteLink); Alert.alert('Copied!', 'Invite link copied to clipboard.'); }}
                   >
-                    <Copy size={16} color="#4CAF50" />
-                    <Text className="font-inter-medium" style={{ color: '#4CAF50' }}>Copy Invite Link</Text>
+                    <Copy size={16} color={colors.green} />
+                    <Text className="font-inter-medium" style={{ color: colors.green }}>Copy Invite Link</Text>
                   </TouchableOpacity>
                 ) : (
-                  <Text className="text-xs mt-2 text-center" style={{ color: '#9CA3AF' }}>
+                  <Text className="text-xs mt-2 text-center" style={{ color: colors.textMuted }}>
                     Send an invite to get a shareable link — works for new users too
                   </Text>
                 )}
@@ -891,7 +893,7 @@ export default function ItineraryScreen() {
       <View className="px-6 py-4">
         {/* History picker */}
         <View className="mb-6">
-          <Text className="font-inter-bold text-sm mb-3" style={{ color: '#F5F5DC' }}>History</Text>
+          <Text className="font-inter-bold text-sm mb-3" style={{ color: colors.text }}>History</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View className="flex-row gap-3">
               {(history.length ? history : (itineraries as any)).slice(0, 20).map((it: any) => {
@@ -900,7 +902,7 @@ export default function ItineraryScreen() {
                   <View key={it.id} className="mr-4">
                     <TouchableOpacity
                       className="w-64 h-40 rounded-3xl overflow-hidden shadow-lg border-2"
-                      style={{ borderColor: isActive ? '#4CAF50' : 'transparent' }}
+                      style={{ borderColor: isActive ? colors.green : 'transparent' }}
                       onPress={() => loadItineraryById(it.id)}
                       disabled={loadingHistory}
                     >
@@ -926,7 +928,7 @@ export default function ItineraryScreen() {
                             }}
                             className="bg-black/40 p-1.5 rounded-full"
                           >
-                            <Trash2 size={14} color="#FF6B6B" />
+                            <Trash2 size={14} color={colors.error} />
                           </TouchableOpacity>
                         </View>
                       </LinearGradient>
@@ -938,23 +940,23 @@ export default function ItineraryScreen() {
           </ScrollView>
         </View>
 
-        <View className="rounded-2xl p-4 shadow-md mb-6 flex-row justify-around" style={{ backgroundColor: '#242922' }}>
+        <View className="rounded-2xl p-4 shadow-md mb-6 flex-row justify-around" style={{ backgroundColor: colors.card }}>
           <View className="items-center">
             <View className="flex-row items-center gap-1 mb-1">
-              <Calendar size={16} color="#F39C12" />
-              <Text className="text-xs" style={{ color: '#9CA3AF' }}>Duration</Text>
+              <Calendar size={16} color={colors.orange} />
+              <Text className="text-xs" style={{ color: colors.textMuted }}>Duration</Text>
             </View>
-            <Text className="font-inter-bold text-lg" style={{ color: '#F5F5DC' }}>
+            <Text className="font-inter-bold text-lg" style={{ color: colors.text }}>
               {(currentItinerary as any).title?.toLowerCase().includes('top 10') ? 'Top 10' : `${currentItinerary.days.length} Days`}
             </Text>
           </View>
-          <View className="w-px" style={{ backgroundColor: '#1A1C19' }} />
+          <View className="w-px" style={{ backgroundColor: colors.background }} />
           <View className="items-center">
             <View className="flex-row items-center gap-1 mb-1">
-              <Wallet size={16} color="#F39C12" />
-              <Text className="text-xs" style={{ color: '#9CA3AF' }}>Budget</Text>
+              <Wallet size={16} color={colors.orange} />
+              <Text className="text-xs" style={{ color: colors.textMuted }}>Budget</Text>
             </View>
-            <Text className="font-inter-bold text-lg" style={{ color: '#F5F5DC' }}>
+            <Text className="font-inter-bold text-lg" style={{ color: colors.text }}>
               ₹{currentItinerary.budget.toLocaleString()}
             </Text>
           </View>
@@ -963,42 +965,42 @@ export default function ItineraryScreen() {
         <View className="flex-row gap-3 mb-6">
           <TouchableOpacity
             className="flex-1 rounded-xl py-3 flex-row items-center justify-center gap-2"
-            style={{ backgroundColor: '#4CAF50' }}
+            style={{ backgroundColor: colors.green }}
             onPress={handleShare}
           >
-            <Share2 size={18} color="#1A1C19" />
-            <Text className="font-bold" style={{ color: '#1A1C19' }}>Share</Text>
+            <Share2 size={18} color={colors.onGreen} />
+            <Text className="font-bold" style={{ color: colors.onGreen }}>Share</Text>
           </TouchableOpacity>
-          <TouchableOpacity className="flex-1 border-2 rounded-xl py-3 flex-row items-center justify-center gap-2" style={{ backgroundColor: '#242922', borderColor: '#4CAF50' }}>
-            <Download size={18} color="#F39C12" />
-            <Text className="font-bold" style={{ color: '#4CAF50' }}>PDF</Text>
+          <TouchableOpacity className="flex-1 border-2 rounded-xl py-3 flex-row items-center justify-center gap-2" style={{ backgroundColor: colors.card, borderColor: colors.green }}>
+            <Download size={18} color={colors.orange} />
+            <Text className="font-bold" style={{ color: colors.green }}>PDF</Text>
           </TouchableOpacity>
         </View>
 
         {mode === 'view' ? (
           <>
-            <Text className="font-inter-bold text-2xl mb-4" style={{ color: '#F5F5DC' }}>
+            <Text className="font-inter-bold text-2xl mb-4" style={{ color: colors.text }}>
               Your Journey
             </Text>
 
             {currentItinerary.days.map((day) => (
               <View key={day.id} className="mb-6">
-                <View className="rounded-t-2xl p-4 border-l-4" style={{ backgroundColor: '#242922', borderLeftColor: '#4CAF50' }}>
+                <View className="rounded-t-2xl p-4 border-l-4" style={{ backgroundColor: colors.card, borderLeftColor: colors.green }}>
                   <View className="flex-row items-center justify-between mb-1">
-                    <Text className="font-inter-bold text-lg" style={{ color: '#F5F5DC' }}>
+                    <Text className="font-inter-bold text-lg" style={{ color: colors.text }}>
                       {(currentItinerary as any).title?.toLowerCase().includes('top 10') ? 'Top Recommended Spots' : `Day ${day.day_number}`}
                     </Text>
-                    <Text className="text-sm" style={{ color: '#9CA3AF' }}>
+                    <Text className="text-sm" style={{ color: colors.textMuted }}>
                       {new Date(day.date).toLocaleDateString('en-IN', {
                         month: 'short',
                         day: 'numeric',
                       })}
                     </Text>
                   </View>
-                  <Text style={{ color: 'rgba(245, 245, 220, 0.8)' }}>{day.title}</Text>
+                  <Text style={{ color: colors.textSecondary }}>{day.title}</Text>
                 </View>
 
-                <View className="rounded-b-2xl px-4 pb-4 shadow-lg" style={{ backgroundColor: '#242922' }}>
+                <View className="rounded-b-2xl px-4 pb-4 shadow-lg" style={{ backgroundColor: colors.card }}>
                   {day.activities.map((activity, actIndex) => (
                     <View key={activity.id || `activity-${day.id}-${actIndex}`}>
                       <TouchableOpacity 
@@ -1026,30 +1028,30 @@ export default function ItineraryScreen() {
                         <View className="flex-1">
                           <View className="flex-row items-start justify-between mb-2">
                             <View className="flex-1">
-                              <Text className="text-base font-bold mb-1" style={{ color: '#F5F5DC' }}>
+                              <Text className="text-base font-bold mb-1" style={{ color: colors.text }}>
                                 {activity.title}
                               </Text>
                               <View className="flex-row items-center gap-1 mb-1">
-                                <Clock size={12} color="#9CA3AF" />
-                                <Text className="text-xs" style={{ color: '#9CA3AF' }}>
+                                <Clock size={12} color={colors.textMuted} />
+                                <Text className="text-xs" style={{ color: colors.textMuted }}>
                                   {activity.time_start} - {activity.time_end}
                                 </Text>
                               </View>
                               <View className="flex-row items-center gap-1">
-                                <MapPin size={12} color="#9CA3AF" />
-                                <Text className="text-xs" numberOfLines={1} style={{ color: '#9CA3AF' }}>
+                                <MapPin size={12} color={colors.textMuted} />
+                                <Text className="text-xs" numberOfLines={1} style={{ color: colors.textMuted }}>
                                   {activity.location}
                                 </Text>
                               </View>
                             </View>
-                            <View className="px-3 py-1 rounded-full flex-row items-center gap-1" style={{ backgroundColor: 'rgba(243, 156, 18, 0.15)' }}>
-                              <Clock size={11} color="#F39C12" />
-                              <Text className="font-bold text-xs" style={{ color: '#F39C12' }}>
+                            <View className="px-3 py-1 rounded-full flex-row items-center gap-1" style={{ backgroundColor: colors.orangeMuted }}>
+                              <Clock size={11} color={colors.orange} />
+                              <Text className="font-bold text-xs" style={{ color: colors.orange }}>
                                 {activity.time_start}–{activity.time_end}
                               </Text>
                             </View>
                             <View className="ml-2 self-center">
-                              <ChevronRight size={18} color="#9CA3AF" />
+                              <ChevronRight size={18} color={colors.textMuted} />
                             </View>
                           </View>
 
@@ -1061,7 +1063,7 @@ export default function ItineraryScreen() {
                             />
                           )}
 
-                          <Text className="text-sm leading-5" numberOfLines={2} style={{ color: 'rgba(245, 245, 220, 0.8)' }}>
+                          <Text className="text-sm leading-5" numberOfLines={2} style={{ color: colors.textSecondary }}>
                             {activity.description}
                           </Text>
 
@@ -1069,21 +1071,21 @@ export default function ItineraryScreen() {
                           <View className="flex-row gap-3 mt-3">
                             <TouchableOpacity
                               className="flex-row items-center gap-1 px-3 py-1.5 rounded-full"
-                              style={{ backgroundColor: votes[activity.id]?.myVote === 1 ? 'rgba(76,175,80,0.3)' : 'rgba(255,255,255,0.06)' }}
+                              style={{ backgroundColor: votes[activity.id]?.myVote === 1 ? colors.greenMuted : colors.textMuted + '0F' }}
                               onPress={() => handleVote(activity.id, 1)}
                             >
-                              <ThumbsUp size={13} color={votes[activity.id]?.myVote === 1 ? '#4CAF50' : '#9CA3AF'} />
-                              <Text className="text-xs font-bold" style={{ color: votes[activity.id]?.myVote === 1 ? '#4CAF50' : '#9CA3AF' }}>
+                              <ThumbsUp size={13} color={votes[activity.id]?.myVote === 1 ? colors.green : colors.textMuted} />
+                              <Text className="text-xs font-bold" style={{ color: votes[activity.id]?.myVote === 1 ? colors.green : colors.textMuted }}>
                                 {votes[activity.id]?.up || 0}
                               </Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                               className="flex-row items-center gap-1 px-3 py-1.5 rounded-full"
-                              style={{ backgroundColor: votes[activity.id]?.myVote === -1 ? 'rgba(239,68,68,0.2)' : 'rgba(255,255,255,0.06)' }}
+                              style={{ backgroundColor: votes[activity.id]?.myVote === -1 ? colors.errorMuted : colors.textMuted + '0F' }}
                               onPress={() => handleVote(activity.id, -1)}
                             >
-                              <ThumbsDown size={13} color={votes[activity.id]?.myVote === -1 ? '#EF4444' : '#9CA3AF'} />
-                              <Text className="text-xs font-bold" style={{ color: votes[activity.id]?.myVote === -1 ? '#EF4444' : '#9CA3AF' }}>
+                              <ThumbsDown size={13} color={votes[activity.id]?.myVote === -1 ? colors.error : colors.textMuted} />
+                              <Text className="text-xs font-bold" style={{ color: votes[activity.id]?.myVote === -1 ? colors.error : colors.textMuted }}>
                                 {votes[activity.id]?.down || 0}
                               </Text>
                             </TouchableOpacity>
@@ -1091,7 +1093,7 @@ export default function ItineraryScreen() {
                         </View>
                       </TouchableOpacity>
                       {actIndex < day.activities.length - 1 && (
-                        <View className="h-px" style={{ backgroundColor: '#1A1C19' }} />
+                        <View className="h-px" style={{ backgroundColor: colors.background }} />
                       )}
                     </View>
                   ))}
@@ -1107,14 +1109,14 @@ export default function ItineraryScreen() {
               onRequestClose={() => setShowNotifModal(false)}
             >
               <View className="flex-1 justify-end" style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}>
-                <View className="rounded-t-3xl pt-4 pb-10 px-4" style={{ backgroundColor: '#1A1C19', maxHeight: '80%' }}>
+                <View className="rounded-t-3xl pt-4 pb-10 px-4" style={{ backgroundColor: colors.background, maxHeight: '80%' }}>
                   {/* Handle bar */}
                   <View className="w-10 h-1 rounded-full self-center mb-4" style={{ backgroundColor: '#333' }} />
 
                   <View className="flex-row items-center justify-between mb-4">
-                    <Text className="text-xl font-bold" style={{ color: '#F5F5DC' }}>Notifications</Text>
+                    <Text className="text-xl font-bold" style={{ color: colors.text }}>Notifications</Text>
                     <TouchableOpacity onPress={() => setShowNotifModal(false)}>
-                      <X size={22} color="#9CA3AF" />
+                      <X size={22} color={colors.textMuted} />
                     </TouchableOpacity>
                   </View>
 
@@ -1122,7 +1124,7 @@ export default function ItineraryScreen() {
                     {notifications.length === 0 ? (
                       <View className="items-center py-12">
                         <Bell size={40} color="#333" />
-                        <Text className="mt-3 text-sm" style={{ color: '#9CA3AF' }}>No notifications yet</Text>
+                        <Text className="mt-3 text-sm" style={{ color: colors.textMuted }}>No notifications yet</Text>
                       </View>
                     ) : (
                       notifications.map((notif) => (
@@ -1130,46 +1132,46 @@ export default function ItineraryScreen() {
                           key={notif.id}
                           className="rounded-2xl p-4 mb-3"
                           style={{
-                            backgroundColor: notif.is_read ? 'rgba(36,41,34,0.5)' : 'rgba(243,156,18,0.08)',
+                            backgroundColor: notif.is_read ? colors.card + '80' : colors.orangeMuted,
                             borderWidth: notif.is_read ? 0 : 1,
-                            borderColor: 'rgba(243,156,18,0.3)',
+                            borderColor: colors.orangeBorder,
                           }}
                         >
                           <View className="flex-row items-start gap-3">
-                            <View className="w-10 h-10 rounded-full items-center justify-center" style={{ backgroundColor: 'rgba(243,156,18,0.15)' }}>
-                              <Bell size={18} color="#F39C12" />
+                            <View className="w-10 h-10 rounded-full items-center justify-center" style={{ backgroundColor: colors.orangeMuted }}>
+                              <Bell size={18} color={colors.orange} />
                             </View>
                             <View className="flex-1">
-                              <Text className="font-bold text-sm mb-0.5" style={{ color: '#F5F5DC' }}>{notif.title}</Text>
-                              <Text className="text-xs leading-4 mb-3" style={{ color: '#9CA3AF' }}>{notif.body}</Text>
+                              <Text className="font-bold text-sm mb-0.5" style={{ color: colors.text }}>{notif.title}</Text>
+                              <Text className="text-xs leading-4 mb-3" style={{ color: colors.textMuted }}>{notif.body}</Text>
 
                               {notif.type === 'collab_invite' && !notif.is_read && (
                                 <View className="flex-row gap-2">
                                   <TouchableOpacity
                                     className="flex-1 py-2 rounded-xl items-center"
-                                    style={{ backgroundColor: 'rgba(76,175,80,0.25)' }}
+                                    style={{ backgroundColor: colors.greenMuted }}
                                     onPress={() => respondToNotification(notif.id, 'accept')}
                                   >
                                     <View className="flex-row items-center gap-1">
-                                      <CheckCircle size={14} color="#4CAF50" />
-                                      <Text className="text-xs font-bold" style={{ color: '#4CAF50' }}>Accept</Text>
+                                      <CheckCircle size={14} color={colors.green} />
+                                      <Text className="text-xs font-bold" style={{ color: colors.green }}>Accept</Text>
                                     </View>
                                   </TouchableOpacity>
                                   <TouchableOpacity
                                     className="flex-1 py-2 rounded-xl items-center"
-                                    style={{ backgroundColor: 'rgba(239,68,68,0.15)' }}
+                                    style={{ backgroundColor: colors.errorMuted }}
                                     onPress={() => respondToNotification(notif.id, 'decline')}
                                   >
                                     <View className="flex-row items-center gap-1">
-                                      <XCircle size={14} color="#EF4444" />
-                                      <Text className="text-xs font-bold" style={{ color: '#EF4444' }}>Decline</Text>
+                                      <XCircle size={14} color={colors.error} />
+                                      <Text className="text-xs font-bold" style={{ color: colors.error }}>Decline</Text>
                                     </View>
                                   </TouchableOpacity>
                                 </View>
                               )}
 
                               {notif.is_read && (
-                                <Text className="text-xs" style={{ color: 'rgba(76,175,80,0.7)' }}>✓ Responded</Text>
+                                <Text className="text-xs" style={{ color: colors.green }}>✓ Responded</Text>
                               )}
                             </View>
                           </View>
@@ -1189,7 +1191,7 @@ export default function ItineraryScreen() {
               onRequestClose={() => setShowDetailModal(false)}
             >
               <View className="flex-1 justify-end" style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}>
-                <View className="h-[90%] rounded-t-[40px] overflow-hidden" style={{ backgroundColor: '#242922' }}>
+                <View className="h-[90%] rounded-t-[40px] overflow-hidden" style={{ backgroundColor: colors.card }}>
                   <ScrollView showsVerticalScrollIndicator={false}>
                     {/* Header Image */}
                     <View className="h-80 w-full relative">
@@ -1203,12 +1205,12 @@ export default function ItineraryScreen() {
                           onPress={() => setShowDetailModal(false)}
                           className="w-12 h-12 items-center justify-center"
                         >
-                          <ChevronRight size={24} color="#F5F5DC" style={{ transform: [{rotate: '180deg'}] }} />
+                          <ChevronRight size={24} color={colors.text} style={{ transform: [{rotate: '180deg'}] }} />
                         </TouchableOpacity>
                       </BlurView>
 
                       <LinearGradient
-                        colors={['transparent', '#242922']}
+                        colors={['transparent', colors.card]}
                         className="absolute bottom-0 left-0 right-0 h-24"
                       />
                     </View>
@@ -1217,18 +1219,18 @@ export default function ItineraryScreen() {
                     <View className="px-8 pb-12">
                       <View className="flex-row justify-between items-start mb-6">
                         <View className="flex-1 mr-4">
-                          <Text className="font-inter-bold text-3xl mb-2" style={{ color: '#F5F5DC' }}>
+                          <Text className="font-inter-bold text-3xl mb-2" style={{ color: colors.text }}>
                             {selectedActivity?.title}
                           </Text>
                           <View className="flex-row items-center gap-2">
-                            <MapPin size={16} color="#F39C12" />
-                            <Text className="font-inter-medium" style={{ color: '#9CA3AF' }}>
+                            <MapPin size={16} color={colors.orange} />
+                            <Text className="font-inter-medium" style={{ color: colors.textMuted }}>
                               {selectedActivity?.location}
                             </Text>
                           </View>
                         </View>
-                        <View className="px-4 py-2 rounded-2xl" style={{ backgroundColor: '#1A1C19' }}>
-                          <Text className="font-inter-bold" style={{ color: '#4CAF50' }}>
+                        <View className="px-4 py-2 rounded-2xl" style={{ backgroundColor: colors.background }}>
+                          <Text className="font-inter-bold" style={{ color: colors.green }}>
                             ₹{selectedActivity?.cost}
                           </Text>
                         </View>
@@ -1236,23 +1238,23 @@ export default function ItineraryScreen() {
 
                       {/* Stats */}
                       <View className="flex-row gap-4 mb-8">
-                        <View className="px-4 py-3 rounded-2xl flex-row items-center gap-2" style={{ backgroundColor: '#1A1C19' }}>
-                          <Clock size={16} color="#9CA3AF" />
-                          <Text className="font-inter-medium" style={{ color: '#F5F5DC' }}>
+                        <View className="px-4 py-3 rounded-2xl flex-row items-center gap-2" style={{ backgroundColor: colors.background }}>
+                          <Clock size={16} color={colors.textMuted} />
+                          <Text className="font-inter-medium" style={{ color: colors.text }}>
                             {selectedActivity?.time_start} - {selectedActivity?.time_end}
                           </Text>
                         </View>
-                        <View className="px-4 py-3 rounded-2xl flex-row items-center gap-2" style={{ backgroundColor: '#1A1C19' }}>
+                        <View className="px-4 py-3 rounded-2xl flex-row items-center gap-2" style={{ backgroundColor: colors.background }}>
                           <Text className="text-lg">{categoryIcons[selectedActivity?.category]}</Text>
-                          <Text className="font-inter-medium" style={{ color: '#F5F5DC' }}>
+                          <Text className="font-inter-medium" style={{ color: colors.text }}>
                             {selectedActivity?.category?.charAt(0).toUpperCase() + selectedActivity?.category?.slice(1)}
                           </Text>
                         </View>
                       </View>
 
                       {/* Description */}
-                      <Text className="font-inter-bold text-xl mb-3" style={{ color: '#F5F5DC' }}>About</Text>
-                      <Text className="font-inter leading-7 text-lg mb-10" style={{ color: 'rgba(245, 245, 220, 0.85)' }}>
+                      <Text className="font-inter-bold text-xl mb-3" style={{ color: colors.text }}>About</Text>
+                      <Text className="font-inter leading-7 text-lg mb-10" style={{ color: colors.textSecondary }}>
                         {selectedActivity?.description}
                       </Text>
 
@@ -1260,11 +1262,11 @@ export default function ItineraryScreen() {
                       <TouchableOpacity
                         onPress={() => openInMaps(selectedActivity?.location || selectedActivity?.title)}
                         className="h-16 rounded-2xl flex-row items-center justify-center gap-3 shadow-lg"
-                        style={{ backgroundColor: '#4CAF50' }}
+                        style={{ backgroundColor: colors.green }}
                       >
-                        <Navigation size={22} color="#1A1C19" />
-                        <Text className="font-inter-bold text-lg" style={{ color: '#1A1C19' }}>Open in Maps</Text>
-                        <ExternalLink size={18} color="#1A1C19" />
+                        <Navigation size={22} color={colors.onGreen} />
+                        <Text className="font-inter-bold text-lg" style={{ color: colors.onGreen }}>Open in Maps</Text>
+                        <ExternalLink size={18} color={colors.onGreen} />
                       </TouchableOpacity>
                     </View>
                   </ScrollView>
@@ -1274,17 +1276,17 @@ export default function ItineraryScreen() {
           </>
         ) : (
           <>
-            <Text className="font-inter-bold text-2xl mb-4" style={{ color: '#F5F5DC' }}>
+            <Text className="font-inter-bold text-2xl mb-4" style={{ color: colors.text }}>
               Edit in place
             </Text>
 
             {currentItinerary.days.map((day) => (
               <View key={day.id} className="mb-6">
-                <View className="rounded-t-2xl p-4 border-l-4" style={{ backgroundColor: '#242922', borderLeftColor: '#4CAF50' }}>
-                  <Text className="font-inter-bold text-lg" style={{ color: '#F5F5DC' }}>
+                <View className="rounded-t-2xl p-4 border-l-4" style={{ backgroundColor: colors.card, borderLeftColor: colors.green }}>
+                  <Text className="font-inter-bold text-lg" style={{ color: colors.text }}>
                     Day {day.day_number}: {day.title}
                   </Text>
-                  <Text className="text-sm" style={{ color: '#9CA3AF' }}>
+                  <Text className="text-sm" style={{ color: colors.textMuted }}>
                     {new Date(day.date).toLocaleDateString('en-IN', {
                       weekday: 'long',
                       month: 'long',
@@ -1293,20 +1295,20 @@ export default function ItineraryScreen() {
                   </Text>
                 </View>
 
-                <View className="rounded-b-2xl shadow-lg" style={{ backgroundColor: '#242922' }}>
+                <View className="rounded-b-2xl shadow-lg" style={{ backgroundColor: colors.card }}>
                   {day.activities.map((activity, actIndex) => (
                     <View
                       key={activity.id || `activity-${day.id}-${actIndex}`}
                       className="border-b last:border-b-0"
-                      style={{ borderColor: '#1A1C19' }}
+                      style={{ borderColor: colors.divider }}
                     >
                       {editingActivity?.id === activity.id ? (
-                        <View className="p-4" style={{ backgroundColor: '#1A1C19' }}>
+                        <View className="p-4" style={{ backgroundColor: colors.background }}>
                           <TextInput
                             className="rounded-lg px-3 py-2 mb-2"
-                            style={{ backgroundColor: '#242922', borderWidth: 1, borderColor: '#242922', color: '#F5F5DC' }}
+                            style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, color: colors.text }}
                             placeholder="Title"
-                            placeholderTextColor="#9CA3AF"
+                            placeholderTextColor={colors.textMuted}
                             value={editingActivity.title}
                             onChangeText={(text) =>
                               setEditingActivity({ ...editingActivity, title: text })
@@ -1314,9 +1316,9 @@ export default function ItineraryScreen() {
                           />
                           <TextInput
                             className="rounded-lg px-3 py-2 mb-2"
-                            style={{ backgroundColor: '#242922', borderWidth: 1, borderColor: '#242922', color: '#F5F5DC' }}
+                            style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, color: colors.text }}
                             placeholder="Description"
-                            placeholderTextColor="#9CA3AF"
+                            placeholderTextColor={colors.textMuted}
                             value={editingActivity.description}
                             onChangeText={(text) =>
                               setEditingActivity({
@@ -1329,9 +1331,9 @@ export default function ItineraryScreen() {
                           <View className="flex-row gap-2 mb-2">
                             <TextInput
                               className="flex-1 rounded-lg px-3 py-2"
-                              style={{ backgroundColor: '#242922', borderWidth: 1, borderColor: '#242922', color: '#F5F5DC' }}
+                              style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, color: colors.text }}
                               placeholder="Start (HH:MM)"
-                              placeholderTextColor="#9CA3AF"
+                              placeholderTextColor={colors.textMuted}
                               value={editingActivity.time_start}
                               onChangeText={(text) =>
                                 setEditingActivity({
@@ -1342,9 +1344,9 @@ export default function ItineraryScreen() {
                             />
                             <TextInput
                               className="flex-1 rounded-lg px-3 py-2"
-                              style={{ backgroundColor: '#242922', borderWidth: 1, borderColor: '#242922', color: '#F5F5DC' }}
+                              style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, color: colors.text }}
                               placeholder="End (HH:MM)"
-                              placeholderTextColor="#9CA3AF"
+                              placeholderTextColor={colors.textMuted}
                               value={editingActivity.time_end}
                               onChangeText={(text) =>
                                 setEditingActivity({
@@ -1356,9 +1358,9 @@ export default function ItineraryScreen() {
                           </View>
                           <TextInput
                             className="rounded-lg px-3 py-2 mb-2"
-                            style={{ backgroundColor: '#242922', borderWidth: 1, borderColor: '#242922', color: '#F5F5DC' }}
+                            style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, color: colors.text }}
                             placeholder="Location"
-                            placeholderTextColor="#9CA3AF"
+                            placeholderTextColor={colors.textMuted}
                             value={editingActivity.location}
                             onChangeText={(text) =>
                               setEditingActivity({ ...editingActivity, location: text })
@@ -1366,9 +1368,9 @@ export default function ItineraryScreen() {
                           />
                           <TextInput
                             className="rounded-lg px-3 py-2 mb-3"
-                            style={{ backgroundColor: '#242922', borderWidth: 1, borderColor: '#242922', color: '#F5F5DC' }}
+                            style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, color: colors.text }}
                             placeholder="Cost (₹)"
-                            placeholderTextColor="#9CA3AF"
+                            placeholderTextColor={colors.textMuted}
                             value={String(editingActivity.cost ?? '')}
                             onChangeText={(text) =>
                               setEditingActivity({
@@ -1381,21 +1383,21 @@ export default function ItineraryScreen() {
                           <View className="flex-row gap-2">
                             <TouchableOpacity
                               className="flex-1 rounded-lg py-2"
-                              style={{ backgroundColor: '#4CAF50' }}
+                              style={{ backgroundColor: colors.green }}
                               onPress={() =>
                                 handleUpdateActivity(activity.id, editingActivity)
                               }
                             >
-                              <Text className="text-center font-bold" style={{ color: '#1A1C19' }}>
+                              <Text className="text-center font-bold" style={{ color: colors.onGreen }}>
                                 Save
                               </Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                               className="flex-1 rounded-lg py-2"
-                              style={{ backgroundColor: '#242922' }}
+                              style={{ backgroundColor: colors.card }}
                               onPress={() => setEditingActivity(null)}
                             >
-                              <Text className="text-center font-bold" style={{ color: '#F5F5DC' }}>
+                              <Text className="text-center font-bold" style={{ color: colors.text }}>
                                 Cancel
                               </Text>
                             </TouchableOpacity>
@@ -1406,19 +1408,19 @@ export default function ItineraryScreen() {
                           className="p-4 flex-row items-center gap-3"
                           onPress={() => setEditingActivity(activity)}
                         >
-                          <GripVertical size={20} color="#9CA3AF" />
+                          <GripVertical size={20} color={colors.textMuted} />
                           <View className="flex-1">
-                            <Text className="font-bold mb-1" style={{ color: '#F5F5DC' }}>
+                            <Text className="font-bold mb-1" style={{ color: colors.text }}>
                               {activity.title}
                             </Text>
                             <View className="flex-row items-center gap-3">
-                              <Text className="text-xs" style={{ color: '#9CA3AF' }}>
+                              <Text className="text-xs" style={{ color: colors.textMuted }}>
                                 {activity.time_start}–{activity.time_end}
                               </Text>
-                              <Text className="text-xs" style={{ color: '#9CA3AF' }} numberOfLines={1}>
+                              <Text className="text-xs" style={{ color: colors.textMuted }} numberOfLines={1}>
                                 {activity.location}
                               </Text>
-                              <Text className="text-xs font-bold" style={{ color: '#4CAF50' }}>
+                              <Text className="text-xs font-bold" style={{ color: colors.green }}>
                                 ₹{activity.cost}
                               </Text>
                             </View>
@@ -1429,20 +1431,20 @@ export default function ItineraryScreen() {
                               className="p-2 mr-1"
                               disabled={actIndex === 0}
                             >
-                              <ChevronUp size={18} color={actIndex === 0 ? '#E5E7EB' : '#9CA3AF'} />
+                              <ChevronUp size={18} color={actIndex === 0 ? colors.divider : colors.textMuted} />
                             </TouchableOpacity>
                             <TouchableOpacity
                               onPress={() => handleMoveActivity(day.id, activity.id, 'down')}
                               className="p-2 mr-2"
                               disabled={actIndex === day.activities.length - 1}
                             >
-                              <ChevronDown size={18} color={actIndex === day.activities.length - 1 ? '#E5E7EB' : '#9CA3AF'} />
+                              <ChevronDown size={18} color={actIndex === day.activities.length - 1 ? colors.divider : colors.textMuted} />
                             </TouchableOpacity>
                             <TouchableOpacity
                               onPress={() => handleDeleteActivity(activity.id, day.id)}
                               className="p-2"
                             >
-                              <Trash2 size={18} color="#EF4444" />
+                              <Trash2 size={18} color={colors.error} />
                             </TouchableOpacity>
                           </View>
                         </TouchableOpacity>
@@ -1451,15 +1453,15 @@ export default function ItineraryScreen() {
                   ))}
 
                   {showAddActivity && editingDay?.id === day.id ? (
-                    <View className="p-4 border-t-2" style={{ backgroundColor: 'rgba(76, 175, 80, 0.1)', borderColor: 'rgba(76, 175, 80, 0.3)' }}>
-                      <Text className="font-bold mb-3" style={{ color: '#F5F5DC' }}>
+                    <View className="p-4 border-t-2" style={{ backgroundColor: colors.greenMuted, borderColor: colors.greenBorder }}>
+                      <Text className="font-bold mb-3" style={{ color: colors.text }}>
                         Add New Activity
                       </Text>
                       <TextInput
                         className="rounded-lg px-3 py-2 mb-2"
-                        style={{ backgroundColor: '#242922', borderWidth: 1, borderColor: '#242922', color: '#F5F5DC' }}
+                        style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, color: colors.text }}
                         placeholder="Activity title"
-                        placeholderTextColor="#9CA3AF"
+                        placeholderTextColor={colors.textMuted}
                         value={newActivity.title}
                         onChangeText={(text) =>
                           setNewActivity({ ...newActivity, title: text })
@@ -1467,9 +1469,9 @@ export default function ItineraryScreen() {
                       />
                       <TextInput
                         className="rounded-lg px-3 py-2 mb-2"
-                        style={{ backgroundColor: '#242922', borderWidth: 1, borderColor: '#242922', color: '#F5F5DC' }}
+                        style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, color: colors.text }}
                         placeholder="Description"
-                        placeholderTextColor="#9CA3AF"
+                        placeholderTextColor={colors.textMuted}
                         value={newActivity.description}
                         onChangeText={(text) =>
                           setNewActivity({ ...newActivity, description: text })
@@ -1479,9 +1481,9 @@ export default function ItineraryScreen() {
                       <View className="flex-row gap-2 mb-2">
                         <TextInput
                           className="flex-1 rounded-lg px-3 py-2"
-                          style={{ backgroundColor: '#242922', borderWidth: 1, borderColor: '#242922', color: '#F5F5DC' }}
+                          style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, color: colors.text }}
                           placeholder="Start (09:00)"
-                          placeholderTextColor="#9CA3AF"
+                          placeholderTextColor={colors.textMuted}
                           value={newActivity.time_start}
                           onChangeText={(text) =>
                             setNewActivity({ ...newActivity, time_start: text })
@@ -1489,9 +1491,9 @@ export default function ItineraryScreen() {
                         />
                         <TextInput
                           className="flex-1 rounded-lg px-3 py-2"
-                          style={{ backgroundColor: '#242922', borderWidth: 1, borderColor: '#242922', color: '#F5F5DC' }}
+                          style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, color: colors.text }}
                           placeholder="End (11:00)"
-                          placeholderTextColor="#9CA3AF"
+                          placeholderTextColor={colors.textMuted}
                           value={newActivity.time_end}
                           onChangeText={(text) =>
                             setNewActivity({ ...newActivity, time_end: text })
@@ -1500,9 +1502,9 @@ export default function ItineraryScreen() {
                       </View>
                       <TextInput
                         className="rounded-lg px-3 py-2 mb-2"
-                        style={{ backgroundColor: '#242922', borderWidth: 1, borderColor: '#242922', color: '#F5F5DC' }}
+                        style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, color: colors.text }}
                         placeholder="Location"
-                        placeholderTextColor="#9CA3AF"
+                        placeholderTextColor={colors.textMuted}
                         value={newActivity.location}
                         onChangeText={(text) =>
                           setNewActivity({ ...newActivity, location: text })
@@ -1510,9 +1512,9 @@ export default function ItineraryScreen() {
                       />
                       <TextInput
                         className="rounded-lg px-3 py-2 mb-3"
-                        style={{ backgroundColor: '#242922', borderWidth: 1, borderColor: '#242922', color: '#F5F5DC' }}
+                        style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, color: colors.text }}
                         placeholder="Cost (₹)"
-                        placeholderTextColor="#9CA3AF"
+                        placeholderTextColor={colors.textMuted}
                         value={newActivity.cost}
                         onChangeText={(text) =>
                           setNewActivity({ ...newActivity, cost: text })
@@ -1522,22 +1524,22 @@ export default function ItineraryScreen() {
                       <View className="flex-row gap-2">
                         <TouchableOpacity
                           className="flex-1 rounded-lg py-2"
-                          style={{ backgroundColor: '#4CAF50' }}
+                          style={{ backgroundColor: colors.green }}
                           onPress={() => handleAddActivity(day.id)}
                         >
-                          <Text className="text-center font-bold" style={{ color: '#1A1C19' }}>
+                          <Text className="text-center font-bold" style={{ color: colors.onGreen }}>
                             Add Activity
                           </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                           className="flex-1 rounded-lg py-2"
-                          style={{ backgroundColor: '#242922' }}
+                          style={{ backgroundColor: colors.card }}
                           onPress={() => {
                             setShowAddActivity(false);
                             setEditingDay(null);
                           }}
                         >
-                          <Text className="text-center font-bold" style={{ color: '#F5F5DC' }}>
+                          <Text className="text-center font-bold" style={{ color: colors.text }}>
                             Cancel
                           </Text>
                         </TouchableOpacity>
@@ -1546,14 +1548,14 @@ export default function ItineraryScreen() {
                   ) : (
                     <TouchableOpacity
                       className="p-4 flex-row items-center justify-center gap-2 border-t"
-                      style={{ borderColor: '#1A1C19' }}
+                      style={{ borderColor: colors.divider }}
                       onPress={() => {
                         setShowAddActivity(true);
                         setEditingDay(day);
                       }}
                     >
-                      <Plus size={18} color="#F39C12" />
-                      <Text className="font-bold" style={{ color: '#4CAF50' }}>
+                      <Plus size={18} color={colors.orange} />
+                      <Text className="font-bold" style={{ color: colors.green }}>
                         Add Activity
                       </Text>
                     </TouchableOpacity>

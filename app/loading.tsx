@@ -4,6 +4,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { supabase } from '@/lib/supabase';
+import { useTheme } from '@/context/ThemeContext';
 import { useStore } from '@/store/useStore';
 import { API_BASE_URL, postJson } from '@/lib/api';
 import type {
@@ -25,6 +26,7 @@ const loadingMessages = [
 export default function LoadingScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
+  const { colors } = useTheme();
 
   const {
     user,
@@ -271,7 +273,7 @@ export default function LoadingScreen() {
 
   return (
     <LinearGradient
-      colors={['#1A1C19', '#242922', '#1A1C19']}
+      colors={[colors.gradientStart, colors.gradientMid, colors.gradientEnd]}
       className="flex-1 items-center justify-center px-6"
     >
       <View className="items-center justify-center">
@@ -281,7 +283,7 @@ export default function LoadingScreen() {
             transform: [{ rotate: spin }],
             position: 'absolute',
             borderWidth: 2,
-            borderColor: 'rgba(76, 175, 80, 0.2)',
+            borderColor: colors.greenBorder,
             width: 256,
             height: 256,
             borderRadius: 128,
@@ -290,29 +292,30 @@ export default function LoadingScreen() {
         />
 
         {/* Outer Glow */}
-        <View className="w-48 h-48 rounded-full absolute" style={{ backgroundColor: 'rgba(76, 175, 80, 0.1)' }} />
+        <View className="w-48 h-48 rounded-full absolute" style={{ backgroundColor: colors.greenMuted }} />
 
         {/* Central Icon Container */}
         <Animated.View
           style={{
             transform: [{ scale: pulseAnim }],
+            backgroundColor: colors.greenMuted,
+            borderColor: colors.greenBorder,
           }}
           className="w-36 h-36 rounded-full items-center justify-center border shadow-xl"
-          style={{ backgroundColor: 'rgba(245, 245, 220, 0.1)', borderColor: 'rgba(245, 245, 220, 0.2)' }}
         >
           <Text className="text-6xl">✨</Text>
         </Animated.View>
 
         <View className="mt-12 items-center">
-          <Text className="font-inter-bold text-3xl text-[#F5F5DC] mb-2 tracking-tight">
+          <Text className="font-inter-bold text-3xl mb-2 tracking-tight" style={{ color: colors.text }}>
             Magical Planning
           </Text>
-          <Text className="font-inter-medium text-sm uppercase tracking-[4px] mb-8" style={{ color: 'rgba(76, 175, 80, 0.8)' }}>
+          <Text className="font-inter-medium text-sm uppercase tracking-[4px] mb-8" style={{ color: colors.green }}>
             AI Assistant
           </Text>
 
           <Animated.View style={{ opacity: fadeAnim }} className="h-12 justify-center">
-            <Text className="font-inter-medium text-lg text-center px-4" style={{ color: 'rgba(245, 245, 220, 0.9)' }}>
+            <Text className="font-inter-medium text-lg text-center px-4" style={{ color: colors.textSecondary }}>
               {loadingMessages[messageIndex]}
             </Text>
           </Animated.View>
@@ -324,7 +327,7 @@ export default function LoadingScreen() {
                 key={i}
                 className="w-2 h-2 rounded-full"
                 style={{
-                  backgroundColor: '#4CAF50',
+                  backgroundColor: colors.green,
                   opacity: messageIndex % 4 === i ? 1 : 0.2,
                   transform: [{ scale: messageIndex % 4 === i ? 1.2 : 1 }],
                 }}
