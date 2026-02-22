@@ -45,6 +45,7 @@ export interface Itinerary {
 export interface Profile {
   id: string;
   email: string;
+  username?: string;
   credits: number;
   is_pro: boolean;
   pro_expires_at?: string;

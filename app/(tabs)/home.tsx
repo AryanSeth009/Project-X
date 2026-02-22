@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
-import {View,Text,TextInput,TouchableOpacity,ScrollView,Alert,Modal} from 'react-native';
+import {View,Text,TextInput,TouchableOpacity,ScrollView,Alert,Modal, ImageBackground} from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Sparkles, MapPin, Calendar, Users, Wallet, Heart, Info, MessageCircle, Home, X, ChevronLeft, ChevronRight, ChevronDown, TreePalm, Mountain, Landmark, Ship, Sun, Train, Plane, Search, Ticket, CheckCircle, ArrowLeft } from 'lucide-react-native';
@@ -377,8 +377,8 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
       scrollEnabled={!showDestinationDropdown}
       keyboardShouldPersistTaps="handled"
     >
-      <LinearGradient
-        colors={[colors.backgroundSecondary, colors.background]}
+      <View
+        // colors={[colors.backgroundSecondary, colors.background]}
         className="pt-12 pb-8 px-6"
       >
         <View className="flex-row items-center justify-between mb-6">
@@ -400,9 +400,9 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
             Step {step} of 3 — {step === 1 ? 'route & dates' : step === 2 ? 'personalize' : 'tickets & transport'}.
           </Text>
         </View>
-      </LinearGradient>
+      </View>
 
-      <View className="px-6 py-6" style={{ backgroundColor: colors.background }}>
+      <View className="px-6 py-6 flex-1" style={{ backgroundColor: 'transparent' }}>
         <View className="rounded-3xl p-6 shadow-lg mb-6" style={{ backgroundColor: colors.card }}>
           <View className="flex-row items-center gap-3 mb-6">
             {step > 1 && (
@@ -1193,7 +1193,7 @@ const [calendarYear, setCalendarYear] = useState(today.getFullYear());
           </View>
         </View>
 
-        <View className="rounded-2xl p-6 mb-6" style={{ backgroundColor: colors.greenMuted, borderWidth: 1, borderColor: colors.greenBorder }}>
+        <View className="rounded-2xl p-6 mb-6 mx-6" style={{ backgroundColor: colors.greenMuted, borderWidth: 1, borderColor: colors.greenBorder }}>
           <Text className="font-inter-bold text-lg mb-3" style={{ color: colors.text }}>
             🎉 Demo Itinerary
           </Text>

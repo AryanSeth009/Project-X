@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { History, LogOut, User as UserIcon, Sun, Moon, Smartphone } from 'lucide-react-native';
+import { History, LogOut, Sun, Moon, Smartphone } from 'lucide-react-native';
 import { useStore } from '@/store/useStore';
 import { supabase } from '@/lib/supabase';
 import { useTheme } from '@/context/ThemeContext';
@@ -9,7 +9,7 @@ import type { ThemeMode } from '@/context/ThemeContext';
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { user, reset, itineraries } = useStore();
+  const { user, profile, reset, itineraries } = useStore();
   const { colors, mode, setMode } = useTheme();
 
   const handleSignOut = async () => {
@@ -41,15 +41,28 @@ export default function ProfileScreen() {
     { value: 'dark', label: 'Dark', icon: Moon },
   ];
 
+  /* Derive display info */
+  const username = profile?.username ?? user?.user_metadata?.username ?? '';
+  const displayName = username || user?.email?.split('@')[0] || 'Traveller';
+  const initials = displayName.slice(0, 2).toUpperCase();
+
   return (
     <ScrollView className="flex-1" style={{ backgroundColor: colors.background }} showsVerticalScrollIndicator={false}>
+      {/* Gradient header with avatar */}
       <LinearGradient colors={[colors.backgroundSecondary, colors.background]} className="pt-16 pb-10 px-6">
-        <View className="flex-row items-center gap-3">
-          <View className="w-14 h-14 rounded-2xl items-center justify-center" style={{ backgroundColor: colors.greenMuted }}>
-            <UserIcon size={26} color={colors.green} />
+        <View className="flex-row items-center gap-4">
+          {/* Initials avatar */}
+          <View style={{
+            width: 64, height: 64, borderRadius: 20,
+            backgroundColor: colors.green,
+            alignItems: 'center', justifyContent: 'center',
+          }}>
+            <Text style={{ color: colors.onGreen, fontSize: 22, fontFamily: 'Inter_700Bold' }}>{initials}</Text>
           </View>
           <View className="flex-1">
-            <Text className="font-inter-bold text-2xl" style={{ color: colors.text }}>Profile</Text>
+            <Text style={{ color: colors.text, fontSize: 22, fontFamily: 'Inter_700Bold' }}>
+              {username ? `@${username}` : displayName}
+            </Text>
             <Text className="font-inter" numberOfLines={1} style={{ color: colors.textSecondary }}>
               {user.email}
             </Text>

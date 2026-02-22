@@ -46,7 +46,7 @@ function RootLayoutContent() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        loadProfile(session.user.id);
+        loadProfile(session.user.id, session.user.user_metadata);
       }
     });
 
@@ -55,7 +55,7 @@ function RootLayoutContent() {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        loadProfile(session.user.id);
+        loadProfile(session.user.id, session.user.user_metadata);
       } else {
         setProfile(null);
       }
@@ -64,7 +64,7 @@ function RootLayoutContent() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const loadProfile = async (userId: string) => {
+  const loadProfile = async (userId: string, userMeta?: Record<string, any>) => {
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
@@ -75,6 +75,8 @@ function RootLayoutContent() {
       setProfile({
         ...data,
         is_pro: data.is_pro === true || data.is_pro === 'true',
+        // Prefer metadata username (set at sign-up) over anything in the profiles table
+        username: userMeta?.username ?? data.username ?? undefined,
       });
     }
   };

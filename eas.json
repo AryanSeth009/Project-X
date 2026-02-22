@@ -1,0 +1,33 @@
+{
+    "cli": {
+        "version": ">= 14.0.0"
+    },
+    "build": {
+        "development": {
+            "developmentClient": true,
+            "distribution": "internal",
+            "android": {
+                "buildType": "apk"
+            }
+        },
+        "preview": {
+            "distribution": "internal",
+            "android": {
+                "buildType": "apk"
+            },
+            "env": {
+                "EXPO_PUBLIC_SUPABASE_URL": "https://zxmhgiuxemsolqnecihb.supabase.co",
+                "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4bWhnaXV4ZW1zb2xxbmVjaWhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyMzYzNDcsImV4cCI6MjA4NjgxMjM0N30.M8mJawHm53WOkI73Uo9Rp7fZh-ZsctyFHid5ILspj5o",
+                "EXPO_PUBLIC_API_URL": "https://project-x-94hb.onrender.com"
+            }
+        },
+        "production": {
+            "android": {
+                "buildType": "app-bundle"
+            }
+        }
+    },
+    "submit": {
+        "production": {}
+    }
+}

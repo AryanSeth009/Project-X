@@ -1156,89 +1156,105 @@ export default function ItineraryScreen() {
                   {day.activities.map((activity, actIndex) => (
                     <View key={activity.id || `activity-${day.id}-${actIndex}`}>
                       <TouchableOpacity
-                        className="flex-row gap-3 py-3 items-center"
+                        className="flex-row gap-3 py-4"
                         onPress={() => {
                           setSelectedActivity(activity);
                           setShowDetailModal(true);
                         }}
                         activeOpacity={0.7}
                       >
-                        {/* Small image thumbnail or category icon */}
-                        <TouchableOpacity
-                          className="rounded-lg overflow-hidden"
-                          style={{ width: 56, height: 56 }}
-                          onPress={(e) => {
-                            e.stopPropagation();
-                            if (activity.image_url) setFullImageUri(activity.image_url);
-                          }}
-                        >
-                          {activity.image_url ? (
-                            <Image
-                              source={{ uri: activity.image_url }}
-                              className="w-full h-full"
-                              resizeMode="cover"
-                            />
-                          ) : (
-                            <View
-                              className={`w-full h-full items-center justify-center ${categoryColors[activity.category]}`}
-                            >
-                              <Text className="text-xl">{categoryIcons[activity.category]}</Text>
-                            </View>
-                          )}
-                        </TouchableOpacity>
-
-                        <View className="flex-1 min-w-0">
-                          <Text className="text-sm font-bold mb-0.5" style={{ color: colors.text }} numberOfLines={1}>
-                            {activity.title}
-                          </Text>
-                          <View className="flex-row items-center gap-1 mb-0.5">
-                            <Clock size={11} color={colors.textMuted} />
-                            <Text className="text-xs" style={{ color: colors.textMuted }}>
-                              {activity.time_start}{activity.time_end ? ` – ${activity.time_end}` : ''}
-                            </Text>
+                        {/* Category icon with connector line */}
+                        <View className="items-center">
+                          <View
+                            className={`w-12 h-12 rounded-full items-center justify-center ${categoryColors[activity.category]}`}
+                          >
+                            <Text className="text-2xl">{categoryIcons[activity.category]}</Text>
                           </View>
-                          {activity.location ? (
-                            <View className="flex-row items-center gap-1" style={{ marginBottom: 2 }}>
-                              <MapPin size={11} color={colors.textMuted} />
-                              <Text className="text-xs" numberOfLines={1} style={{ color: colors.textMuted }}>
-                                {activity.location}
+                          {actIndex < day.activities.length - 1 && (
+                            <View className="w-0.5 flex-1 mt-2" style={{ backgroundColor: colors.divider }} />
+                          )}
+                        </View>
+
+                        <View className="flex-1">
+                          <View className="flex-row items-start justify-between mb-2">
+                            <View className="flex-1">
+                              <Text className="text-base font-bold mb-1" style={{ color: colors.text }}>
+                                {activity.title}
+                              </Text>
+                              <View className="flex-row items-center gap-1 mb-1">
+                                <Clock size={12} color={colors.textMuted} />
+                                <Text className="text-xs" style={{ color: colors.textMuted }}>
+                                  {activity.time_start} - {activity.time_end}
+                                </Text>
+                              </View>
+                              <View className="flex-row items-center gap-1">
+                                <MapPin size={12} color={colors.textMuted} />
+                                <Text className="text-xs" numberOfLines={1} style={{ color: colors.textMuted }}>
+                                  {activity.location}
+                                </Text>
+                              </View>
+                            </View>
+                            {/* Time badge */}
+                            <View className="px-3 py-1 rounded-full flex-row items-center gap-1" style={{ backgroundColor: colors.orangeMuted }}>
+                              <Clock size={11} color={colors.orange} />
+                              <Text className="font-bold text-xs" style={{ color: colors.orange }}>
+                                {activity.time_start}–{activity.time_end}
                               </Text>
                             </View>
-                          ) : null}
-                          <Text className="text-xs leading-4" numberOfLines={1} style={{ color: colors.textSecondary }}>
+                            <View className="ml-2 self-center">
+                              <ChevronRight size={18} color={colors.textMuted} />
+                            </View>
+                          </View>
+
+                          {activity.image_url && (
+                            <TouchableOpacity
+                              onPress={(e) => { e.stopPropagation(); setFullImageUri(activity.image_url ?? null); }}
+                              activeOpacity={0.85}
+                            >
+                              <Image
+                                source={{ uri: activity.image_url }}
+                                className="w-full h-40 rounded-xl mb-2"
+                                resizeMode="cover"
+                              />
+                            </TouchableOpacity>
+                          )}
+
+                          <Text className="text-sm leading-5" numberOfLines={2} style={{ color: colors.textSecondary }}>
                             {activity.description}
                           </Text>
-                          <View className="flex-row gap-2 mt-1.5">
+
+                          {/* Vote buttons */}
+                          <View className="flex-row gap-3 mt-3">
                             <TouchableOpacity
-                              className="flex-row items-center gap-1 px-2 py-1 rounded-full"
-                              style={{ backgroundColor: votes[activity.id]?.myVote === 1 ? colors.greenMuted : colors.textMuted + '0F' }}
+                              className="flex-row items-center gap-1 px-3 py-1.5 rounded-full"
+                              style={{ backgroundColor: votes[activity.id]?.myVote === 1 ? colors.greenMuted : colors.textMuted + '18' }}
                               onPress={(e) => { e.stopPropagation(); handleVote(activity.id, 1); }}
                             >
-                              <ThumbsUp size={12} color={votes[activity.id]?.myVote === 1 ? colors.green : colors.textMuted} />
+                              <ThumbsUp size={13} color={votes[activity.id]?.myVote === 1 ? colors.green : colors.textMuted} />
                               <Text className="text-xs font-bold" style={{ color: votes[activity.id]?.myVote === 1 ? colors.green : colors.textMuted }}>
                                 {votes[activity.id]?.up || 0}
                               </Text>
                             </TouchableOpacity>
                             <TouchableOpacity
-                              className="flex-row items-center gap-1 px-2 py-1 rounded-full"
-                              style={{ backgroundColor: votes[activity.id]?.myVote === -1 ? colors.errorMuted : colors.textMuted + '0F' }}
+                              className="flex-row items-center gap-1 px-3 py-1.5 rounded-full"
+                              style={{ backgroundColor: votes[activity.id]?.myVote === -1 ? colors.errorMuted : colors.textMuted + '18' }}
                               onPress={(e) => { e.stopPropagation(); handleVote(activity.id, -1); }}
                             >
-                              <ThumbsDown size={12} color={votes[activity.id]?.myVote === -1 ? colors.error : colors.textMuted} />
+                              <ThumbsDown size={13} color={votes[activity.id]?.myVote === -1 ? colors.error : colors.textMuted} />
                               <Text className="text-xs font-bold" style={{ color: votes[activity.id]?.myVote === -1 ? colors.error : colors.textMuted }}>
                                 {votes[activity.id]?.down || 0}
                               </Text>
                             </TouchableOpacity>
                           </View>
                         </View>
-                        <ChevronRight size={18} color={colors.textMuted} />
                       </TouchableOpacity>
                       {actIndex < day.activities.length - 1 && (
-                        <View className="h-px ml-[56px]" style={{ backgroundColor: colors.divider }} />
+                        <View className="h-px" style={{ backgroundColor: colors.divider }} />
                       )}
                     </View>
                   ))}
                 </View>
+
               </View>
             ))}
 
